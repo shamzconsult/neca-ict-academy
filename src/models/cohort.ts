@@ -17,7 +17,7 @@ const CohortSchema = new Schema({
         type: String,
         required: true
     },
-    applicationEnddate: {
+    applicationEndDate: {
         type: String,
         required: true
     }

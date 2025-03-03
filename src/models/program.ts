@@ -13,6 +13,10 @@ const ProgramSchema = new Schema ({
     description: {
         type: String,
         required: true,
+    },
+    coverImage: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

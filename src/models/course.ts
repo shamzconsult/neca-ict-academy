@@ -1,7 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
 const ALLOWED_LEVEL = [ "Beginner", "Intermediate", "Advanced" ]
-const ALLOWED_CERTIFIED_STATUS = [ "Yes", "No" ]
 
 const CourseSchema = new Schema ({
     programId: {
@@ -44,13 +43,12 @@ const CourseSchema = new Schema ({
             required: true
         }
     },
-    image: {
+    coverImage: {
         type: String,
         required: true
     },
     isCertified: {
-        type: String,
-        enum: ALLOWED_CERTIFIED_STATUS,
+        type: Boolean,
         required: true
     },
     mode: {
@@ -59,7 +57,7 @@ const CourseSchema = new Schema ({
         required: true
     },
     rating: {
-        type: String,
+        type: Number,
         default: "1" 
     },
     courseOutlines: [

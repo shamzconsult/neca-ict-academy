@@ -1,7 +1,7 @@
-import mongoose, { models, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const ALLOWED_GENDER = [ "female", "male" ];
-const ALLOWED_LEVEL = [ "0", "1", "2", "3", "4", "5" ];
+const ALLOWED_LEVEL = [ "Dropped", "Applied", "Interviewed", "Admitted", "Completed" ];
 const ALLOWED_STATUS = [ "Admitted", "Declined", "Pending", "Graduated" ];
 
 const EnrollmentSchema = new Schema({
@@ -37,7 +37,7 @@ const EnrollmentSchema = new Schema({
     level: {
         type: String,
         enum: ALLOWED_LEVEL,
-        default: "1"
+        default: "Applied"
     },
     date: {
         type: Date,
