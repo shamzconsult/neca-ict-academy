@@ -44,12 +44,12 @@ const Contact = () => {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="flex space-x-4 mt-1 block w-full px-4 py-4 border-2 border-gray-300 rounded-md">
-                <label htmlFor="name" className="block text-sm font-medium text-[#525252] flex gap-2">
+              <div className="flex items-center w-full px-4 py-4 border-2 border-gray-300 rounded-md">
+                <label htmlFor="name" className="text-sm font-medium text-[#525252] min-w-[100px] flex gap-2">
                   Name <span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent"
+                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent text-gray-900"
                   type="text"
                   id="name"
                   name="name"
@@ -59,12 +59,12 @@ const Contact = () => {
                 />
               </div>
 
-              <div className="flex space-x-4 mt-1 block w-full px-4 py-4 border-2 border-gray-300 rounded-md">
-                <label htmlFor="email" className="block text-sm font-medium text-[#525252] flex gap-2">
+              <div className="flex items-center w-full px-4 py-4 border-2 border-gray-300 rounded-md">
+                <label htmlFor="email" className="text-sm font-medium text-[#525252] min-w-[100px] flex gap-2">
                   Email
                 </label>
                 <input
-                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent"
+                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent text-gray-900"
                   type="email"
                   id="email"
                   name="email"
@@ -74,12 +74,12 @@ const Contact = () => {
                 />
               </div>
 
-              <div className="flex space-x-4 mt-1 block w-full px-4 py-4 border-[1.6px] border-gray-300 rounded-md">
-                <label htmlFor="phoneNumber" className="block text-sm font-medium text-[#525252] flex gap-2 w-[200px]">
+              <div className="flex items-center w-full px-4 py-4 border-2 border-gray-300 rounded-md">
+                <label htmlFor="phoneNumber" className="text-sm font-medium text-[#525252] min-w-[150px] flex gap-2">
                   Phone number <span className="text-red-500">*</span>
                 </label>
                 <input
-                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent"
+                  className="w-full appearance-none border-none outline-none focus:ring-0 focus:border-transparent bg-transparent text-gray-900"
                   type="tel"
                   id="phoneNumber"
                   name="phoneNumber"
@@ -113,8 +113,8 @@ const Contact = () => {
               </div>
             </form>
 
-            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-8 md:gap-0 mt-10">
-                {[
+            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-0 mt-15">
+              {[
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_831_cxgaus.png",
                   title: "PHONE",
@@ -130,20 +130,20 @@ const Contact = () => {
                   title: "EMAIL",
                   value: "neca@neca.org.ng"
                 }
-                ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between gap-8 mt-20">
+              ].map((item, index) => (
+                <div key={index} className="flex items-center gap-4">
                   <Image
-                  src={item.icon}
-                  alt={`${item.title} icon`}
-                  width={30}
-                  height={40}
+                    src={item.icon}
+                    alt={`${item.title} icon`}
+                    width={30}
+                    height={40}
                   />
                   <div>
-                  <p className="text-[#27156F] font-bold">{item.title}</p>
-                  <p className="text-[#E02B20] text-sm">{item.value}</p>
+                    <p className="text-[#27156F] font-bold">{item.title}</p>
+                    <p className="text-[#E02B20] text-sm">{item.value}</p>
                   </div>
                 </div>
-                ))}
+              ))}
             </div>
           </div>
 
