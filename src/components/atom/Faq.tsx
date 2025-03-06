@@ -10,7 +10,7 @@ const Faq = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full px-0 md:container md:mx-auto md:px-4 py-8">
             <div className="flex flex-col lg:flex-row bg-white overflow-hidden">
                 <div className="hidden lg:w-1/2 lg:block">
                     <img
@@ -19,11 +19,11 @@ const Faq = () => {
                         className="w-[537px] h-[1117px] object-cover rounded-[21.53px]"
                     />
                 </div>
-                <div className="w-full lg:w-1/2 p-6 flex flex-col">
-                    <h1 className="text-3xl mb-4 text-[#E02B20] inconsolata">FAQ</h1>
-                    <h2 className="text-2xl font-bold mb-4 text-[#27156F] lg:text-3xl">Got Questions? We’ve Got Answers!</h2>
-                    <p className="mb-6 text-[#525252] text-[20px] lg:text-xl">
-                      We understand that you may have questions about our courses, enrollment process, certifications, and more. That’s why we’ve put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
+                <div className="w-full lg:w-1/2 p-2 md:p-6 flex flex-col">
+                    <h1 className="text-3xl mb-4 text-[#E02B20] inconsolata px-2 md:px-0">FAQ</h1>
+                    <h2 className="text-2xl font-bold mb-4 text-[#27156F] lg:text-3xl px-2 md:px-0">Got Questions? We've Got Answers!</h2>
+                    <p className="mb-6 text-[#525252] text-[20px] lg:text-xl px-2 md:px-0">
+                        We understand that you may have questions about our courses, enrollment process, certifications, and more. That's why we've put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
                     </p>
 
                     <div className="space-y-4 w-full max-w-2xl">
@@ -56,7 +56,7 @@ const Faq = () => {
                     <h2 className="text-[20px] font-bold text-[#27156F] mt-8">Need More information?</h2>
 
                     <div className="mt-8">
-                        <p className="text-[#525252] text-xl lg:text-[20px]">Can’t find the answer you’re looking for? Please contact our customer service.</p>
+                        <p className="text-[#525252] text-xl lg:text-[20px]">Can't find the answer you're looking for? Please contact our customer service.</p>
                         <button className="mt-4 px-4.5 py-3 lg:px-5.5 lg:py-3.5 bg-[#E02B20] text-white rounded-md hover:bg-[#cc1912] focus:outline-none">CONTACT US</button>
                     </div>
                 </div>
