@@ -36,7 +36,7 @@ const Faq = () => {
                             { question: "Is there career support after training?", answer: "Yes, we provide career support, including job placement assistance and resume building." },
                             { question: "How do I get started?", answer: "Simply choose a course, enroll, and start learning! Our team is here to guide you every step of the way." },
                         ].map((faq, index) => (
-                            <div key={index} className="accordion border-b border-gray-200 pb-4 pt-4">
+                            <div key={index} className="accordion border-b-3 border-gray-200 pb-4 pt-4">
                                 <button
                                     className="accordion-toggle w-full flex justify-between items-center text-left focus:outline-none"
                                     onClick={() => toggleAccordion(index)}
