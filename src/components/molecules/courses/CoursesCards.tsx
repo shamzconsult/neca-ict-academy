@@ -7,12 +7,11 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
 export const CoursesCards = () => {
-  const [course, setCourses] = useState<CourseType[]>(maincourses);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState<CourseType[]>(maincourses);
 
   const choice = (category: string) => {
-    setCourses(
+    setFilteredData(
       maincourses.filter((course) => {
         return course.category === category;
       })
@@ -45,8 +44,8 @@ export const CoursesCards = () => {
           </div>
           <CourseButtons
             choice={choice}
-            setCourses={setCourses}
-            generalCourses={filteredData}
+            setFilteredData={setFilteredData}
+            generalCourses={maincourses}
           />
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
             <p className="text-[#1E1E1E] font-semibold">Search:</p>
