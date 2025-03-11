@@ -5,7 +5,7 @@ import React from "react";
 
 export const CourseHeroSection = () => {
   return (
-    <div className="max-w-6xl mx-auto flex flex-col lg:justify-between items-center lg:flex-row gap-8 mt-32  px-4 lg:px-0">
+    <div className="max-w-6xl mx-auto flex flex-col lg:justify-between w-full items-center lg:flex-row gap-8 mt-32  px-4 lg:px-0">
       <section className="flex flex-col justify-center text-center lg:text-left max-w-2xl lg:max-w-1/2">
         <Heading>Gain In-Demand Tech Skills with Expert Training</Heading>
         <p className="my-[29px] lg:max-w-md">
@@ -17,13 +17,13 @@ export const CourseHeroSection = () => {
           <EnrollBtn />
         </div>
       </section>
-      <section className="w-full md:max-w-1/2">
-        <div className=" w-full h-[300px]  relative  md:w-[100%] md:h-[400px]  ">
+      <section className="w-full flex justify-center md:max-w-1/2">
+        <div className=" w-full h-[400px]  relative   md:h-[405px] md:w-[582px]  ">
           <Image
             src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1741249832/Neca_web_6_xrloov.png"
             alt="hero-image"
             fill
-            className="rounded-lg"
+            className="rounded-3xl"
           />
         </div>
       </section>

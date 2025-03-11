@@ -27,13 +27,13 @@ export const CourseButtons = ({
   };
 
   const buttonClasses = (category: string) =>
-    `text-[#1E1E1E] border border-[#C4C4C4] px-6 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
+    `text-[#1E1E1E] border border-[#C4C4C4] px-4 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
       activeCategory === category ? "bg-[#27156F] text-white border-none" : ""
     }`;
   return (
     <div
       className="mx-auto text-center font-medium mb-8 flex justify-center items-center gap-4 
-      overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-2 py-2"
+      overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-2 py-2 "
     >
       <button
         onClick={() => handleButtonClick("All")}
