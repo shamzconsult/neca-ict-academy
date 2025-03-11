@@ -31,7 +31,7 @@ export const CourseCard = ({
           <Link
             href=""
             key={index}
-            className={`bg-white rounded-xl shadow-lg overflow-hidden p-4 text-left ${
+            className={`bg-white border border-[#C4C4C480] rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath
                 ? "w-full md:w-[350px] lg:w-[400px] hover:cursor-pointer hover:bg-[#DBEAF6]"
                 : ""
