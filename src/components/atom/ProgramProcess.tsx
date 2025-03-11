@@ -24,8 +24,8 @@ const ProgramProcess = () => {
           <p className="text-[#1E1E1E] text-center font-Poppins text-base leading-[150%] h-auto max-w-3xl">
             Taking the first step toward a successful tech career has never been easier. Simply browse our 
             courses, select the one that aligns with your goals, and enroll in our expert-led training. With
-            hands-on projects, mentorship, and career support, you'll gain the skills needed to thrive in the
-            digital world. Whether you're a beginner or looking to upskill, we're here to guide you every step
+            hands-on projects, mentorship, and career support, you&apos;ll gain the skills needed to thrive in the
+            digital world. Whether you&apos;re a beginner or looking to ups-kill, we&apos;re here to guide you every step
             of the way!
           </p>
         </div>

@@ -18,14 +18,16 @@ const Faq = () => {
                     <Image
                         src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092798/0_LmGSx7loZgQCyE-a_iiam6w.png"
                         alt="FAQ Image"
+                        width={537}
+                        height={1117}
                         className="w-[537px] h-[1117px] object-cover rounded-[21.53px]"
                     />
                 </div>
                 <div className="w-full lg:w-1/2 lg:text-left p-2 md:p-6 flex flex-col text-center">
                     <SubHeading>FAQ</SubHeading>
-                    <h2 className="text-center text-[#27156F] mt-4 mb-4 lg:text-left lg:text-[25px] font-bold">Got Questions? We've Got Answers!</h2>
+                    <h2 className="text-center text-[#27156F] mt-4 mb-4 lg:text-left lg:text-[25px] font-bold">Got Questions? We&apos;ve Got Answers!</h2>
                     <p className="lg:max-w-md mt-3 text-center lg:text-left mb-3">
-                        We understand that you may have questions about our courses, enrollment process, certifications, and more. That's why we've put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
+                        We understand that you may have questions about our courses, enrollment process, certifications, and more. That&apos;s why we&apos;ve put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
                     </p>
 
                     <div className="space-y-4 w-full max-w-2xl">
@@ -59,7 +61,7 @@ const Faq = () => {
 
                     <div className="mt-5">
                         <p className="text-[#525252] text-xl lg:text-[18px] text-center lg:text-left">
-                            Can't find the answer you're looking for? Please contact our customer service.
+                            Can&apos;t find the answer you&apos;re looking for? Please contact our customer service.
                         </p>
                         <div className="flex justify-center lg:justify-start">
                             <button className="mt-4 px-4.5 py-3 lg:px-5 lg:py-3 bg-[#E02B20] text-white rounded-md hover:bg-[#cc1912] focus:outline-none cursor-pointer">CONTACT US</button>
