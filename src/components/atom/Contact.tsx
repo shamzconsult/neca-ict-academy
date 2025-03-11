@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { Heading } from "@/components/atom/headers/Heading"
+import { SubHeading } from "@/components/atom/headers/SubHeading";
 import Image from 'next/image';
 
 interface ContactFormData {
@@ -33,13 +35,14 @@ const Contact = () => {
   };
 
   return (
-    <section className="container font-poppins mt-10">
-      <div className="container mx-auto py-5">
+    <section className="max-w-6xl font-poppins mt-10">
+      <div className="max-w-6xl mx-auto py-5">
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
-          <div className="w-full md:w-1/2 bg-white p-2 max-w-[584px]">
-            <h1 className="text-[#E02B20] text-3xl mb-4">Contact</h1>
-            <h2 className="text-2xl text-[#27156F] font-bold mb-4">Get In Touch</h2>
-            <p className="mb-6 text-gray-600 text-xl font-[400]">
+          <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px] text-center">
+             <SubHeading>Contact Us</SubHeading> 
+             <br />
+            <Heading>Get In Touch</Heading>
+            <p className="lg:max-w-md mt-3 mb-4 lg:text-left">
               We understand that you may have questions about our courses, enrollment process, certifications, and more. That&apos;s why we&apos;ve put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
             </p>
 
@@ -113,7 +116,7 @@ const Contact = () => {
               </div>
             </form>
 
-            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-0 mt-15">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15">
               {[
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_831_cxgaus.png",
@@ -140,7 +143,7 @@ const Contact = () => {
                   />
                   <div>
                     <p className="text-[#27156F] font-bold">{item.title}</p>
-                    <p className="text-[#E02B20] text-sm">{item.value}</p>
+                    <p className="text-[#E02B20] text-[12px]">{item.value}</p>
                   </div>
                 </div>
               ))}
