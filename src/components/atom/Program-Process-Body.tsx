@@ -8,7 +8,7 @@ const ProgramProcessBody = () => {
     <div className="relative w-full">
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741686736/Rectangle_4383-1_wooyza.png"
+          src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741686736/Rectangle_4383-1_wooyza.png"
           alt="Background Image 1"
           width={300}
           height={300}
@@ -121,7 +121,7 @@ const ProgramProcessBody = () => {
             <div className="w-full lg:w-1/2">
               <Image
                 className="w-[400px] h-auto shadow-xl rounded-2xl bg-white py-2 px-4"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092795/NECA_Web_13_dj9vlt.png"
+                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092795/NECA_Web_13_dj9vlt.png"
                 alt="Course Image"
                 width={400}
                 height={400}
