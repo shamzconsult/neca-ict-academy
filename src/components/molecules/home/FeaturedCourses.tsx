@@ -16,7 +16,7 @@ export const FeaturedCourses = () => {
       <div className="max-w-6xl mx-auto p-4 py-20">
         <div className="text-center lg:text-left">
           <SubHeading>Featured Courses</SubHeading>
-          <p className="text-2xl mt-4">
+          <p className="lg:text-2xl mt-4">
             Explore our handpicked selection of top-rated courses designed to
             equip you with in-demand skills and industry knowledge. Learn from
             experts and advance your career today!

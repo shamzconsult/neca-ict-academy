@@ -33,7 +33,7 @@ export const WhyUs = () => {
         <section className="flex flex-col justify-center items-center text-center gap-5">
           <SubHeading>Why Us</SubHeading>
           <Heading>Empowering the Next Generation of Tech Innovators</Heading>
-          <p className="text-[20px] max-w-5xl text-center">
+          <p className="lg:text-[20px] max-w-5xl text-center">
             With expert instructors, cutting-edge curriculum, and job placement
             support, we bridge the gap between learning and career success.
             Whether you&apos;re starting your journey or upgrading your skills,
