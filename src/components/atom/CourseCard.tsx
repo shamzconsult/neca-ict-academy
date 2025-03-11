@@ -33,14 +33,14 @@ export const CourseCard = ({
             key={index}
             className={`bg-white border border-[#C4C4C480] rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath
-                ? "w-full md:w-[350px] lg:w-[400px] hover:cursor-pointer hover:bg-[#DBEAF6]"
+                ? "w-full md:w-[350px] lg:w-[500px] hover:cursor-pointer hover:bg-[#DBEAF6]"
                 : ""
             }`}
           >
             <div
               className={`  relative p-3 ${
                 isCoursesPath
-                  ? "w-full md:w-[340px]  lg:w-[360px] h-[250px] lg:h-[200px]"
+                  ? "w-full md:w-[340px]  lg:w-[100%] h-[250px] lg:h-[270px]"
                   : "w-full h-[250px] lg:h-[189px] lg:w-[331px]"
               }`}
             >
@@ -132,7 +132,9 @@ export const CourseCard = ({
       ) : (
         <p className="text-center w-full  font-bold py-24">
           No results found
-          <span className="text-red-400 mx-1"> &#34;{searchTerm}&#34; </span>
+          <span className="text-red-400 mx-1">
+            {searchTerm ? `"${searchTerm}"` : ""}{" "}
+          </span>
         </p>
       )}
     </div>

@@ -18,7 +18,9 @@ export const Testimonials = () => {
     slidesToScroll: 1,
     centerMode: true,
     centerPadding: "2%",
-    beforeChange: (newIndex: number) => setCurrentIndex(newIndex),
+    autoplay: true,
+    autoplaySpeed: 3000,
+    beforeChange: (_: number, newIndex: number) => setCurrentIndex(newIndex),
     responsive: [
       {
         breakpoint: 1024,
