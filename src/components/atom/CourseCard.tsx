@@ -70,7 +70,7 @@ export const CourseCard = ({
                     <h3 className="font-bold mb-2 text-sm">Course Details</h3>
                     <div className="grid grid-cols-3 gap-3 text-xs">
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Lesson</p>
+                        <p className="font-semibold">Lesson</p>
                         <div className="flex gap-2  items-center ">
                           <span>
                             <BsPlayBtn />
@@ -79,7 +79,7 @@ export const CourseCard = ({
                         </div>
                       </div>
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Duration</p>
+                        <p className="font-semibold">Duration</p>
                         <div className="flex gap-2 items-center ">
                           <span>
                             <MdAccessTime />
@@ -88,7 +88,7 @@ export const CourseCard = ({
                         </div>
                       </div>
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Skill Level</p>
+                        <p className="font-semibold">Skill Level</p>
                         <div className="flex  gap-2 items-center ">
                           <span>
                             <FiBarChart />
