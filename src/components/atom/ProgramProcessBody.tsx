@@ -1,24 +1,31 @@
 'use client';
 
 import React from 'react';
+import Image from "next/image";
 
 const ProgramProcessBody = () => {
   return (
     <div className="relative w-full">
       <div className="absolute inset-0 z-0">
-        <img
+        <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741686736/Rectangle_4383-1_wooyza.png"
           alt="Background Image 1"
+          width={300}
+          height={300}
           className="absolute top-1/2 right-0 transform -translate-y-1/2 w-[300px] h-auto"
         />
-        <img
+        <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741686737/Rectangle_4383_aayodz.png"
           alt="Background Image 2"
+          width={300}
+          height={300}
           className="hidden md:block absolute top-[50px] left-0 transform -translate-y-1/2 w-[300px] h-auto"
         />
-        <img
+        <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741686736/Rectangle_31_ytai2s.png"
           alt="Background Image 3"
+          width={200}
+          height={200}
           className="absolute bottom-0 right-0 w-[200px] h-auto"
         />
       </div>
@@ -28,17 +35,21 @@ const ProgramProcessBody = () => {
           {/* FIRST CARD */}
           <div className="flex flex-col lg:flex-row justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
-              <img
+              <Image
                 className="w-[400px] h-auto transition-shadow duration-300"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_467975184_q7cv5l.png"
                 alt="Course Image"
+                width={400}
+                height={400}
               />
             </div>
             <div className="w-full lg:w-1/2 space-y-6">
-              <img
+              <Image
                 className="w-7 h-7"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/Frame_36392_qmw2ww.png"
                 alt="Icon"
+                width={28}
+                height={28}
               />
               <h2 className="text-xl sm:text-2xl font-bold text-[#1E1E1E]">
                 Choose a Course
@@ -52,17 +63,21 @@ const ProgramProcessBody = () => {
           {/* SECOND CARD */}
           <div className="flex flex-col lg:flex-row-reverse justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
-              <img
+              <Image
                 className="w-[400px] h-auto"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_358334872_vrvcwo.png"
                 alt="Course Image"
+                width={400}
+                height={400}
               />
             </div>
             <div className="w-full lg:w-1/2 space-y-6">
-              <img
+              <Image
                 className="w-7 h-7"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_36392_1_lkmwwe.png"
                 alt="Icon"
+                width={28}
+                height={28}
               />
               <h2 className="text-[21px] sm:text-2xl font-bold text-[#1E1E1E]">
                 Register & Enroll
@@ -76,17 +91,21 @@ const ProgramProcessBody = () => {
           {/* THIRD CARD */}
           <div className="flex flex-col lg:flex-row justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
-              <img
+              <Image
                 className="w-[400px] h-auto"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_359620712_f6wddm.png"
                 alt="Course Image"
+                width={400}
+                height={400}
               />
             </div>
             <div className="w-full lg:w-1/2 space-y-6">
-              <img
+              <Image
                 className="w-7 h-7"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_36392_2_rsmljg.png"
                 alt="Icon"
+                width={28}
+                height={28}
               />
               <h2 className="text-xl sm:text-2xl font-bold text-[#1E1E1E]">
                 Learn from Experts
@@ -100,17 +119,21 @@ const ProgramProcessBody = () => {
           {/* FORTH CARD */}
           <div className="flex flex-col lg:flex-row-reverse justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
-              <img
+              <Image
                 className="w-[400px] h-auto shadow-xl rounded-2xl bg-white py-2 px-4"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092795/NECA_Web_13_dj9vlt.png"
                 alt="Course Image"
+                width={400}
+                height={400}
               />
             </div>
             <div className="w-full lg:w-1/2 space-y-6">
-              <img
+              <Image
                 className="w-7 h-7"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/Frame_36392_3_cusjhi.png"
                 alt="Icon"
+                width={28}
+                height={28}
               />
               <h2 className="text-xl sm:text-2xl font-bold text-[#1E1E1E]">
                 Get Certified & Start Your Career
@@ -122,7 +145,7 @@ const ProgramProcessBody = () => {
               <p className="bg-[#FFC80033] text-[17px] text-[#27156F] leading-relaxed p-2">
                 Gain the skills you need to succeed in today's digital world. Your journey to success starts here!
               </p>
-              <button className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2">
+              <button className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer">
                 Get Started Now
               </button>
             </div>

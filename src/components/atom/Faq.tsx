@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-
+import Image from "next/image";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 
 const Faq = () => {
@@ -15,7 +15,7 @@ const Faq = () => {
         <div className="max-w-6xl w-full px-0 md:max-w-6xl md:mx-auto md:px-4 py-8">
             <div className="flex flex-col lg:flex-row bg-white overflow-hidden">
                 <div className="hidden lg:w-1/2 lg:block">
-                    <img
+                    <Image
                         src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092798/0_LmGSx7loZgQCyE-a_iiam6w.png"
                         alt="FAQ Image"
                         className="w-[537px] h-[1117px] object-cover rounded-[21.53px]"
