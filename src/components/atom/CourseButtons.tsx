@@ -5,22 +5,21 @@ import { useState } from "react";
 
 interface CoursesButtonsProps {
   choice: (category: string) => void;
-  setCourses: (courses: CourseType[]) => void;
+  setFilteredData: (courses: CourseType[]) => void;
   generalCourses: CourseType[];
 }
 
 export const CourseButtons = ({
   choice,
-  setCourses,
+  setFilteredData,
   generalCourses,
 }: CoursesButtonsProps) => {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const handleButtonClick = (category: string) => {
-    console.log("Button clicked:", category);
     setActiveCategory(category);
-    if (category === "All") {
-      setCourses(generalCourses);
+    if (category === "all") {
+      setFilteredData(generalCourses);
     } else {
       choice(category);
     }
@@ -36,8 +35,8 @@ export const CourseButtons = ({
       overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-2 py-2 "
     >
       <button
-        onClick={() => handleButtonClick("All")}
-        className={buttonClasses("All")}
+        onClick={() => handleButtonClick("all")}
+        className={buttonClasses("all")}
       >
         All programs
       </button>

@@ -36,8 +36,9 @@ export const WhyUs = () => {
           <p className="text-[20px] max-w-5xl text-center">
             With expert instructors, cutting-edge curriculum, and job placement
             support, we bridge the gap between learning and career success.
-            Whether you're starting your journey or upgrading your skills, we
-            provide the tools and opportunities to unlock your full potential.
+            Whether you&apos;re starting your journey or upgrading your skills,
+            we provide the tools and opportunities to unlock your full
+            potential.
           </p>
         </section>
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center items-center gap-6 px-4 lg:px-0 mt-8 md:mt-16 lg:mt-20">
