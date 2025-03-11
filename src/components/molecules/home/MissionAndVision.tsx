@@ -6,7 +6,7 @@ export const MissionAndVision = () => {
     <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-start items-center gap-8 lg:gap-16 my-16 lg:my-28 px-4 lg:px-0">
       <section className=" h-[300px] md:h-[525px] w-full  lg:w-[633px] relative ">
         <Image
-          src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1741252924/Group_1_qush2s.png"
+          src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1741705164/Group_1_j5zxcc.png"
           alt="mission&vission"
           fill
         />

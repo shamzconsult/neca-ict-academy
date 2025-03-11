@@ -22,3 +22,18 @@ body {
   background: var(--background);
   /* font-family: Arial, Helvetica, sans-serif; */
 }
+
+@layer utilities {
+  .mask-box {
+    --mask: radial-gradient(
+          26.83rem at 50% calc(100% - 36rem),
+          #000 99%,
+          #0000 101%
+        )
+        calc(50% - 24rem) 0/48rem 100%,
+      radial-gradient(26.83rem at 50% calc(100% + 24rem), #0000 99%, #000 101%)
+        50% calc(100% - 12rem) / 48rem 100% repeat-x;
+    -webkit-mask: var(--mask);
+    mask: var(--mask);
+  }
+}

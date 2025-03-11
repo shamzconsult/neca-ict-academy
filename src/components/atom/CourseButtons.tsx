@@ -26,8 +26,10 @@ export const CourseButtons = ({
   };
 
   const buttonClasses = (category: string) =>
-    `text-[#1E1E1E] border border-[#C4C4C4] px-4 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
-      activeCategory === category ? "bg-[#27156F] text-white border-none" : ""
+    `text-[#1E1E1E] text-[12px]  border border-[#C4C4C4] px-4 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
+      activeCategory === category
+        ? "bg-[#27156F] text-white border-none"
+        : "bg-white"
     }`;
   return (
     <div
