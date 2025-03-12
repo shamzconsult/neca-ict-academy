@@ -29,7 +29,7 @@ export const CourseCard = ({
       {courses.length > 0 ? (
         courses.map((course, index) => (
           <Link
-            href=""
+            href={`/courses/${course.slug}`}
             key={index}
             className={`bg-white border border-[#C4C4C480] rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath
@@ -65,7 +65,7 @@ export const CourseCard = ({
                 {course.description}
               </p>
               <div>
-                {course.lessons !== undefined && (
+                {isCoursesPath && (
                   <div className="text-sm mt-3 ">
                     <h3 className="font-bold mb-2 text-sm">Course Details</h3>
                     <div className="grid grid-cols-3 gap-3 text-xs">
@@ -105,7 +105,7 @@ export const CourseCard = ({
             </div>
 
             <div className="mt-5">
-              {course.ratings !== undefined && (
+              {isCoursesPath && (
                 <p>
                   <span className="font-bold">{course.ratings}</span>⭐{" "}
                   <span>({course.reviews})</span>
@@ -121,7 +121,7 @@ export const CourseCard = ({
                 </div>
               )}
               <Link
-                href=""
+                href={`/courses/${course.slug}`}
                 className="text-[#E02B20]  mt-3 inline-flex items-center hover:underline-offset-4 hover:underline"
               >
                 Learn More <span className="ml-2">→</span>
@@ -133,7 +133,7 @@ export const CourseCard = ({
         <p className="text-center w-full  font-bold py-24">
           No results found
           <span className="text-red-400 mx-1">
-            {searchTerm ? `"${searchTerm}"` : ""}{" "}
+            {searchTerm ? `"${searchTerm}"` : ""}
           </span>
         </p>
       )}

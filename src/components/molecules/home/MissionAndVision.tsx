@@ -11,7 +11,7 @@ export const MissionAndVision = () => {
           fill
         />
       </section>
-      <section className="flex flex-col justify-between  gap-10 md:max-w-2xl lg:max-w-1/2 px-3">
+      <section className="flex flex-col justify-between  gap-10 md:max-w-2xl lg:max-w-1/2 px-3 md:text-[20px]">
         <div className="text-center lg:text-left">
           <SubHeading>Mission Statement</SubHeading>
           <p className="lg:max-w-md mt-3 ">
