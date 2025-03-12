@@ -1,6 +1,6 @@
 import { CourseCard } from "@/components/atom/CourseCard";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
-import { courses } from "@/const/courses";
+import { maincourses } from "@/const/courses";
 import Link from "next/link";
 import React from "react";
 
@@ -16,13 +16,13 @@ export const FeaturedCourses = () => {
       <div className="max-w-6xl mx-auto p-4 py-20">
         <div className="text-center lg:text-left">
           <SubHeading>Featured Courses</SubHeading>
-          <p className="lg:text-2xl mt-4">
+          <p className="md:text-2xl mt-4">
             Explore our handpicked selection of top-rated courses designed to
             equip you with in-demand skills and industry knowledge. Learn from
             experts and advance your career today!
           </p>
         </div>
-        <CourseCard courses={courses} />
+        <CourseCard courses={maincourses} />
         <div className="flex justify-center items-center text-center">
           <Link
             href="/courses"
