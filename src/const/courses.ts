@@ -1,10 +1,13 @@
+import { BsPlayBtn } from "react-icons/bs";
 import {
   FiAirplay,
+  FiBarChart,
   FiCpu,
   FiLayers,
   FiServer,
   FiSliders,
 } from "react-icons/fi";
+import { MdAccessTime } from "react-icons/md";
 import { VscInbox } from "react-icons/vsc";
 
 export type CourseType = {
@@ -237,5 +240,29 @@ export const courseModules = [
       "Resume writing, LinkedIn optimization, mock interviews",
     ],
     icon: FiSliders,
+  },
+];
+
+export const courseDetails = [
+  {
+    title: "Lessons",
+    value: "128",
+    description:
+      "Carefully structured lessons designed to take you from the basics of software engineering to advanced development skills. Each lesson is crafted to provide hands-on experience, covering front-end and back-end development, API integration, version control, testing, and deployment.",
+    icon: BsPlayBtn,
+  },
+  {
+    title: "Duration",
+    value: "6 Months",
+    description:
+      "Flexible and self-paced with live sessions and hands-on projects. You’ll have access to live sessions, recorded classes, and hands-on projects throughout the course. Learn at your own pace while receiving real-time support from instructors and peers.",
+    icon: MdAccessTime,
+  },
+  {
+    title: "Skill Level",
+    value: "Beginner to Advanced",
+    description:
+      "This course is designed for learners at all levels. Whether you’re a complete beginner or someone looking to advance your software engineering skills, the structured lessons and hands-on projects will take you from the fundamentals to mastering full-stack development.",
+    icon: FiBarChart,
   },
 ];

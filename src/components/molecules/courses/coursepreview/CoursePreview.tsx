@@ -2,6 +2,9 @@ import { maincourses } from "@/const/courses";
 import Link from "next/link";
 import React from "react";
 import { CoursePreviewHero } from "./CoursePreviewHero";
+import { TrackCards } from "./TrackCards";
+import { CourseDetails } from "./CourseDetails";
+import { JoinUs } from "@/components/atom/JoinUs";
 
 export const CoursePreview = ({ slug }: { slug: string }) => {
   const courseData = maincourses.find((course) => {
@@ -23,6 +26,9 @@ export const CoursePreview = ({ slug }: { slug: string }) => {
   return (
     <div>
       <CoursePreviewHero courseData={courseData} />
+      <TrackCards />
+      <CourseDetails courseData={courseData} />
+      <JoinUs />
     </div>
   );
 };
