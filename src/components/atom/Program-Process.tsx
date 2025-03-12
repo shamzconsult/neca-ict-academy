@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { Heading } from "@/components/atom/headers/Heading";
-import React from 'react';
+import React from "react";
 // import Image from "next/image";
 
 const ProgramProcess = () => {
@@ -13,10 +13,11 @@ const ProgramProcess = () => {
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover opacity-90">
-        <source 
-          src="https://res.cloudinary.com/daqmbfctv/video/upload/v1741262020/shot-vid_-_Made_with_Clipchamp_hioyh3.mp4" 
-          type="video/mp4" 
+        className="absolute inset-0 w-full h-full object-cover opacity-90"
+      >
+        <source
+          src="https://res.cloudinary.com/daqmbfctv/video/upload/v1741262020/shot-vid_-_Made_with_Clipchamp_hioyh3.mp4"
+          type="video/mp4"
         />
       </video>
       <div className="absolute inset-0 bg-[#DBEAF6] opacity-60"></div>
@@ -25,11 +26,13 @@ const ProgramProcess = () => {
           <SubHeading>Program Process</SubHeading>
           <Heading>How to get started!</Heading>
           <p className="text-[#1E1E1E] text-center text-[18px] text-base leading-[140%] tracking-wide h-auto max-w-6xl">
-            Taking the first step toward a successful tech career has never been easier. Simply browse our 
-            courses, select the one that aligns with your goals, and enroll in our expert-led training. With
-            hands-on projects, mentorship, and career support, you'll gain the skills needed to thrive in the
-            digital world. Whether you're a beginner or looking to ups-kill, we're here to guide you every step
-            of the way!
+            Taking the first step toward a successful tech career has never been
+            easier. Simply browse our courses, select the one that aligns with
+            your goals, and enroll in our expert-led training. With hands-on
+            projects, mentorship, and career support, you&apos;ll gain the
+            skills needed to thrive in the digital world. Whether you&apos;re a
+            beginner or looking to ups-kill, we&apos;re here to guide you every
+            step of the way!
           </p>
         </div>
       </div>
