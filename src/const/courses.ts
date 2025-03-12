@@ -1,3 +1,12 @@
+import {
+  FiAirplay,
+  FiCpu,
+  FiLayers,
+  FiServer,
+  FiSliders,
+} from "react-icons/fi";
+import { VscInbox } from "react-icons/vsc";
+
 export type CourseType = {
   id: string;
   slug?: string;
@@ -173,7 +182,7 @@ export const courseModules = [
       "Git & GitHub workflow",
       "Personal Project: Build a personal portfolio website",
     ],
-    icon: "💻",
+    icon: FiLayers,
   },
   {
     month: "Month 2",
@@ -184,7 +193,7 @@ export const courseModules = [
       "Tailwind CSS, Chakra UI, or Material UI",
       "Personal Project: Build an interactive dashboard",
     ],
-    icon: "🎨",
+    icon: FiAirplay,
   },
   {
     month: "Month 3",
@@ -195,7 +204,7 @@ export const courseModules = [
       "Database management (PostgreSQL, MongoDB)",
       "Personal Project: Build a task management API",
     ],
-    icon: "🔗",
+    icon: FiCpu,
   },
   {
     month: "Month 4",
@@ -206,7 +215,7 @@ export const courseModules = [
       "CI/CD pipelines, Docker basics",
       "Personal Project: Deploy a secure SaaS application",
     ],
-    icon: "🔐",
+    icon: VscInbox,
   },
   {
     month: "Month 5",
@@ -217,7 +226,7 @@ export const courseModules = [
       "Performance optimization & caching strategies",
       "Personal Project: Scalable real-world application",
     ],
-    icon: "⚙️",
+    icon: FiServer,
   },
   {
     month: "Month 6",
@@ -227,6 +236,6 @@ export const courseModules = [
       "Agile workflow, version control, PR reviews",
       "Resume writing, LinkedIn optimization, mock interviews",
     ],
-    icon: "👥",
+    icon: FiSliders,
   },
 ];
