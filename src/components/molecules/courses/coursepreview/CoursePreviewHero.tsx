@@ -29,12 +29,12 @@ export const CoursePreviewHero = ({
           </div>
         </div>
       </section>
-      <section className="max-w-5xl flex flex-col justify-center items-center text-center gap-2 mt-8 md:mt-24">
+      <section className="max-w-5xl flex flex-col justify-center items-center text-center gap-2 mt-8 md:mt-24 px-2 lg:px-0">
         <SubHeading>About The Course</SubHeading>
         <Heading>
           Build Your Future with Our Software Engineering Course
         </Heading>
-        <p className="lg:text-[20px] text-center">
+        <p className="md:text-[20px] text-center px-4 lg:px-0">
           This Software Engineering course is designed to provide you with a
           strong foundation in both front-end and back-end development.
           You&#8217;ll learn key programming languages, software architecture,
