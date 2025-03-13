@@ -27,7 +27,6 @@ export const CoursesCards = () => {
         )
       )
     );
-    setSearchTerm("");
   };
   return (
     <div>

@@ -8,7 +8,7 @@ export const MileStone = () => {
 
   return (
     <section
-      className="py-20 my-16 bg-[#27156F] bg-cover bg-center relative"
+      className="py-20 my-16 bg-[#27156F] bg-cover bg-center relative animate-bg-move"
       style={{
         backgroundImage:
           "url('https://res.cloudinary.com/dcgghkk7q/image/upload/v1741252922/Milestone_fill_pebo8m.png')",

@@ -22,7 +22,7 @@ export const CourseDetails = ({
     slidesToShow: 3,
     slidesToScroll: 1,
     centerMode: true,
-    centerPadding: "2%",
+    centerPadding: "5%",
     autoplay: true,
     autoplaySpeed: 3000,
     beforeChange: (_: number, newIndex: number) => setCurrentIndex(newIndex),
@@ -55,8 +55,8 @@ export const CourseDetails = ({
               key={index}
               className={`bg-white text-center text-[12px] rounded-xl shadow-lg p-6  max-w-sm transition-all text-[#000000] duration-500 ${
                 index === currentIndex
-                  ? "scale-110 z-10"
-                  : "scale-100 opacity-60"
+                  ? "scale-100 z-10"
+                  : "scale-90 opacity-60"
               }`}
             >
               <div className="mb-4 flex justify-center items-center">
