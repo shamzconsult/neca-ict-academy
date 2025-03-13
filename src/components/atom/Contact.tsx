@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
-import { Heading } from "@/components/atom/headers/Heading"
-import { SubHeading } from "@/components/atom/headers/SubHeading";
 import Image from 'next/image';
+import { useState, FormEvent } from 'react';
+import { MdArrowDropDown } from "react-icons/md";
+import { SubHeading } from "@/components/atom/headers/SubHeading";
+
+
 
 interface ContactFormData {
   name: string;
@@ -22,7 +24,7 @@ const Contact = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     console.log('Form submitted:', formData);
   };
 
@@ -36,13 +38,13 @@ const Contact = () => {
 
   return (
     <section className="max-w-6xl font-poppins mt-10">
-      <div className="max-w-6xl mx-auto py-5">
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+      <div className="max-w-6xl mx-auto py-5 px-4">
+        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-5">
           <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px] text-center">
-             <SubHeading>Contact Us</SubHeading> 
-             <br />
-            <Heading>Get In Touch</Heading>
-            <p className="lg:max-w-md mt-3 mb-4 lg:text-left">
+            <SubHeading>Contact Us</SubHeading>
+            <br />
+            <h2 className="font-bold text-[24px] md:text-[30px] text-[#27156F] leading-normal md:leading-[40px]">Get In Touch</h2>
+            <p className="lg:max-w-xl mt-2 mb-6.5 lg:text-left lg:text-[18px]">
               We understand that you may have questions about our courses, enrollment process, certifications, and more. That&apos;s why we&apos;ve put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to help!
             </p>
 
@@ -92,18 +94,21 @@ const Contact = () => {
                 />
               </div>
 
-              <div>
+              <div className="relative">
                 <select
                   id="source"
                   name="source"
                   value={formData.source}
                   onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-4 border-[1.6px] border-gray-300 rounded-md focus:outline-none focus:ring-[#27156F] focus:border-[#27156F] text-[#27156F]"
+                  className="mt-1 block w-full px-4 py-4 border-[1.6px] border-gray-300 rounded-md focus:outline-none focus:ring-[#27156F] focus:border-[#27156F] text-[#27156F] appearance-none cursor-pointer"
                 >
                   <option value="" disabled>How did you find us?</option>
                   <option value="social">Social</option>
                   <option value="others">Others</option>
                 </select>
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-[#27156F]">
+                  <MdArrowDropDown size={24} />
+                </div>
               </div>
 
               <div>
@@ -119,17 +124,17 @@ const Contact = () => {
             <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15">
               {[
                 {
-                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_831_cxgaus.png",
+                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_831_cxgaus.png",
                   title: "PHONE",
                   value: "+234 809 938 7853"
                 },
                 {
-                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_835_cz07k8.png",
+                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_835_cz07k8.png",
                   title: "FAX",
                   value: "0 809 938 7853"
                 },
                 {
-                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/v1741092792/Frame_833_czmxeu.png",
+                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_833_czmxeu.png",
                   title: "EMAIL",
                   value: "neca@neca.org.ng"
                 }
@@ -150,14 +155,16 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 bg-white p-6 flex items-center justify-center">
-            <Image
-              src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/Frame_1618869608_tre0rv.png"
-              alt="Contact illustration"
-              width={577}
-              height={700}
-              className="max-w-[577px] h-[700px]"
-            />
+          <div className="w-full md:w-1/2 bg-white p-6">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.1500306894045!2d7.485448874049589!3d9.050076288660685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0ba3d6cef4c9%3A0x818eab5a4834a347!2sUnity%20Bank%20PLC!5e0!3m2!1sen!2sng!4v1741878840642!5m2!1sen!2sng" 
+              width="100%" 
+              height="400" 
+              allowFullScreen 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-full h-full md:w-[570px] md:h-[730px]"
+            ></iframe>
           </div>
         </div>
       </div>
