@@ -18,9 +18,9 @@ const Faq = () => {
                     <Image
                         src="https://res.cloudinary.com/daqmbfctv/image/upload/t_faqimage/v1741092798/0_LmGSx7loZgQCyE-a_iiam6w.png"
                         alt="FAQ Image"
-                        width={537}
+                        width={537} 
                         height={1117}
-                        className="w-[525px] max-h-[996px] object-cover rounded-b-[21.53px]"
+                        className="w-[525px] max-h-[996px] object-cover rounded-b-[21.53px] rounded-t-[5px]"
                     />
                 </div>
                 <div className="w-full lg:w-full lg:text-left md:p-6 flex flex-col text-center h-full flex-grow">
