@@ -5,10 +5,10 @@ export const JoinUs = () => {
   return (
     <div className="w-full lg:mt-8 bg-[#DBEAF6] py-20">
       <div
-        className="max-w-6xl lg:mx-auto text-white flex flex-col justify-center items-center gap-4 text-center rounded-2xl py-20 px-2 md:px-6 mx-2 md:mx-6 h-full"
+        className="max-w-6xl lg:mx-auto text-white flex flex-col justify-center items-center gap-4 text-center rounded-2xl py-10 px-2 md:px-6 mx-2 md:mx-6 h-full"
         style={{
           backgroundImage:
-            "url('https://res.cloudinary.com/dcgghkk7q/image/upload/v1741794381/Frame_1618869616_uw7uop.png')",
+            "url('https://res.cloudinary.com/dcgghkk7q/image/upload/v1741858265/Frame_1618869616_pmzw4v.png')",
           backgroundRepeat: "no-repeat",
           backgroundSize: "cover",
           backgroundPosition: "center",

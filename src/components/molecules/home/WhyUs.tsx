@@ -45,7 +45,7 @@ export const WhyUs = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-b-xl shadow-lg overflow-hidden "
+              className="bg-white rounded-b-xl shadow-lg overflow-hidden h-[340px]"
             >
               <div className=" h-[184px] w-[379px]  relative ">
                 <Image src={feature.image} alt="features-img" fill />

@@ -37,3 +37,16 @@ body {
     mask: var(--mask);
   }
 }
+
+@keyframes bgMove {
+  from {
+    background-position: 500% 0%;
+  }
+  to {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-bg-move {
+  animation: bgMove 5s linear infinite;
+}
