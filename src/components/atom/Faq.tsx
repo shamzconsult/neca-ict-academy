@@ -13,8 +13,8 @@ const Faq = () => {
 
     return (
         <div className="max-w-6xl w-full px-0 lg:pt-20 md:max-w-8xl md:mx-auto md:px-4 py-8">
-            <div className="flex bg-white items-center justify-evenly overflow-hidden gap-15 h-full">
-                <div className="hidden lg:w-full lg:block h-full">
+            <div className="flex flex-col lg:flex-row bg-white items-center justify-evenly overflow-hidden gap-15 h-full">
+                <div className="lg:w-full lg:block h-full">
                     <Image
                         src="https://res.cloudinary.com/daqmbfctv/image/upload/t_faqimage/v1741092798/0_LmGSx7loZgQCyE-a_iiam6w.png"
                         alt="FAQ Image"

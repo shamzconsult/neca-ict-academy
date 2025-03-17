@@ -37,8 +37,8 @@ const Contact = () => {
   };
 
   return (
-    <section className="max-w-7xl lg:max-w-6xl font-poppins mt-10">
-      <div className="max-w-7xl lg:max-w-6xl mx-auto py-5 px-4">
+    <section className="max-w-6xl font-poppins mt-10">
+      <div className="max-w-6xl mx-auto py-5 px-4">
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-5">
           <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px]">
             <SubHeading>Contact Us</SubHeading>
