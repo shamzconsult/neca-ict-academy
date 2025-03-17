@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const ALLOWED_LEVEL = [ "Beginner", "Intermediate", "Advanced" ]
+const ALLOWED_MODE = ["Physical", "Self-Pace", "Hybrid"]
 
 const CourseSchema = new Schema ({
     programId: {
@@ -37,6 +38,7 @@ const CourseSchema = new Schema ({
         }
     },
     skillLevel: {
+        type: String,
         enum: ALLOWED_LEVEL,
         description: {
             type: String,
@@ -53,12 +55,12 @@ const CourseSchema = new Schema ({
     },
     mode: {
         type: String,
-        enum: ["Physical", "Self-Pace", "Hybrid"],
+        enum: ALLOWED_MODE,
         required: true
     },
     rating: {
         type: Number,
-        default: "1" 
+        default: 1
     },
     courseOutlines: [
         {
