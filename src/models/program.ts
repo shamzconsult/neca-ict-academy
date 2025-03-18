@@ -4,7 +4,9 @@ const ALLOWED_ACTIVE_STATUS = [ 'Yes', 'No' ]
 
 const ProgramSchema = new Schema ({
     isActive: {
+        type: String,
         enum: ALLOWED_ACTIVE_STATUS,
+        required: true,
     },
     name: {
         type: String,
