@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
+
 const ALLOWED_ROLES = [ "Super_Admin", "Admin", "Students" ]
 
 const UserSchema = new Schema({

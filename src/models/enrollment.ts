@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const ALLOWED_GENDER = [ "Female", "Male" ];
+
 const ALLOWED_LEVEL = [ "Dropped", "Applied", "Interviewed", "Admitted", "Completed" ];
 const ALLOWED_STATUS = [ "Admitted", "Declined", "Pending", "Graduated" ];
 

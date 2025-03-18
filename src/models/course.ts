@@ -3,6 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const ALLOWED_LEVEL = [ "Beginner", "Intermediate", "Advanced" ]
 const ALLOWED_MODE = ["Physical", "Self-Pace", "Hybrid"]
 
+
 const CourseSchema = new Schema ({
     programId: {
         type: Schema.Types.ObjectId,
