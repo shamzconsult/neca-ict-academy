@@ -13,8 +13,8 @@ const Faq = () => {
 
     return (
         <div className="max-w-6xl w-full px-0 lg:pt-20 md:max-w-8xl md:mx-auto md:px-4 py-8">
-            <div className="flex bg-white items-center justify-evenly overflow-hidden gap-15 h-full">
-                <div className="hidden lg:w-full lg:block h-full">
+            <div className="flex flex-col lg:flex-row bg-white items-center justify-evenly overflow-hidden gap-15 h-full">
+                <div className="lg:w-full lg:block h-full">
                     <Image
                         src="https://res.cloudinary.com/daqmbfctv/image/upload/t_faqimage/v1741092798/0_LmGSx7loZgQCyE-a_iiam6w.png"
                         alt="FAQ Image"
@@ -23,10 +23,10 @@ const Faq = () => {
                         className="w-[525px] max-h-[996px] object-cover rounded-b-[21.53px] rounded-t-[5px]"
                     />
                 </div>
-                <div className="w-full lg:w-full lg:text-left md:p-6 flex flex-col text-center h-full flex-grow">
+                <div className="w-full lg:w-full lg:text-left md:p-6 flex flex-col h-full flex-grow">
                     <SubHeading>FAQ</SubHeading>
-                    <h2 className="text-center text-[#27156F] mt-4 mb-2 lg:text-left lg:text-[25px] font-bold">Got Questions? We&apos;ve Got Answers!</h2>
-                    <p className="lg:max-w-full mt-2 text-center lg:text-left mb-4 text">
+                    <h2 className="text-[#27156F] mt-4 mb-2 lg:text-left lg:text-[25px] font-bold">Got Questions? We&apos;ve Got Answers!</h2>
+                    <p className="lg:max-w-full mt-2 lg:text-left mb-4 text">
                         We understand that you may have questions about our courses, enrollment process, certifications, and more. That&apos;s why we&apos;ve put together this FAQ section to provide clear answers and help you make informed decisions. Explore the most common inquiries below, and if you need further assistance, our support team is always here to <br /> help!
                     </p>
 

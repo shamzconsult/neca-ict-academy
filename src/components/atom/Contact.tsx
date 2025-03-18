@@ -40,7 +40,7 @@ const Contact = () => {
     <section className="max-w-6xl font-poppins mt-10">
       <div className="max-w-6xl mx-auto py-5 px-4">
         <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-5">
-          <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px] text-center">
+          <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px]">
             <SubHeading>Contact Us</SubHeading>
             <br />
             <h2 className="font-bold text-[24px] md:text-[30px] text-[#27156F] leading-normal md:leading-[40px]">Get In Touch</h2>
@@ -121,7 +121,7 @@ const Contact = () => {
               </div>
             </form>
 
-            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15">
+            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15 cursor-pointer">
               {[
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_831_cxgaus.png",
@@ -155,7 +155,7 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 bg-white p-6">
+            <div className="w-full md:w-1/2 bg-white p-6">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.1500306894045!2d7.485448874049589!3d9.050076288660685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0ba3d6cef4c9%3A0x818eab5a4834a347!2sUnity%20Bank%20PLC!5e0!3m2!1sen!2sng!4v1741878840642!5m2!1sen!2sng" 
               width="100%" 
@@ -163,9 +163,9 @@ const Contact = () => {
               allowFullScreen 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-full h-full md:w-[570px] md:h-[730px]"
+              className="w-[100%] h-94 md:w-[570px] md:h-[730px]"
             ></iframe>
-          </div>
+            </div>
         </div>
       </div>
     </section>
