@@ -7,7 +7,7 @@ export const HomeHerosection = () => {
     <div className=" max-w-6xl mx-auto flex flex-col justify-center items-center lg:flex-row lg:justify-between gap-8 mt-32  px-4 lg:px-0">
       <section className="flex flex-col justify-center text-center lg:text-left max-w-2xl lg:max-w-1/2">
         <Heading>Empowering the Future Through Digital Skills</Heading>
-        <p className="my-[29px] lg:max-w-md">
+        <p className="my-[29px] lg:max-w-md md:text-[20px]">
           Our hands-on training programs, expert-led courses, and globally
           recognized certifications are designed to equip you with the knowledge
           and experience needed to thrive in today&#8217;s fast-paced tech

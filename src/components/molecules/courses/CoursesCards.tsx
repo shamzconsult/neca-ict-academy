@@ -7,12 +7,11 @@ import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
 export const CoursesCards = () => {
-  const [course, setCourses] = useState<CourseType[]>(maincourses);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredData, setFilteredData] = useState<CourseType[]>(maincourses);
 
   const choice = (category: string) => {
-    setCourses(
+    setFilteredData(
       maincourses.filter((course) => {
         return course.category === category;
       })
@@ -28,7 +27,6 @@ export const CoursesCards = () => {
         )
       )
     );
-    setSearchTerm("");
   };
   return (
     <div>
@@ -37,7 +35,7 @@ export const CoursesCards = () => {
           <div className="max-w-6xl mx-auto flex flex-col justify-center items-center gap-3 text-center mb-10">
             <SubHeading>Explore Courses</SubHeading>
             <Heading>Build the Skills for a Future in Tech!</Heading>
-            <p className="max-w-3xl">
+            <p className="max-w-4xl md:text-[20px]">
               Discover industry-relevant courses designed to equip you with the
               knowledge and hands-on experience needed to excel in today&#8217;s
               digital world.
@@ -45,26 +43,28 @@ export const CoursesCards = () => {
           </div>
           <CourseButtons
             choice={choice}
-            setCourses={setCourses}
-            generalCourses={filteredData}
+            setFilteredData={setFilteredData}
+            generalCourses={maincourses}
           />
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
-            <p className="text-[#1E1E1E] font-semibold">Search:</p>
+            <p className="text-[#1E1E1E]md:text-[20px] font-semibold">
+              Search:
+            </p>
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-2 flex items-center ">
-                <GoSearch className="h-5 w-5" />
+                <GoSearch className="h-5 w-5 text-[#C4C4C4]" />
               </span>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search for courses"
-                className="w-full py-3 px-8 rounded border border-[#C4C4C4] bg-white shadow-sm focus:outline-none focus:ring-0 focus:ring-none focus:bg-white"
+                className="w-full h-[48px] px-8 rounded border border-[#C4C4C4] bg-white shadow-sm focus:outline-none focus:ring-0 focus:ring-none focus:bg-white"
               />
             </div>
             <button
               onClick={handleSearch}
-              className="px-5 py-3 rounded-lg cursor-pointer bg-[#E02B20] text-white w-full md:w-fit "
+              className="px-5 h-[48px] text-[12px] rounded-lg cursor-pointer bg-[#E02B20] text-white w-full md:w-fit "
             >
               Search
             </button>

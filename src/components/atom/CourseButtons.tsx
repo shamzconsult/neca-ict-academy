@@ -5,39 +5,40 @@ import { useState } from "react";
 
 interface CoursesButtonsProps {
   choice: (category: string) => void;
-  setCourses: (courses: CourseType[]) => void;
+  setFilteredData: (courses: CourseType[]) => void;
   generalCourses: CourseType[];
 }
 
 export const CourseButtons = ({
   choice,
-  setCourses,
+  setFilteredData,
   generalCourses,
 }: CoursesButtonsProps) => {
-  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const handleButtonClick = (category: string) => {
-    console.log("Button clicked:", category);
     setActiveCategory(category);
-    if (category === "All") {
-      setCourses(generalCourses);
+    if (category === "all") {
+      setFilteredData(generalCourses);
     } else {
       choice(category);
     }
   };
 
   const buttonClasses = (category: string) =>
-    `text-[#1E1E1E] border border-[#C4C4C4] px-6 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
-      activeCategory === category ? "bg-[#27156F] text-white border-none" : ""
+    `text-[#1E1E1E] text-[12px]  border border-[#C4C4C4] px-4 cursor-pointer rounded-md py-2 duration-300 hover:border-none hover:bg-[#27156F] hover:text-white ${
+      activeCategory === category
+        ? "bg-[#27156F] text-white border-none"
+        : "bg-white"
     }`;
   return (
     <div
       className="mx-auto text-center font-medium mb-8 flex justify-center items-center gap-4 
-      overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-2 py-2"
+      overflow-x-auto whitespace-nowrap flex-nowrap scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 px-2 py-2 "
     >
       <button
-        onClick={() => handleButtonClick("All")}
-        className={buttonClasses("All")}
+        onClick={() => handleButtonClick("all")}
+        className={buttonClasses("all")}
       >
         All programs
       </button>

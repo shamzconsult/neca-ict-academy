@@ -33,18 +33,19 @@ export const WhyUs = () => {
         <section className="flex flex-col justify-center items-center text-center gap-5">
           <SubHeading>Why Us</SubHeading>
           <Heading>Empowering the Next Generation of Tech Innovators</Heading>
-          <p className="text-[20px] max-w-5xl text-center">
+          <p className="lg:text-[20px] max-w-5xl text-center">
             With expert instructors, cutting-edge curriculum, and job placement
             support, we bridge the gap between learning and career success.
-            Whether you're starting your journey or upgrading your skills, we
-            provide the tools and opportunities to unlock your full potential.
+            Whether you&apos;re starting your journey or upgrading your skills,
+            we provide the tools and opportunities to unlock your full
+            potential.
           </p>
         </section>
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-center items-center gap-6 px-4 lg:px-0 mt-8 md:mt-16 lg:mt-20">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-b-xl shadow-lg overflow-hidden "
+              className="bg-white rounded-b-xl shadow-lg overflow-hidden h-[340px]"
             >
               <div className=" h-[184px] w-[379px]  relative ">
                 <Image src={feature.image} alt="features-img" fill />

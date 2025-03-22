@@ -29,19 +29,19 @@ export const CourseCard = ({
       {courses.length > 0 ? (
         courses.map((course, index) => (
           <Link
-            href=""
+            href={`/courses/${course.slug}`}
             key={index}
-            className={`bg-white rounded-xl shadow-lg overflow-hidden p-4 text-left ${
+            className={`bg-white border border-[#C4C4C480] hover:bg-[#DBEAF6] rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath
-                ? "w-full md:w-[350px] lg:w-[400px] hover:cursor-pointer hover:bg-[#DBEAF6]"
+                ? "w-full md:w-[350px] lg:w-[500px] hover:cursor-pointer "
                 : ""
             }`}
           >
             <div
-              className={`  relative p-3 ${
+              className={`  relative  p-3 ${
                 isCoursesPath
-                  ? "w-full md:w-[340px]  lg:w-[360px] h-[250px] lg:h-[200px]"
-                  : "w-full h-[250px] lg:h-[189px] lg:w-[331px]"
+                  ? "w-full md:w-[340px]  lg:w-[100%] h-[250px] lg:h-[270px]"
+                  : "w-full h-[250px]  lg:h-[189px] lg:w-[331px]"
               }`}
             >
               <Image
@@ -65,12 +65,12 @@ export const CourseCard = ({
                 {course.description}
               </p>
               <div>
-                {course.lessons !== undefined && (
+                {isCoursesPath && (
                   <div className="text-sm mt-3 ">
                     <h3 className="font-bold mb-2 text-sm">Course Details</h3>
                     <div className="grid grid-cols-3 gap-3 text-xs">
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Lesson</p>
+                        <p className="font-semibold">Lesson</p>
                         <div className="flex gap-2  items-center ">
                           <span>
                             <BsPlayBtn />
@@ -79,7 +79,7 @@ export const CourseCard = ({
                         </div>
                       </div>
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Duration</p>
+                        <p className="font-semibold">Duration</p>
                         <div className="flex gap-2 items-center ">
                           <span>
                             <MdAccessTime />
@@ -88,7 +88,7 @@ export const CourseCard = ({
                         </div>
                       </div>
                       <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                        <p className="font-medium">Skill Level</p>
+                        <p className="font-semibold">Skill Level</p>
                         <div className="flex  gap-2 items-center ">
                           <span>
                             <FiBarChart />
@@ -105,7 +105,7 @@ export const CourseCard = ({
             </div>
 
             <div className="mt-5">
-              {course.ratings !== undefined && (
+              {isCoursesPath && (
                 <p>
                   <span className="font-bold">{course.ratings}</span>⭐{" "}
                   <span>({course.reviews})</span>
@@ -121,7 +121,7 @@ export const CourseCard = ({
                 </div>
               )}
               <Link
-                href=""
+                href={`/courses/${course.slug}`}
                 className="text-[#E02B20]  mt-3 inline-flex items-center hover:underline-offset-4 hover:underline"
               >
                 Learn More <span className="ml-2">→</span>
@@ -132,7 +132,9 @@ export const CourseCard = ({
       ) : (
         <p className="text-center w-full  font-bold py-24">
           No results found
-          <span className="text-red-400 mx-1"> &#34;{searchTerm}&#34; </span>
+          <span className="text-red-400 mx-1">
+            {searchTerm ? `"${searchTerm}"` : ""}
+          </span>
         </p>
       )}
     </div>

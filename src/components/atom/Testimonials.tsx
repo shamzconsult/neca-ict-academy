@@ -17,8 +17,10 @@ export const Testimonials = () => {
     slidesToShow: 3,
     slidesToScroll: 1,
     centerMode: true,
-    centerPadding: "2%",
-    beforeChange: (newIndex: number) => setCurrentIndex(newIndex),
+    centerPadding: "5%",
+    autoplay: true,
+    autoplaySpeed: 3000,
+    beforeChange: (_: number, newIndex: number) => setCurrentIndex(newIndex),
     responsive: [
       {
         breakpoint: 1024,
@@ -57,8 +59,8 @@ export const Testimonials = () => {
                 key={index}
                 className={`bg-white rounded-xl shadow-lg p-6 text-left max-w-sm transition-all text-[#000000] duration-500 ${
                   index === currentIndex
-                    ? "scale-110 z-10"
-                    : "scale-100 opacity-60"
+                    ? "scale-100 z-10"
+                    : "scale-90 opacity-60"
                 }`}
               >
                 <div className="flex items-center mb-4">

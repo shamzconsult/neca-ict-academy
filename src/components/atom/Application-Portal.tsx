@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { useState } from 'react';
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { MdArrowDropDown } from "react-icons/md";
 
@@ -18,20 +18,22 @@ interface FormData {
 
 const ApplicationPortal = () => {
   const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    state: '',
-    gender: '',
-    course: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    state: "",
+    gender: "",
+    course: "",
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -41,11 +43,11 @@ const ApplicationPortal = () => {
     console.log(formData);
   };
 
-  const timelineSteps = [
-    { step: 1, label: 'Application' },
-    { step: 2, label: 'Interview' },
-    { step: 3, label: 'Selection' }
-  ];
+  // const timelineSteps = [
+  //   { step: 1, label: 'Application' },
+  //   { step: 2, label: 'Interview' },
+  //   { step: 3, label: 'Selection' }
+  // ];s`
 
   return (
     <div>
@@ -79,18 +81,24 @@ const ApplicationPortal = () => {
       <div className="relative max-w-6xl mx-auto my-20 mt-[150px] p-6 bg-white rounded-lg overflow-hidden">
         <div className="relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-            <div className="w-auto h-auto relative">
+            <div className="w-48 h-auto relative">
               <Image
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/20250212_180601_1_w6sgpi.png"
                 alt="NECA ICT ACADEMY Logo"
                 width={192}
                 height={96}
-                className="object-contain lg:w-[300px] lg:mb-15"
+                className="object-contain"
               />
             </div>
-            <div className="lg:mb-15">
+            <div>
               <h3 className="text-lg">
-                Already applied? <Link href="#" className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors">Check Status</Link>
+                Already applied?{" "}
+                <Link
+                  href="#"
+                  className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors"
+                >
+                  Check Status
+                </Link>
               </h3>
             </div>
           </div>
@@ -98,7 +106,7 @@ const ApplicationPortal = () => {
           <div className="flex flex-col md:flex-row justify-evenly items-start gap-8">
             <div className="w-full md:w-1/2 md:pr-8">
               <div className="relative w-full h-[300px] mb-6">
-                <div className='absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0 pl-20'></div>
+                <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0 pl-20"></div>
                 <Image
                   src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Online_education_and_virtual_learning_g0fzok.png"
                   alt="Online Education Image"
@@ -107,25 +115,33 @@ const ApplicationPortal = () => {
                 />
               </div>
               <div className="lg:mt-55">
-                <h1 className="text-xl font-semibold text-left text-[#1E1E1E] mb-5 mt-10 pl-2">Application Timeline</h1>
-                <div className='flex gap-7 items-center'>
-                  <div className=' bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'><p>1</p></div>
-                  <div className='flex gap-2 items-center'>
-                    <div className='bg-[#525252] w-2 h-1'></div>
-                    <div className='bg-[#525252] w-3 h-1'></div>
-                    <div className='bg-[#525252] w-4 h-1'></div>
-                    <div className='bg-[#525252] w-5 h-1'></div>
+                <h1 className="text-xl font-semibold text-left text-[#1E1E1E] mb-5 mt-10 pl-2">
+                  Application Timeline
+                </h1>
+                <div className="flex gap-7 items-center">
+                  <div className=" bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                    <p>1</p>
                   </div>
-                  <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'><p>2</p></div>
-                  <div className='flex gap-2 items-center'>
-                    <div className='bg-[#525252] w-2 h-1'></div>
-                    <div className='bg-[#525252] w-3 h-1'></div>
-                    <div className='bg-[#525252] w-4 h-1'></div>
-                    <div className='bg-[#525252] w-5 h-1'></div>
+                  <div className="flex gap-2 items-center">
+                    <div className="bg-[#525252] w-2 h-1"></div>
+                    <div className="bg-[#525252] w-3 h-1"></div>
+                    <div className="bg-[#525252] w-4 h-1"></div>
+                    <div className="bg-[#525252] w-5 h-1"></div>
                   </div>
-                  <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'><p>3</p></div>
+                  <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                    <p>2</p>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <div className="bg-[#525252] w-2 h-1"></div>
+                    <div className="bg-[#525252] w-3 h-1"></div>
+                    <div className="bg-[#525252] w-4 h-1"></div>
+                    <div className="bg-[#525252] w-5 h-1"></div>
+                  </div>
+                  <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                    <p>3</p>
+                  </div>
                 </div>
-                <div className='flex lg:gap-23 gap-4 mt-4 items-center'>
+                <div className="flex lg:gap-23 gap-4 mt-4 items-center">
                   <p>Application</p>
                   <p>Interview</p>
                   <p>Selection</p>
@@ -135,16 +151,23 @@ const ApplicationPortal = () => {
 
             <div className="w-full md:w-1/2">
               <SubHeading>Application Form</SubHeading>
-              <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">Register Now!</h2>
+              <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">
+                Register Now!
+              </h2>
               <p className="text-gray-600 text-xl mb-7">
-                To apply for our training programs or opportunities, please fill out the form below with accurate information.
-                Ensure all required fields are completed to avoid delays in processing <br /> your application.
+                To apply for our training programs or opportunities, please fill
+                out the form below with accurate information. Ensure all
+                required fields are completed to avoid delays in processing{" "}
+                <br /> your application.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="firstName">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="firstName"
+                    >
                       First Name
                     </label>
                     <input
@@ -159,7 +182,10 @@ const ApplicationPortal = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="lastName">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="lastName"
+                    >
                       Last Name
                     </label>
                     <input
@@ -177,7 +203,10 @@ const ApplicationPortal = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="email">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="email"
+                    >
                       Email Address
                     </label>
                     <input
@@ -192,7 +221,10 @@ const ApplicationPortal = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="phone">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="phone"
+                    >
                       Phone Number
                     </label>
                     <input
@@ -210,7 +242,10 @@ const ApplicationPortal = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="state">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="state"
+                    >
                       State
                     </label>
                     <div className="relative">
@@ -227,11 +262,17 @@ const ApplicationPortal = () => {
                         <option value="Kwara state">Kwara state</option>
                         <option value="Lagos State">Lagos State</option>
                       </select>
-                      <MdArrowDropDown size={24} className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none" />
+                      <MdArrowDropDown
+                        size={24}
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                      />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700" htmlFor="gender">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="gender"
+                    >
                       Gender
                     </label>
                     <div className="relative">
@@ -247,13 +288,19 @@ const ApplicationPortal = () => {
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                       </select>
-                      <MdArrowDropDown size={24} className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none" />
+                      <MdArrowDropDown
+                        size={24}
+                        className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="course">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="course"
+                  >
                     Course
                   </label>
                   <div className="relative">
@@ -270,7 +317,10 @@ const ApplicationPortal = () => {
                       <option value="Data Science">Data Science</option>
                       <option value="UI/UX Design">UI/UX Design</option>
                     </select>
-                    <MdArrowDropDown size={24} className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none" />
+                    <MdArrowDropDown
+                      size={24}
+                      className="absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none"
+                    />
                   </div>
                 </div>
 
@@ -284,7 +334,6 @@ const ApplicationPortal = () => {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
