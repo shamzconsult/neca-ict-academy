@@ -1,15 +1,15 @@
-'use client';
+// 'use client';
 
-import Image from 'next/image';
-import { SubHeading } from "@/components/atom/headers/SubHeading";
+// import Image from 'next/image';
+// import { SubHeading } from "@/components/atom/headers/SubHeading";
 
-const SuccessPage = () => {
+// const SuccessPage = () => {
 
 
 
   return (
     <div>
-      <div className="absolute top-0 left-0 w-1/5 h-2/2 z-0">
+      {/* <div className="absolute top-0 left-0 w-1/5 h-2/2 z-0">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
           alt="Background Left"
@@ -17,8 +17,8 @@ const SuccessPage = () => {
           objectFit="cover"
           className="opacity-40"
         />
-      </div>
-      <div className="absolute top-0 right-0 w-3/7 h-3/1 z-0">
+      </div> */}
+      {/* <div className="absolute top-0 right-0 w-3/7 h-3/1 z-0">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/v1742225179/Rectangle_4383_akoej5.png"
           alt="Background Right"
@@ -26,8 +26,8 @@ const SuccessPage = () => {
           objectFit="cover"
           className="opacity-20"
         />
-      </div>
-      <div className="absolute top-0 right-0 w-1/7 mt-180 h-full z-0">
+      </div> */}
+      {/* <div className="absolute top-0 right-0 w-1/7 mt-180 h-full z-0">
       </div>
       <div className="relative max-w-6xl mx-auto my-20 mt-[150px] p-6 bg-white rounded-lg overflow-hidden">
         <div className="relative flex flex-col w-[540px] items-center justify-center min-h-screen mx-auto">
@@ -51,4 +51,4 @@ const SuccessPage = () => {
   );
 };
 
-export default SuccessPage;
+export default SuccessPage; */}

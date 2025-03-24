@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { MdArrowDropDown } from "react-icons/md";
+import Link from "next/link";
+// import { PortalHeader } from "@/components/atom/headers/PortalHeader";
 
 interface FormData {
   firstName: string;
@@ -43,15 +44,9 @@ const ApplicationPortal = () => {
     console.log(formData);
   };
 
-  // const timelineSteps = [
-  //   { step: 1, label: 'Application' },
-  //   { step: 2, label: 'Interview' },
-  //   { step: 3, label: 'Selection' }
-  // ];s`
-
   return (
-    <div>
-      <div className="absolute top-0 left-0 w-1/5 h-2/2 z-0">
+    <div className="relative">
+      <div className="absolute top-[-50px] left-0 w-[8%] h-[75%] z-0 transform rotate-[-0.47deg] origin-top-left">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
           alt="Background Left"
@@ -60,34 +55,34 @@ const ApplicationPortal = () => {
           className="opacity-40"
         />
       </div>
-      <div className="absolute top-0 right-0 w-1/2 h-full z-0">
+      {/* <div className="absolute top-60 right-0 w-1/4 h-8/6 b-20 z-0 transform rotate-[0.47deg] origin-top-right">
         <Image
-          src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4383_akoej5.png"
+          src="https://res.cloudinary.com/daqmbfctv/image/upload/v1742225179/Rectangle_4383_akoej5.png"
           alt="Background Right"
           layout="fill"
           objectFit="cover"
-          className="opacity-20"
+          className="opacity-35"
         />
-      </div>
-      <div className="absolute top-0 right-0 w-1/7 mt-180 h-full z-0">
+      </div> */}
+      <div className="absolute top-0 right-0 w-full top-90 h-1/2 z-0">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
           alt="Background Right"
           layout="fill"
           objectFit="cover"
-          className="opacity-20"
+          className="opacity-40"
         />
       </div>
-      <div className="relative max-w-6xl mx-auto my-20 mt-[150px] p-6 bg-white rounded-lg overflow-hidden">
+      <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
         <div className="relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 lg:mb-30">
             <div className="w-48 h-auto relative">
               <Image
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/20250212_180601_1_w6sgpi.png"
+                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
                 alt="NECA ICT ACADEMY Logo"
                 width={192}
                 height={96}
-                className="object-contain"
+                className="object-contain w-full h-full cursor-pointer"
               />
             </div>
             <div>
@@ -103,7 +98,7 @@ const ApplicationPortal = () => {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-evenly items-start gap-8">
+          <div className="flex flex-col md:flex-row justify-evenly items-start my-10 gap-8">
             <div className="w-full md:w-1/2 md:pr-8">
               <div className="relative w-full h-[300px] mb-6">
                 <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0 pl-20"></div>
@@ -114,7 +109,7 @@ const ApplicationPortal = () => {
                   className="object-contain relative z-10"
                 />
               </div>
-              <div className="lg:mt-55">
+              <div className="lg:mt-58 mt-10">
                 <h1 className="text-xl font-semibold text-left text-[#1E1E1E] mb-5 mt-10 pl-2">
                   Application Timeline
                 </h1>
