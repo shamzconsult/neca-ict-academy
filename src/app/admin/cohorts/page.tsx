@@ -1,3 +1,5 @@
+import { Cohorts } from "@/components/molecules/admin/cohorts/Cohorts";
+
 export default function Page() {
-  return <h1 className="p-4">All cohort page</h1>;
+  return <Cohorts />;
 }

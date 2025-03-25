@@ -4,6 +4,8 @@ import { useState } from "react";
 import { CgMoreVertical } from "react-icons/cg";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
+import { CohortForm } from "@/components/atom/CohortForm";
+import { cohorts } from "@/const/cohort";
 
 const statsData = [
   { label: "Total applicants", value: "1,150,000" },
@@ -14,53 +16,8 @@ const statsData = [
 
 export const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
-  const [cohorts] = useState([
-    {
-      name: "Cohort 1.0",
-      applicants: 2500,
-      admitted: 1500,
-      graduated: 450,
-      declined: 50,
-      startDate: "1/02/2025",
-      endDate: "2/05/2025",
-    },
-    {
-      name: "Cohort 2.0",
-      applicants: 1234,
-      admitted: 9507,
-      graduated: 210,
-      declined: 456,
-      startDate: "2/05/2024",
-      endDate: "2/08/2024",
-    },
-    {
-      name: "Cohort 3.0",
-      applicants: 5687,
-      admitted: 1009,
-      graduated: 386,
-      declined: 196,
-      startDate: "2/05/2024",
-      endDate: "2/12/2023",
-    },
-    {
-      name: "Cohort 4.0",
-      applicants: 2500,
-      admitted: 4587,
-      graduated: 123,
-      declined: 510,
-      startDate: "1/02/2025",
-      endDate: "2/05/2023",
-    },
-    {
-      name: "Cohort 5.0",
-      applicants: 25079,
-      admitted: 1500,
-      graduated: 450,
-      declined: 123,
-      startDate: "1/02/2025",
-      endDate: "2/05/2022",
-    },
-  ]);
+
+  const firstFiveCohorts = cohorts.slice(0, 5);
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -94,15 +51,15 @@ export const AdminDashboard = () => {
           <h2 className="text-xl font-semibold">Cohorts</h2>
           <a
             href="/admin/cohorts"
-            className="text-[#E02B20] hover:underline-offset-8"
+            className="text-[#E02B20] hover:underline hover:underline-offset-8"
           >
             View All Cohorts
           </a>
         </div>
-        <div className="overflow-x-auto border border-[#C4C4C4] p-2 rounded-lg">
+        <div className="overflow-x-auto border border-[#C4C4C4]  ">
           <table className="w-full table-auto   bg-white">
             <thead>
-              <tr className="">
+              <tr className="text-nowrap">
                 {[
                   "Cohort Name",
                   "Total Applicants",
@@ -120,7 +77,7 @@ export const AdminDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {cohorts.map((cohort, index) => (
+              {firstFiveCohorts.map((cohort, index) => (
                 <tr key={index} className="border-t border-[#C4C4C4]">
                   <td className="p-4">{cohort.name}</td>
                   <td className="p-4">{cohort.applicants.toLocaleString()}</td>
@@ -139,59 +96,7 @@ export const AdminDashboard = () => {
         </div>
       </section>
 
-      {showModal && (
-        <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
-            <h2 className="text-xl font-bold mb-4">Create Cohort</h2>
-            <div className="space-y-4 ">
-              <div>
-                <label className="block text-sm font-semibold mb-1">
-                  Cohort Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                  placeholder="Enter cohort name"
-                />
-              </div>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold mb-1">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                  />
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold mb-1">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-center space-x-2">
-                {/* <button
-                  className="px-4 py-2 bg-black text-white rounded-md"
-                  onClick={toggleModal}
-                >
-                  Cancel
-                </button> */}
-                <button
-                  onClick={toggleModal}
-                  className="px-4 py-2 bg-[#E02B20] text-white rounded-md"
-                >
-                  Create Cohort
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {showModal && <CohortForm />}
     </div>
   );
 };
