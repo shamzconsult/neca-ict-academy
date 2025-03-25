@@ -6,6 +6,7 @@ import { HiOutlinePlusCircle } from "react-icons/hi";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
 import { CohortForm } from "@/components/atom/CohortForm";
 import { cohorts } from "@/const/cohort";
+import Link from "next/link";
 
 const statsData = [
   { label: "Total applicants", value: "1,150,000" },
@@ -49,12 +50,12 @@ export const AdminDashboard = () => {
       <section className="w-full">
         <div className="flex justify-between items-center py-3">
           <h2 className="text-xl font-semibold">Cohorts</h2>
-          <a
+          <Link
             href="/admin/cohorts"
             className="text-[#E02B20] hover:underline hover:underline-offset-8"
           >
             View All Cohorts
-          </a>
+          </Link>
         </div>
         <div className="overflow-x-auto border border-[#C4C4C4]  ">
           <table className="w-full table-auto   bg-white">
