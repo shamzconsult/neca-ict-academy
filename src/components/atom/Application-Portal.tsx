@@ -5,7 +5,8 @@ import { useState } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { MdArrowDropDown } from "react-icons/md";
 import Link from "next/link";
-// import { PortalHeader } from "@/components/atom/headers/PortalHeader";
+// import { ApplicationReview } from "./ApplicationReview";
+import { CheckStatusModal } from "./CheckStatusModal";
 
 interface FormData {
   firstName: string;
@@ -28,6 +29,8 @@ const ApplicationPortal = () => {
     course: "",
   });
 
+  const [showModal, setShowModal] = useState(false);
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -44,6 +47,10 @@ const ApplicationPortal = () => {
     console.log(formData);
   };
 
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
+
   return (
     <div className="relative">
       <div className="absolute top-[-50px] left-0 w-[8%] h-[75%] z-0 transform rotate-[-0.47deg] origin-top-left">
@@ -55,15 +62,6 @@ const ApplicationPortal = () => {
           className="opacity-40"
         />
       </div>
-      {/* <div className="absolute top-60 right-0 w-1/4 h-8/6 b-20 z-0 transform rotate-[0.47deg] origin-top-right">
-        <Image
-          src="https://res.cloudinary.com/daqmbfctv/image/upload/v1742225179/Rectangle_4383_akoej5.png"
-          alt="Background Right"
-          layout="fill"
-          objectFit="cover"
-          className="opacity-35"
-        />
-      </div> */}
       <div className="absolute top-0 right-0 w-full top-90 h-1/2 z-0">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
@@ -75,7 +73,7 @@ const ApplicationPortal = () => {
       </div>
       <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
         <div className="relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 lg:mb-30">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 lg:mb-30">
             <div className="w-48 h-auto relative">
               <Image
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
@@ -91,6 +89,7 @@ const ApplicationPortal = () => {
                 <Link
                   href="#"
                   className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors"
+                  onClick={toggleModal}
                 >
                   Check Status
                 </Link>
@@ -329,6 +328,12 @@ const ApplicationPortal = () => {
             </div>
           </div>
         </div>
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-30">
+              {/* <ApplicationReview /> */}
+              <CheckStatusModal />
+          </div>
+        )}
       </div>
     </div>
   );
