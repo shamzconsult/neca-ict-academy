@@ -5,7 +5,8 @@ import { useState } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { MdArrowDropDown } from "react-icons/md";
 import Link from "next/link";
-// import { PortalHeader } from "@/components/atom/headers/PortalHeader";
+import { CheckStatusModal } from "./CheckStatusModal";
+import { ApplicationReview } from "./ApplicationReview";
 
 interface FormData {
   firstName: string;
@@ -28,6 +29,10 @@ const ApplicationPortal = () => {
     course: "",
   });
 
+  const [showModal, setShowModal] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [email, setEmail] = useState("");
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -40,8 +45,26 @@ const ApplicationPortal = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
     console.log(formData);
+  };
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+    setShowReview(false); // Reset review state when reopening the modal
+  };
+
+  const handleCheckStatus = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(email)) {
+      setShowReview(true); // Show ApplicationReview if email is valid
+    } else {
+      alert("Please enter a valid email address.");
+    }
+  };
+
+  const handleCloseReview = () => {
+    setShowModal(false); // Close the modal
+    setShowReview(false); // Reset review state
   };
 
   return (
@@ -55,15 +78,6 @@ const ApplicationPortal = () => {
           className="opacity-40"
         />
       </div>
-      {/* <div className="absolute top-60 right-0 w-1/4 h-8/6 b-20 z-0 transform rotate-[0.47deg] origin-top-right">
-        <Image
-          src="https://res.cloudinary.com/daqmbfctv/image/upload/v1742225179/Rectangle_4383_akoej5.png"
-          alt="Background Right"
-          layout="fill"
-          objectFit="cover"
-          className="opacity-35"
-        />
-      </div> */}
       <div className="absolute top-0 right-0 w-full top-90 h-1/2 z-0">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
@@ -75,7 +89,7 @@ const ApplicationPortal = () => {
       </div>
       <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
         <div className="relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 lg:mb-30">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 lg:mb-30">
             <div className="w-48 h-auto relative">
               <Image
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
@@ -91,6 +105,7 @@ const ApplicationPortal = () => {
                 <Link
                   href="#"
                   className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors"
+                  onClick={toggleModal}
                 >
                   Check Status
                 </Link>
@@ -329,6 +344,19 @@ const ApplicationPortal = () => {
             </div>
           </div>
         </div>
+        {showModal && (
+          <div className="fixed inset-0 flex items-center justify-center z-30 bg-black/30">
+            {!showReview ? (
+              <CheckStatusModal
+                email={email}
+                setEmail={setEmail}
+                onCheckStatus={handleCheckStatus}
+              />
+            ) : (
+              <ApplicationReview onClose={handleCloseReview} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
