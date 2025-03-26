@@ -1,39 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
 
-export const CheckStatusModal = () => {
-  const [showModal, setShowModal] = useState(false);
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
+interface CheckStatusModalProps {
+  email: string;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  onCheckStatus: () => void;
+}
+
+export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
+  email,
+  setEmail,
+  onCheckStatus,
+}) => {
   return (
-    <div className="fixed lg:sticky w-full h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
+    <div className="fixed inset-0 bg-black/30 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
-        <p className="text-[#27156F] font-bold mb-4">Check your application status.</p>
-        <div className="space-y-4 ">
-          <div>
-            <label className="block text-[#1E1E1E] font-semibold mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              className="w-full p-2 border border-[#C4C4C4] rounded-md"
-              placeholder="Enter your email address"
-            />
-          </div>
-          <div className="flex justify-center space-x-2">
-            {/* <button
-                  className="px-4 py-2 bg-black text-white rounded-md"
-                  onClick={toggleModal}
-                >
-                  Cancel
-                </button> */}
-            <button
-              onClick={toggleModal}
-              className="px-10 py-1.5 bg-[#E02B20] text-white rounded-md cursor-pointer mt-6"
-            >
-              Check Status
-            </button>
-          </div>
+        <h2 className="text-[15px] text-[#27156F] font-semibold mb-4">Check your Application Status.</h2>
+        <label htmlFor="" className="text-[#1E1E1E]">Email Address</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter your email"
+          className="w-full p-3 border border-gray-300 rounded-md mb-4 mt-2"
+        />
+        <div className="flex justify-center space-x-2">
+          <button
+            onClick={onCheckStatus}
+            className="w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#C0241A] transition-colors"
+          >
+            Check Status
+          </button>
         </div>
       </div>
     </div>

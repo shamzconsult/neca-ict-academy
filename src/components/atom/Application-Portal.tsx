@@ -5,8 +5,8 @@ import { useState } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { MdArrowDropDown } from "react-icons/md";
 import Link from "next/link";
-// import { ApplicationReview } from "./ApplicationReview";
 import { CheckStatusModal } from "./CheckStatusModal";
+import { ApplicationReview } from "./ApplicationReview";
 
 interface FormData {
   firstName: string;
@@ -30,6 +30,8 @@ const ApplicationPortal = () => {
   });
 
   const [showModal, setShowModal] = useState(false);
+  const [showReview, setShowReview] = useState(false);
+  const [email, setEmail] = useState("");
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -43,12 +45,26 @@ const ApplicationPortal = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
     console.log(formData);
   };
 
   const toggleModal = () => {
     setShowModal(!showModal);
+    setShowReview(false); // Reset review state when reopening the modal
+  };
+
+  const handleCheckStatus = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(email)) {
+      setShowReview(true); // Show ApplicationReview if email is valid
+    } else {
+      alert("Please enter a valid email address.");
+    }
+  };
+
+  const handleCloseReview = () => {
+    setShowModal(false); // Close the modal
+    setShowReview(false); // Reset review state
   };
 
   return (
@@ -329,9 +345,16 @@ const ApplicationPortal = () => {
           </div>
         </div>
         {showModal && (
-          <div className="fixed inset-0 flex items-center justify-center z-30">
-              {/* <ApplicationReview /> */}
-              <CheckStatusModal />
+          <div className="fixed inset-0 flex items-center justify-center z-30 bg-black/30">
+            {!showReview ? (
+              <CheckStatusModal
+                email={email}
+                setEmail={setEmail}
+                onCheckStatus={handleCheckStatus}
+              />
+            ) : (
+              <ApplicationReview onClose={handleCloseReview} />
+            )}
           </div>
         )}
       </div>
