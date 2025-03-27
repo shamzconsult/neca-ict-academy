@@ -5,9 +5,9 @@ import Link from "next/link";
 
 export const Logo = () => (
   <Link href="/" className="text-xl font-medium">
-    <div className="w-[200px]  h-[30px] lg:w-[270px] lg:h-[37px] relative ">
+    <div className="w-[200px]  h-[50px] lg:w-[222px] lg:h-[66px] relative ">
       <Image
-        src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1740647793/20250212_180601_1_st7yx6.png"
+        src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1742725836/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_b55ms5.png"
         alt="Neca-logo"
         fill
       />
