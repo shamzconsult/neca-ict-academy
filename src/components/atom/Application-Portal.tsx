@@ -53,14 +53,26 @@ const ApplicationPortal = () => {
     setShowReview(false); // Reset review state when reopening the modal
   };
 
-  const handleCheckStatus = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (emailRegex.test(email)) {
-      setShowReview(true); // Show ApplicationReview if email is valid
-    } else {
-      alert("Please enter a valid email address.");
-    }
-  };
+  const [emailError, setEmailError] = useState(""); // Add state for email error
+
+const handleCheckStatus = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (emailRegex.test(email)) {
+    setEmailError(""); // Clear error if email is valid
+    setShowReview(true); // Show ApplicationReview if email is valid
+  } else {
+    setEmailError("Please enter a valid email address."); // Set error message
+  }
+};
+
+  // const handleCheckStatus = () => {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (emailRegex.test(email)) {
+  //     setShowReview(true); // Show ApplicationReview if email is valid
+  //   } else {
+  //     alert("Please enter a valid email address.");
+  //   }
+  // };
 
   const handleCloseReview = () => {
     setShowModal(false); // Close the modal
@@ -98,7 +110,7 @@ const ApplicationPortal = () => {
       </div> */}
       <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
         <div className="relative z-10">
-          <div className="flex flex-row mt-10 lg:mt-0 md:flex-row justify-between items-center gap-5 lg:mb-30">
+          <div className="flex flex-col lg:flex-row mt-10 lg:mt-0 justify-between items-center gap-5 lg:mb-30">
             <div className="w-36 h-auto relative right-0 lg:w-48 lg:right-7">
               <Image
               src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
@@ -110,7 +122,7 @@ const ApplicationPortal = () => {
             </div>
             <div>
                 <h3 className="text-lg text-center md:text-left">
-                Already applied? <br className="block md:hidden" />
+                Already applied?
                 <Link
                   href="#"
                   className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors"
@@ -138,25 +150,25 @@ const ApplicationPortal = () => {
                   Application Timeline
                 </h1>
                 <div className="flex gap-7 items-center">
-                  <div className=" bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                  <div className=" bg-[#525252] text-white text-center items-center w-6 h-6 lg:w-8 lg:h-8 rounded-full pb-1.5 lg:pt-1">
                     <p>1</p>
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex lg:gap-2 gap-1 items-center">
                     <div className="bg-[#525252] w-2 h-1"></div>
                     <div className="bg-[#525252] w-3 h-1"></div>
                     <div className="bg-[#525252] w-4 h-1"></div>
                     <div className="bg-[#525252] w-5 h-1"></div>
                   </div>
-                  <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                  <div className="bg-[#525252] text-white text-sm text-center items-center w-6 h-6 lg:w-8 lg:h-8 rounded-full pt-1 lg:pt-1.5">
                     <p>2</p>
                   </div>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex gap-1 lg:gap-2 items-center">
                     <div className="bg-[#525252] w-2 h-1"></div>
                     <div className="bg-[#525252] w-3 h-1"></div>
                     <div className="bg-[#525252] w-4 h-1"></div>
                     <div className="bg-[#525252] w-5 h-1"></div>
                   </div>
-                  <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                  <div className="bg-[#525252] text-white text-center items-center w-6 h-6 lg:w-8 lg:h-8 rounded-full pb-1.5 lg:pt-1">
                     <p>3</p>
                   </div>
                 </div>
@@ -360,6 +372,7 @@ const ApplicationPortal = () => {
                 email={email}
                 setEmail={setEmail}
                 onCheckStatus={handleCheckStatus}
+                emailError={emailError}
               />
             ) : (
               <ApplicationReview onClose={handleCloseReview} />
