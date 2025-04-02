@@ -39,8 +39,8 @@ export const CohortPreview = ({ slug }: { slug: string }) => {
       </h1>
 
       <section className="border border-[#C4C4C4] w-full">
-        <div className="flex flex-col items-start md:flex-row md:items-center gap-4 p-4 w-full">
-          <div className="relative w-full md:w-[60%]">
+        <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full">
+          <div className="relative w-full md:w-[70%]">
             <FaSearch className="absolute left-3 top-3 " />
             <input
               type="text"

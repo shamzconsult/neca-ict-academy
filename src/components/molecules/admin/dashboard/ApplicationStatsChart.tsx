@@ -31,8 +31,8 @@ export const ApplicationStatsChart = () => {
       {
         label: "",
         fill: true,
-        backgroundColor: "#C4C4C4",
-        borderColor: "#27156F",
+        backgroundColor: "#27156F",
+        borderColor: "#E02B20",
         pointBackgroundColor: "#FFFFFF",
         pointBorderColor: "#47AA49",
         data: [5000, 15000, 30000, 50000, 10000, 20000, 40000, 60000],
