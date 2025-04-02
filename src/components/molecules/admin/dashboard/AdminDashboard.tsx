@@ -24,7 +24,7 @@ export const AdminDashboard = () => {
     setShowModal(!showModal);
   };
   return (
-    <div className="px-4 space-y-8 w-full pb-10">
+    <div className="md:px-4 space-y-8 w-full pb-10">
       <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white">
         <h1 className="md:text-[20px] font-medium">Dashboard Overview</h1>
         <button
@@ -97,7 +97,7 @@ export const AdminDashboard = () => {
         </div>
       </section>
 
-      {showModal && <CohortForm />}
+      {showModal && <CohortForm toggleModal={toggleModal} />}
     </div>
   );
 };

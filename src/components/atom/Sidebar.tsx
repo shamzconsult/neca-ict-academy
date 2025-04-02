@@ -4,24 +4,35 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiUsers, FiSettings, FiLogOut, FiMenu, FiX } from "react-icons/fi";
+import { FiUsers, FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { MdDashboard } from "react-icons/md";
+import { AdminLogo } from "./AdminLogo";
+import { LogoutModal } from "./LogoutModal";
 
 export const Sidebar = () => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const isActive = (path: string) => pathname === path;
 
+  const handleLogout = () => {
+    setShowModal(false);
+  };
   return (
     <div className="relative">
-      <button
-        className="lg:hidden p-4 focus:outline-none"
-        onClick={() => setIsOpen(true)}
-      >
-        <FiMenu size={24} />
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          className="lg:hidden  focus:outline-none"
+          onClick={() => setIsOpen(true)}
+        >
+          <FiMenu size={24} />
+        </button>
 
+        <div className="py-1 flex md:hidden">
+          <AdminLogo />
+        </div>
+      </div>
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/60 bg-opacity-50 z-40"
@@ -79,7 +90,7 @@ export const Sidebar = () => {
         </div>
 
         <div className="mb-6">
-          <Link
+          {/* <Link
             href="/admin/settings"
             onClick={() => setIsOpen(false)}
             className={`flex items-center px-6 py-3 text-sm font-medium mx-1 ${
@@ -90,14 +101,23 @@ export const Sidebar = () => {
           >
             <FiSettings size={20} className="mr-3" />
             Settings
-          </Link>
+          </Link> */}
 
-          <button className="flex items-center px-6 py-3 text-sm text-[#E02B20] hover:text-red-800 w-full">
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center px-6 py-3 text-sm text-[#E02B20] hover:text-red-800 w-full cursor-pointer"
+          >
             <FiLogOut size={20} className="mr-3" />
             Logout
           </button>
         </div>
       </div>
+
+      <LogoutModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };

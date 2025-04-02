@@ -1,10 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 
-export const CohortForm = () => {
-  const [showModal, setShowModal] = useState(false);
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
+export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
   return (
     <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
