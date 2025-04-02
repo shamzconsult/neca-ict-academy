@@ -17,7 +17,7 @@ export const Testimonials = () => {
     slidesToShow: 3,
     slidesToScroll: 1,
     centerMode: true,
-    centerPadding: "5%",
+    centerPadding: "0%",
     autoplay: true,
     autoplaySpeed: 3000,
     beforeChange: (_: number, newIndex: number) => setCurrentIndex(newIndex),
@@ -59,7 +59,7 @@ export const Testimonials = () => {
                 key={index}
                 className={`bg-white rounded-xl shadow-lg p-6 text-left max-w-sm transition-all text-[#000000] duration-500 ${
                   index === currentIndex
-                    ? "scale-100 z-10"
+                    ? "scale-100 z-10 mb-3"
                     : "scale-90 opacity-60"
                 }`}
               >
@@ -74,7 +74,7 @@ export const Testimonials = () => {
                   <div className="ml-3">
                     <h4 className="text-lg font-bold">{testimonial.name}</h4>
                     <p className="text-sm">
-                      {testimonial.role}{" "}
+                      {testimonial.role}
                       <span className="text-yellow-500">
                         {"★".repeat(testimonial.rating)}
                         {"★".repeat(5 - testimonial.rating)}
@@ -83,7 +83,7 @@ export const Testimonials = () => {
                   </div>
                 </div>
 
-                <h4 className="text-lg font-semibold mt-2">
+                <h4 className="text-lg font-semibold mt-2 text-center">
                   {testimonial.title}
                 </h4>
                 <p className="mt-2 text-sm text-center">{testimonial.review}</p>

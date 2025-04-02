@@ -27,8 +27,8 @@ export const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white font-medium w-full fixed top-0 z-50 text-[#27156F] py-4 px-4 shadow-md text-sm">
-      <div className="max-w-6xl mx-auto flex items-center justify-between py-3">
+    <nav className="bg-white font-medium w-full fixed top-0 z-50 text-[#27156F]  px-4 shadow-md text-sm">
+      <div className="max-w-6xl mx-auto flex items-center justify-between h-[80px] lg:h-[106px]">
         <div className="flex items-center w-full lg:w-auto">
           <div onClick={handleLinkClick}>
             <Logo />

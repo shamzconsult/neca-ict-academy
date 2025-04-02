@@ -38,10 +38,10 @@ export const CourseCard = ({
             }`}
           >
             <div
-              className={`  relative  p-3 ${
+              className={`  relative  p3 ${
                 isCoursesPath
-                  ? "w-full md:w-[340px]  lg:w-[100%] h-[250px] lg:h-[270px]"
-                  : "w-full h-[250px]  lg:h-[189px] lg:w-[331px]"
+                  ? "w-full  h-[250px] lg:h-[270px]"
+                  : "w-full h-[250px]  lg:h-[189px] "
               }`}
             >
               <Image
