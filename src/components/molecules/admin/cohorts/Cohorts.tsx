@@ -72,7 +72,7 @@ export const Cohorts = () => {
           </tbody>
         </table>
       </div>
-      {showModal && <CohortForm />}
+      {showModal && <CohortForm toggleModal={toggleModal} />}
     </div>
   );
 };
