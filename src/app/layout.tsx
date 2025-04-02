@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/atom/Navbar";
 import { Poppins } from "next/font/google";
-import { Footer } from "@/components/atom/Footer";
 
-export const poppins = Poppins({
+const poppins = Poppins({
   subsets: ["latin"],
   weight: "400",
 });
@@ -21,11 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={` ${poppins.className}`}>
-        <Navbar />
-        {children}
-        <Footer />
-      </body>
+      <body className={poppins.className}>{children}</body>
     </html>
   );
 }

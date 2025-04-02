@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import Marquee from "react-fast-marquee";
+// import Marquee from "react-fast-marquee";
 import { partners } from "@/const/partners";
 import { Heading } from "./headers/Heading";
 import { SubHeading } from "./headers/SubHeading";
@@ -12,7 +12,8 @@ export const Partners = () => {
         <SubHeading>Partners</SubHeading>
         <Heading>Organisations That Trusts Us</Heading>
       </div>
-      <Marquee speed={50} pauseOnHover={false}>
+      {/* <Marquee speed={50} pauseOnHover={false}> */}
+      <div className="flex gap-3 justify-center items-center">
         {partners?.map((partner, index) => (
           <div
             key={index}
@@ -26,7 +27,8 @@ export const Partners = () => {
             />
           </div>
         ))}
-      </Marquee>
+      </div>
+      {/* </Marquee> */}
     </div>
   );
 };

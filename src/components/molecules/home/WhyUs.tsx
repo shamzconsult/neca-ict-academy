@@ -29,7 +29,7 @@ export const WhyUs = () => {
   ];
   return (
     <div className="w-full py-20 bg-[#DBEAF6]">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-2 md:px-4">
         <section className="flex flex-col justify-center items-center text-center gap-5">
           <SubHeading>Why Us</SubHeading>
           <Heading>Empowering the Next Generation of Tech Innovators</Heading>
@@ -45,9 +45,9 @@ export const WhyUs = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-b-xl shadow-lg overflow-hidden h-[340px]"
+              className="bg-white rounded-b-xl  shadow-lg overflow-hidden h-full"
             >
-              <div className=" h-[184px] w-[379px]  relative ">
+              <div className=" h-[184px]  w-full  relative ">
                 <Image src={feature.image} alt="features-img" fill />
               </div>
               <div className="p-3 my-4">
