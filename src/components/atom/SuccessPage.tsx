@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import Image from 'next/image';
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 
@@ -39,12 +39,6 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
       </button>
     </div>
   );
-};
-
-const SuccessComponent = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleCloseModal = () => setIsModalOpen(false);
 };
 
 export default SuccessModal;
