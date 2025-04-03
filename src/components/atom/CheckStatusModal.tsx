@@ -35,7 +35,7 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
         <div className="flex justify-center space-x-2 mt-4">
           <button
             onClick={onCheckStatus}
-            className="w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#C0241A] transition-colors"
+            className="w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#C0241A] transition-colors cursor-pointer"
           >
             Check Status
           </button>
