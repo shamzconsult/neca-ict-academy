@@ -7,21 +7,21 @@ export const WhyUs = () => {
   const features = [
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264010/Neca_web_12_y5ye8z.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/Neca_web_12_wvsozl.png",
       title: "100% Government-Backed Training",
       description:
         "Our ICT Academy is fully supported by the government, ensuring high-quality, accessible, and affordable training for all.",
     },
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264011/NECA_WEB_21_boiule.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/NECA_WEB_21_xs95rt.png",
       title: "Learn from Industry Experts and Mentors",
       description:
         "Gain invaluable knowledge from seasoned professionals with years of experience in the tech industry.",
     },
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264010/neca_web_9_jxyhtg.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/neca_web_9_fimcse.png",
       title: "Earn Globally Recognized Certifications",
       description:
         "Our certification programs are designed to meet global standards, ensuring that you stand out to employers in the competitive tech industry.",
