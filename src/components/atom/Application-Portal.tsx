@@ -81,7 +81,7 @@ const ApplicationPortal = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative min-h-screen overflow-hidden">
       <div className="absolute top-[-50px] left-0 w-[8%] h-[73%] z-0 transform rotate-[-0.47deg] origin-top-left">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
@@ -91,7 +91,7 @@ const ApplicationPortal = () => {
           className="opacity-40"
         />
       </div>
-      <div className="hidden lg:block absolute top-[90%] right-[-50] w-[20%] top-90 h-[20%] z-10 transform">
+      <div className="hidden lg:block absolute top-[90%] right-[-50] w-[20%]  h-[20%] z-10 transform">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
           alt="Background Right"
@@ -102,7 +102,7 @@ const ApplicationPortal = () => {
       </div>
 
       {!isSuccessModalOpen && (
-        <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
+        <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-5">
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row mt-10 lg:mt-0 justify-between items-center gap-5 lg:mb-30">
               <div className="w-36 h-auto relative right-0 lg:w-48 lg:right-7">
@@ -180,8 +180,8 @@ const ApplicationPortal = () => {
                   Register Now!
                 </h2>
                 <p className="text-gray-600 text-xl mb-7">
-                  To apply for our training programs or opportunities, please fill
-                  out the form below with accurate information. Ensure all
+                  To apply for our training programs or opportunities, please
+                  fill out the form below with accurate information. Ensure all
                   required fields are completed to avoid delays in processing{" "}
                   <br /> your application.
                 </p>
@@ -372,7 +372,10 @@ const ApplicationPortal = () => {
         </div>
       )}
 
-      <SuccessModal isOpen={isSuccessModalOpen} onClose={handleCloseSuccessModal} />
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={handleCloseSuccessModal}
+      />
     </div>
   );
 };
