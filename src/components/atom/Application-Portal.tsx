@@ -282,6 +282,8 @@ const ApplicationPortal = () => {
                           <option value="Abuja">Abuja</option>
                           <option value="Kwara state">Kwara state</option>
                           <option value="Lagos State">Lagos State</option>
+                          <option value="Lagos State">Niger State</option>
+                          <option value="Lagos State">Oyo State</option>
                         </select>
                         <MdArrowDropDown
                           size={24}
