@@ -36,18 +36,18 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
               />
             </div>
           </div>
-          <div className="flex justify-center space-x-2">
-            {/* <button
-                  className="px-4 py-2 bg-black text-white rounded-md"
-                  onClick={toggleModal}
-                >
-                  Cancel
-                </button> */}
+          <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
             <button
               onClick={toggleModal}
-              className="px-4 py-2 bg-[#E02B20] text-white rounded-md cursor-pointer"
+              className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] text-white w-full rounded-md cursor-pointer"
             >
               Create Cohort
+            </button>
+            <button
+              className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
+              onClick={toggleModal}
+            >
+              Cancel
             </button>
           </div>
         </div>
