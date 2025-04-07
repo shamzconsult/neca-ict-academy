@@ -8,6 +8,7 @@ import Link from "next/link";
 import { CheckStatusModal } from "./CheckStatusModal";
 import { ApplicationReview } from "./ApplicationReview";
 import SuccessModal from "./SuccessPage";
+import { FiFileText, FiImage } from 'react-icons/fi';
 
 interface FormData {
   firstName: string;
@@ -116,13 +117,13 @@ const ApplicationPortal = () => {
               </div>
               <div>
                 <h3 className="text-lg text-center md:text-left">
-                  Already applied?
+                  Already applied?{" "}
                   <Link
-                    href="#"
-                    className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors"
-                    onClick={toggleModal}
+                  href="#"
+                  className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
+                  onClick={toggleModal}
                   >
-                    Check Status
+                  Check Status
                   </Link>
                 </h3>
               </div>
@@ -175,7 +176,7 @@ const ApplicationPortal = () => {
               </div>
 
               <div className="w-full md:w-1/2 text-center lg:text-left">
-                <SubHeading>Application Form</SubHeading>
+                <SubHeading>Neca Academy Application Portal</SubHeading>
                 <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">
                   Register Now!
                 </h2>
@@ -186,104 +187,97 @@ const ApplicationPortal = () => {
                   <br /> your application.
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
-                    <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="firstName"
-                      >
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div className="md:col-span-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                        <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         First Name
                       </label>
-                      <input
-                        type="text"
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
-                        placeholder="Enter your first name"
-                      />
+                          <input
+                            type="text"
+                            placeholder="First Name"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleInputChange}
+                            className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 text-left mb-2">
+                            Last Name
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Last Name"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleInputChange}
+                            className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
+                            required
+                          />
+                        </div>
+                      </div>
                     </div>
+
+
                     <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="lastName"
-                      >
-                        Last Name
-                      </label>
-                      <input
-                        type="text"
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
-                        placeholder="Enter your last name"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="lastName"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Email Address
                       </label>
                       <input
                         type="email"
-                        id="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
+                        className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
                         placeholder="Enter your email address"
                       />
                     </div>
+
+                   
                     <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="lastName"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Phone Number
                       </label>
                       <input
                         type="tel"
-                        id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
+                        className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer"
                         placeholder="Enter your phone number"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
+
+                
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                   
                     <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="state"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         State
                       </label>
                       <div className="relative">
                         <select
-                          id="state"
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer appearance-none"
+                          className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none"
                         >
                           <option value="">Select your state</option>
                           <option value="Abuja">Abuja</option>
                           <option value="Kwara state">Kwara state</option>
                           <option value="Lagos State">Lagos State</option>
-                          <option value="Lagos State">Niger State</option>
-                          <option value="Lagos State">Oyo State</option>
+                          <option value="Niger State">Niger State</option>
+                          <option value="Oyo State">Oyo State</option>
                         </select>
                         <MdArrowDropDown
                           size={24}
@@ -291,21 +285,19 @@ const ApplicationPortal = () => {
                         />
                       </div>
                     </div>
+
+                  
                     <div>
-                      <label
-                        className="block text-sm font-medium text-gray-700 text-left"
-                        htmlFor="gender"
-                      >
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Gender
                       </label>
                       <div className="relative">
                         <select
-                          id="gender"
                           name="gender"
                           value={formData.gender}
                           onChange={handleInputChange}
                           required
-                          className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer appearance-none"
+                          className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none"
                         >
                           <option value="">Select gender</option>
                           <option value="Male">Male</option>
@@ -318,21 +310,19 @@ const ApplicationPortal = () => {
                       </div>
                     </div>
                   </div>
+
+                  
                   <div>
-                    <label
-                      className="block text-sm font-medium text-gray-700 text-left"
-                      htmlFor="course"
-                    >
+                    <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                       Course
                     </label>
                     <div className="relative">
                       <select
-                        id="course"
                         name="course"
                         value={formData.course}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 block w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer appearance-none"
+                        className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none"
                       >
                         <option value="">Select a course</option>
                         <option value="Web Development">Web Development</option>
@@ -345,9 +335,54 @@ const ApplicationPortal = () => {
                       />
                     </div>
                   </div>
+
+                 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
+                        Upload CV
+                      </label>
+                      <div className="relative h-14">
+                        <div className="flex items-center gap-3 p-3 h-full border border-[#1E1E1E] rounded-md focus-within:ring focus-within:ring-[#1E1E1E] cursor-pointer">
+                          <FiFileText className="text-gray-500 text-xl flex-shrink-0" />
+                          <input
+                            type="file"
+                            name="cv"
+                            accept=".pdf,.doc,.docx"
+                            required
+                            className="w-full opacity-0 absolute inset-0 cursor-pointer"
+                          />
+                          <span className="text-gray-500 text-sm truncate">Choose PDF or DOC file</span>
+                        </div>
+                      </div>
+                    </div>
+
+                     
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 text-left mb-2">
+                        Upload Profile Image
+                      </label>
+                      <div className="relative h-14">
+                        <div className="flex items-center gap-3 p-3 h-full border border-[#1E1E1E] rounded-md focus-within:ring focus-within:ring-[#1E1E1E] cursor-pointer">
+                          <FiImage className="text-gray-500 text-xl flex-shrink-0" />
+                          <input
+                            type="file"
+                            name="profileImage"
+                            accept="image/*"
+                            required
+                            className="w-full opacity-0 absolute inset-0 cursor-pointer"
+                          />
+                          <span className="text-gray-500 text-sm truncate">Choose image file</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                   
                   <button
                     type="submit"
-                    className="w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#E02B20] transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer"
+                    className="w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer"
                   >
                     SUBMIT
                   </button>
