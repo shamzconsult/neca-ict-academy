@@ -2,6 +2,40 @@ import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { NextResponse } from "next/server";
 
+const GET = async (req: Request) => {
+    try {
+        const url = new URL(req.url);
+        const id = url.pathname.split("/").pop();
+
+        if (!id) {
+            return NextResponse.json(
+                { message: "Id is required" },
+                { status: 400 }
+            )
+        }
+
+        const course = await Course.findById(id);
+
+        if (!course) {
+            return NextResponse.json(
+                { message: "Course not found" },
+                { status: 404 }
+            )
+        }
+
+        return NextResponse.json(
+            { course },
+            { status: 200 }
+        )
+    } catch (error) {
+        console.error("error fetching course");
+        return NextResponse.json(
+            { message: "Error fetching Course", error },
+            { status: 500 }
+        )
+    }
+}
+
 const PUT = async (req: Request) => {
     try {
         await connectViaMongoose();
@@ -42,4 +76,4 @@ const DELETE = async (req: Request) => {
     }
 };
 
-export { PUT, DELETE }
+export { GET, PUT, DELETE }
