@@ -54,7 +54,7 @@ export const Sidebar = () => {
           </button>
           <div className="w-[150px] h-[60px] lg:w-[222px] lg:h-[66px] relative m-4">
             <Image
-              src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1742725836/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_b55ms5.png"
+              src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1744035920/logo_qrd6my.png"
               alt="Neca-logo"
               fill
             />
@@ -64,7 +64,7 @@ export const Sidebar = () => {
             <Link
               href="/admin/dashboard"
               onClick={() => setIsOpen(false)}
-              className={`flex items-center px-6 py-3 text-sm font-medium mx-1 ${
+              className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/dashboard")
                   ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
                   : " hover:text-[#27156F]"
@@ -77,7 +77,7 @@ export const Sidebar = () => {
             <Link
               href="/admin/cohorts"
               onClick={() => setIsOpen(false)}
-              className={`flex items-center px-6 py-3 text-sm font-medium mx-1 ${
+              className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/cohorts")
                   ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
                   : " hover:text-[#27156F]"
