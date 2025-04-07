@@ -1,7 +1,6 @@
 "use client";
 
 import { CohortForm } from "@/components/atom/CohortForm";
-import { cohorts } from "@/const/cohort";
 import { getAPIData } from "@/utils/getAPIData";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -24,7 +23,6 @@ export const Cohorts = () => {
   const fetchData = async () => {
     try {
       const data = await getAPIData({ uri: "/api/cohort" });
-      console.log(data);
       setCohort(data);
     } catch (error) {
       console.log("Error loading data", error);
