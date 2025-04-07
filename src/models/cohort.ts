@@ -5,6 +5,13 @@ const CohortSchema = new Schema({
         type: String,
         required: true
     },
+    slug: {
+        type: String,
+        unique: true,
+        default: function() {
+            return new mongoose.Types.ObjectId().toString();
+        }
+    },
     startDate: {
         type: String,
         required: true
@@ -20,8 +27,13 @@ const CohortSchema = new Schema({
     applicationEndDate: {
         type: String,
         required: true
-    }
-    
+    },
+    applicants: [
+        {
+        type: Schema.Types.ObjectId,
+        ref: "Enrollment"
+        }
+    ]
 }, {
     timestamps: true
 });
