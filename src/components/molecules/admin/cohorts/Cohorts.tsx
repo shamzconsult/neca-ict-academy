@@ -7,6 +7,31 @@ import React, { useEffect, useState } from "react";
 import { CgMoreVertical } from "react-icons/cg";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 
+type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
+
+interface ApplicantDetail {
+  applicantName: string;
+  applicantEmail: string;
+  course: string;
+  level: number;
+  location: string;
+  date: string;
+  status: Status;
+}
+
+interface CohortType {
+  _id: number;
+  slug: string;
+  name: string;
+  applicants: string;
+  admitted: string;
+  graduated: string;
+  declined: string;
+  startDate: string;
+  endDate: string;
+  applicantDetails: ApplicantDetail[];
+}
+
 export const Cohorts = () => {
   const [showModal, setShowModal] = useState(false);
   const [cohort, setCohort] = useState([]);
@@ -66,9 +91,9 @@ export const Cohorts = () => {
               </tr>
             </thead>
             <tbody>
-              {cohort.map((cohort: any) => (
+              {cohort.map((cohort: CohortType) => (
                 <tr
-                  key={cohort.id}
+                  key={cohort._id}
                   onClick={() => handleRowClick(cohort.slug)}
                   className="border-t border-[#C4C4C4] cursor-pointer hover:bg-slate-50"
                 >
