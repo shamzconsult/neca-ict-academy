@@ -14,6 +14,13 @@ const CourseSchema = new Schema ({
         type: String,
         required: true
     },
+    slug: {
+        type: String,
+        unique: true,
+        default: function() {
+            return new mongoose.Types.ObjectId().toString();
+        }
+    },
     description: {
         type: String,
         required: true

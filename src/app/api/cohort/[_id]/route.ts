@@ -10,13 +10,12 @@ const GET = async (req: Request) => {
         const id = url.pathname.split("/").pop();
 
         if (!id) {
-            return NextResponse.json(
-                { message: "Applicant ID is required" },
-                { status: 400 }
-            );
+            // To Get all cohorts with applicants populated
+            const cohorts = await Cohort.find({}).populate('applicants');
+            return NextResponse.json(cohorts);
         }
 
-        const cohort = await Cohort.findById(id);
+        const cohort = await Cohort.findById(id).populate('applicants');
         if (!cohort) {
             return NextResponse.json(
                 { message: "Cohort not found" },
@@ -50,13 +49,29 @@ const PUT = async (req: Request) => {
             );
         };
 
-        const { name, startDate, endDate, applicationStartDate, applicationEndDate } = await req.json();
+        const { name, startDate, endDate, applicationStartDate, applicationEndDate, applicantId } = await req.json();
+
+        let updateData: {
+            name?: string;
+            startDate?: string;
+            endDate?: string;
+            applicationStartDate?: string;
+            applicationEndDate?: string;
+        } | {
+            $addToSet: { applicants: string };
+        } = { name, startDate, endDate, applicationStartDate, applicationEndDate };
+        
+        if (applicantId) {
+            updateData = {
+                $addToSet: { applicants: applicantId }
+            };
+        }
 
         const updatedCohort = await Cohort.findByIdAndUpdate(
             id,
-            { name, startDate, endDate, applicationStartDate, applicationEndDate },
+            updateData,
             { new: true, runValidators: true }
-        )
+        ).populate('applicants');
 
         return NextResponse.json(
             { message: "Cohort updated Successfully!", updatedCohort },
