@@ -2,13 +2,15 @@
 
 import { CohortForm } from "@/components/atom/CohortForm";
 import { cohorts } from "@/const/cohort";
+import { getAPIData } from "@/utils/getAPIData";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CgMoreVertical } from "react-icons/cg";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 
 export const Cohorts = () => {
   const [showModal, setShowModal] = useState(false);
+  const [cohort, setCohort] = useState([]);
   const router = useRouter();
 
   const handleRowClick = (slug: string) => {
@@ -18,6 +20,20 @@ export const Cohorts = () => {
   const toggleModal = () => {
     setShowModal(!showModal);
   };
+
+  const fetchData = async () => {
+    try {
+      const data = await getAPIData({ uri: "/api/cohort" });
+      console.log(data);
+      setCohort(data);
+    } catch (error) {
+      console.log("Error loading data", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="px-4 space-y-8 w-full pb-10">
@@ -30,48 +46,57 @@ export const Cohorts = () => {
           <HiOutlinePlusCircle /> Create Cohort
         </button>
       </div>
-      <div className="overflow-x-auto   border border-[#C4C4C4]">
-        <table className="w-full table-auto bg-white">
-          <thead className="">
-            <tr className="text-nowrap">
-              {[
-                "Cohort Name",
-                "Total Applicants",
-                "Total Admitted",
-                "Total Graduated",
-                "Total Declined",
-                "Start Date",
-                "End Date",
-                "Action",
-              ].map((header) => (
-                <th key={header} className="p-4 text-left font-medium">
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {cohorts.map((cohort) => (
-              <tr
-                key={cohort.id}
-                onClick={() => handleRowClick(cohort.slug)}
-                className="border-t border-[#C4C4C4] cursor-pointer hover:bg-slate-50"
-              >
-                <td className="p-4">{cohort.name}</td>
-                <td className="p-4">{cohort.applicants}</td>
-                <td className="p-4">{cohort.admitted}</td>
-                <td className="p-4">{cohort.graduated}</td>
-                <td className="p-4">{cohort.declined}</td>
-                <td className="p-4">{cohort.startDate}</td>
-                <td className="p-4">{cohort.endDate}</td>
-                <td className="p-4">
-                  <CgMoreVertical />
-                </td>
+      {cohort.length > 0 ? (
+        <div className="overflow-x-auto   border border-[#C4C4C4]">
+          <table className="w-full table-auto bg-white">
+            <thead className="">
+              <tr className="text-nowrap">
+                {[
+                  "Cohort Name",
+                  "Total Applicants",
+                  "Total Admitted",
+                  "Total Graduated",
+                  "Total Declined",
+                  "Start Date",
+                  "End Date",
+                  "Action",
+                ].map((header) => (
+                  <th key={header} className="p-4 text-left font-medium">
+                    {header}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {cohort.map((cohort: any) => (
+                <tr
+                  key={cohort.id}
+                  onClick={() => handleRowClick(cohort.slug)}
+                  className="border-t border-[#C4C4C4] cursor-pointer hover:bg-slate-50"
+                >
+                  <td className="p-4">{cohort.name}</td>
+                  <td className="p-4">{cohort.applicants || "Nill"}</td>
+                  <td className="p-4">{cohort.admitted || "Nill"}</td>
+                  <td className="p-4">{cohort.graduated || "Nill"}</td>
+                  <td className="p-4">{cohort.declined || "Nill"}</td>
+                  <td className="p-4">{cohort.startDate}</td>
+                  <td className="p-4">{cohort.endDate}</td>
+                  <td className="p-4">
+                    <CgMoreVertical />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className=" h-[70vh] mt2 flex flex-col justify-center items-center">
+          <h1 className="text-center font-bold  ">No Cohort Created yet</h1>
+          <p className="text-sm text-slate-400">
+            Click on the create Cohort button to start
+          </p>
+        </div>
+      )}
       {showModal && <CohortForm toggleModal={toggleModal} />}
     </div>
   );
