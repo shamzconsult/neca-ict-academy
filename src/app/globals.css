@@ -40,7 +40,7 @@ body {
 
 @keyframes bgMove {
   from {
-    background-position: 500% 0%;
+    background-position: 1000% 0%;
   }
   to {
     background-position: 0% 0%;
@@ -48,5 +48,5 @@ body {
 }
 
 .animate-bg-move {
-  animation: bgMove 5s linear infinite;
+  animation: bgMove 10s linear infinite;
 }

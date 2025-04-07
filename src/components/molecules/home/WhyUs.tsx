@@ -7,21 +7,21 @@ export const WhyUs = () => {
   const features = [
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264010/Neca_web_12_y5ye8z.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/Neca_web_12_wvsozl.png",
       title: "100% Government-Backed Training",
       description:
         "Our ICT Academy is fully supported by the government, ensuring high-quality, accessible, and affordable training for all.",
     },
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264011/NECA_WEB_21_boiule.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/NECA_WEB_21_xs95rt.png",
       title: "Learn from Industry Experts and Mentors",
       description:
         "Gain invaluable knowledge from seasoned professionals with years of experience in the tech industry.",
     },
     {
       image:
-        "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741264010/neca_web_9_jxyhtg.png",
+        "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743687777/neca_web_9_fimcse.png",
       title: "Earn Globally Recognized Certifications",
       description:
         "Our certification programs are designed to meet global standards, ensuring that you stand out to employers in the competitive tech industry.",
@@ -29,7 +29,7 @@ export const WhyUs = () => {
   ];
   return (
     <div className="w-full py-20 bg-[#DBEAF6]">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-2 md:px-4">
         <section className="flex flex-col justify-center items-center text-center gap-5">
           <SubHeading>Why Us</SubHeading>
           <Heading>Empowering the Next Generation of Tech Innovators</Heading>
@@ -45,9 +45,9 @@ export const WhyUs = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white rounded-b-xl shadow-lg overflow-hidden h-[340px]"
+              className="bg-white rounded-b-xl  shadow-lg overflow-hidden h-full"
             >
-              <div className=" h-[184px] w-[379px]  relative ">
+              <div className=" h-[184px]  w-full  relative ">
                 <Image src={feature.image} alt="features-img" fill />
               </div>
               <div className="p-3 my-4">

@@ -5,6 +5,8 @@ import { CoursePreviewHero } from "./CoursePreviewHero";
 import { TrackCards } from "./TrackCards";
 import { CourseDetails } from "./CourseDetails";
 import { JoinUs } from "@/components/atom/JoinUs";
+import { Navbar } from "@/components/atom/Navbar";
+import { Footer } from "@/components/atom/Footer";
 
 export const CoursePreview = ({ slug }: { slug: string }) => {
   const courseData = maincourses.find((course) => {
@@ -25,10 +27,12 @@ export const CoursePreview = ({ slug }: { slug: string }) => {
   }
   return (
     <div>
+      <Navbar />
       <CoursePreviewHero courseData={courseData} />
       <TrackCards />
       <CourseDetails courseData={courseData} />
       <JoinUs />
+      <Footer />
     </div>
   );
 };

@@ -155,7 +155,7 @@ const Contact = () => {
             </div>
           </div>
 
-            <div className="w-full md:w-1/2 bg-white p-6">
+            <div className="w-full md:w-1/2 bg-white p-6 gap-4 flex flex-col items-center justify-center max-w-[584px]">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.1500306894045!2d7.485448874049589!3d9.050076288660685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0ba3d6cef4c9%3A0x818eab5a4834a347!2sUnity%20Bank%20PLC!5e0!3m2!1sen!2sng!4v1741878840642!5m2!1sen!2sng" 
               width="100%" 
@@ -163,7 +163,16 @@ const Contact = () => {
               allowFullScreen 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-[100%] h-94 md:w-[570px] md:h-[730px]"
+              className="w-[100%] h-94 md:w-[570px] md:h-[330px] md:ml-14"
+            ></iframe>
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.1892339823!2d3.352856074645217!3d6.623400993370829!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b93b89afbc06d%3A0xce547bf9cde23cfd!2sNECA%20Building!5e0!3m2!1sen!2sng!4v1744028951710!5m2!1sen!2sng" 
+              width="100%" 
+              height="400" 
+              allowFullScreen 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+              className="w-[100%] h-94 md:w-[570px] md:h-[330px] md:ml-14"
             ></iframe>
             </div>
         </div>
