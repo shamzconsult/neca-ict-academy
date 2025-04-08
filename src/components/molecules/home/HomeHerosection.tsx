@@ -23,6 +23,7 @@ export const HomeHerosection = () => {
             src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743684060/Neca_web_6_zsloyh.png"
             alt="hero-image"
             fill
+            className="object-fit"
           />
         </div>
         <div className="flex flex-col justify-between w-full gap-4 md:w-1/2">
@@ -30,7 +31,7 @@ export const HomeHerosection = () => {
             <Image
               src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1743744742/NECA_Web_13_fniqfh.jpg"
               alt="hero-image"
-              className="rounded-lg border-4 border-white"
+              className="rounded-lg border-4 border-white object-cover"
               fill
             />
           </div>
@@ -38,7 +39,7 @@ export const HomeHerosection = () => {
             <Image
               src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1743744967/NECA_Web_16_ckl8pl.jpg"
               alt="hero-image"
-              className="rounded-lg border-4 border-white"
+              className="rounded-lg border-4 border-white object-cover"
               fill
             />
           </div>

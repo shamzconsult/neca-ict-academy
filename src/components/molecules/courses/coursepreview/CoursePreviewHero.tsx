@@ -24,8 +24,13 @@ export const CoursePreviewHero = ({
           </div>
         </div>
         <div className="w-full flex justify-center md:max-w-1/2">
-          <div className=" w-full h-[400px]  relative   md:h-[405px] md:w-[582px]  ">
-            <Image src={image} alt="hero-image" fill className="rounded-3xl" />
+          <div className=" w-full h-[300px] md:h-[400px]    md:w-[582px]  relative  ">
+            <Image
+              src={image}
+              alt="hero-image"
+              fill
+              className="rounded-xl object-fit "
+            />
           </div>
         </div>
       </section>
