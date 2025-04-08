@@ -23,6 +23,19 @@ export const AddNewCourse = ({ toggleModal }: { toggleModal: () => void }) => {
           </div>
           <div>
             <label className="block text-sm font-semibold mb-1">
+              Course Slug
+            </label>
+            <input
+              type="text"
+              //   onChange={(e) => setName(e.target.value)}
+              //   value={name}
+              required
+              className="w-full p-2 border border-[#C4C4C4] rounded-md"
+              placeholder="software-engineering"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">
               Description
             </label>
             <textarea
