@@ -18,16 +18,18 @@ const GET = async () => {
 const POST = async (req: Request) => {
     try {
         await connectViaMongoose();
-        const { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort } = await req.json();
+        const { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort, cv, profilePicture } = await req.json();
 
-        if (!firstName || !lastName || !course || !email || !phoneNumber || !state || !gender || !level || !status || !cohort) {
+        if (!firstName || !lastName || !course || !email || !phoneNumber || !state || !gender || !level || !status || !cohort || !cv || !profilePicture) {
             return NextResponse.json(
                 { message: "All fields are required" },
                 { status: 400 }
             )
         }
 
-        const newApplicant = await Enrollment.create({ firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort });
+        const newApplicant = await Enrollment.create({ firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort,  cv: cv || { url: "", public_id: "" },
+            profilePicture: profilePicture || { url: "", public_id: "" }
+        });
 
         return NextResponse.json(
             { message: "Applicant created successfully!", newApplicant },

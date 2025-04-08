@@ -1,3 +1,4 @@
+import { deleteFile } from "@/lib/cloudinary";
 import connectViaMongoose from "@/lib/db"
 import Enrollment from "@/models/enrollment";
 import { NextResponse } from "next/server";
@@ -50,11 +51,11 @@ const PUT = async (req: Request) => {
             );
         };
 
-        const { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort } = await req.json();
+        const { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort, cv, profilePicture } = await req.json();
 
         const updatedApplicant = await Enrollment.findByIdAndUpdate(
             id,
-            { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort },
+            { firstName, lastName, course, email, phoneNumber, state, gender, level, date, status, cohort, cv, profilePicture },
             { new: true, runValidators: true }
         );
 
@@ -86,6 +87,22 @@ const DELETE = async (req: Request) => {
                 { message: 'applicant ID is required' },
                 { status: 400 }
             );
+        }
+
+        const applicant = await Enrollment.findById(id);
+        if (!applicant) {
+            return NextResponse.json(
+                { message: "Applicant not found" },
+                { status: 404 }
+            );
+        }
+
+         // Delete files from Cloudinary if they exist
+         if (applicant.cv?.public_id) {
+            await deleteFile(applicant.cv.public_id);
+        }
+        if (applicant.profilePicture?.public_id) {
+            await deleteFile(applicant.profilePicture.public_id);
         }
 
         await Enrollment.findByIdAndDelete(id);
