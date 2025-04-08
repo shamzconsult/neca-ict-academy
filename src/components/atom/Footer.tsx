@@ -124,7 +124,7 @@ export const Footer = () => {
                   className="text-black outline-none w-full "
                 />
               </div>
-              <button className="bg-[#E02B20] text-white text-center  px-2 py-2 w-full md:w-[35%] cursor-pointer hover:shadow-xl">
+              <button className="bg-[#E02B20] hover:bg-[#e02a20ce] duration-300 text-white text-center  px-2 py-2 w-full md:w-[35%] cursor-pointer hover:shadow-xl">
                 Subscribe
               </button>
             </div>

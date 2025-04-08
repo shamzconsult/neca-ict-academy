@@ -1,40 +1,14 @@
 "use client";
 
 import { CohortForm } from "@/components/atom/CohortForm";
-import { getAPIData } from "@/utils/getAPIData";
+import { CohortsProps, CohortType } from "@/types";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CgMoreVertical } from "react-icons/cg";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 
-type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
-
-interface ApplicantDetail {
-  applicantName: string;
-  applicantEmail: string;
-  course: string;
-  level: number;
-  location: string;
-  date: string;
-  status: Status;
-}
-
-interface CohortType {
-  _id: number;
-  slug: string;
-  name: string;
-  applicants: string;
-  admitted: string;
-  graduated: string;
-  declined: string;
-  startDate: string;
-  endDate: string;
-  applicantDetails: ApplicantDetail[];
-}
-
-export const Cohorts = () => {
+export const Cohorts = ({ cohortsData = [] }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
-  const [cohort, setCohort] = useState([]);
   const router = useRouter();
 
   const handleRowClick = (slug: string) => {
@@ -44,19 +18,6 @@ export const Cohorts = () => {
   const toggleModal = () => {
     setShowModal(!showModal);
   };
-
-  const fetchData = async () => {
-    try {
-      const data = await getAPIData({ uri: "/api/cohort" });
-      setCohort(data);
-    } catch (error) {
-      console.log("Error loading data", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="px-4 space-y-8 w-full pb-10">
@@ -69,7 +30,7 @@ export const Cohorts = () => {
           <HiOutlinePlusCircle /> Create Cohort
         </button>
       </div>
-      {cohort.length > 0 ? (
+      {cohortsData.length > 0 ? (
         <div className="overflow-x-auto   border border-[#C4C4C4]">
           <table className="w-full table-auto bg-white">
             <thead className="">
@@ -91,7 +52,7 @@ export const Cohorts = () => {
               </tr>
             </thead>
             <tbody>
-              {cohort.map((cohort: CohortType) => (
+              {cohortsData.map((cohort: CohortType) => (
                 <tr
                   key={cohort._id}
                   onClick={() => handleRowClick(cohort.slug)}

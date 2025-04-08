@@ -47,9 +47,8 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
         }),
       });
       const details = res;
-      console.log(details);
       if (res.ok) {
-        toast.success("Cohort created successfully 🎉");
+        toast("Cohort created successfully 🎉");
         clearForm();
         toggleModal();
       } else {
@@ -62,10 +61,10 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
 
   return (
     <>
-      <Toaster position="bottom-right" />
       <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
         <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
           <h2 className="text-xl font-bold mb-4">Create Cohort</h2>
+          <Toaster />
           <form onSubmit={handleSubmit} className="space-y-4 ">
             <div>
               <label className="block text-sm font-semibold mb-1">
@@ -135,7 +134,7 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
             <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] text-white w-full rounded-md cursor-pointer"
+                className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] duration-300 text-white w-full rounded-md cursor-pointer"
               >
                 Create Cohort
               </button>
