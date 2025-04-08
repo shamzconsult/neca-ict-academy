@@ -8,6 +8,7 @@ import { FiUsers, FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { MdDashboard } from "react-icons/md";
 import { AdminLogo } from "./AdminLogo";
 import { LogoutModal } from "./LogoutModal";
+import { FaBook } from "react-icons/fa";
 
 export const Sidebar = () => {
   const pathname = usePathname();
@@ -85,6 +86,18 @@ export const Sidebar = () => {
             >
               <FiUsers size={20} className="mr-3" />
               Cohorts
+            </Link>
+            <Link
+              href="/admin/courses"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
+                isActive("/admin/courses")
+                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
+                  : " hover:text-[#27156F]"
+              }`}
+            >
+              <FaBook size={20} className="mr-3" />
+              Manage Courses
             </Link>
           </nav>
         </div>
