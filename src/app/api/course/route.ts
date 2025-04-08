@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 const GET = async () => {
     try {
         await connectViaMongoose();
-        const courses = await Course.find({}).populate("programId"); 
+        const courses = await Course.find({})
         return NextResponse.json(courses, { status: 200 });
     } catch (error) {
         return NextResponse.json({ message: "Error fetching courses", error }, { status: 500 });

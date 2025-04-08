@@ -2,10 +2,17 @@ import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { NextResponse } from "next/server";
 
-export const GET = async (req: Request, { params }: { params: { slug: string } }) => {
+export const GET = async (req: Request) => {
     try {
         await connectViaMongoose();
-        const course = await Course.findOne({ slug: params.slug }).populate("programId");
+        const url = new URL(req.url);
+        const slug = url.pathname.split("/").pop();
+
+        if (!slug) {
+            return NextResponse.json({ message: "Slug is required" }, { status: 400 });
+        }
+
+        const course = await Course.findOne({ slug })
         if (!course) {
             return NextResponse.json({ message: "Course not found" }, { status: 404 });
         }
