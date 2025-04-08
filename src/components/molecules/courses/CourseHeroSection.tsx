@@ -23,7 +23,7 @@ export const CourseHeroSection = () => {
             src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1741695429/Frame_1618869617_icfxaa.png"
             alt="hero-image"
             fill
-            className="rounded-3xl"
+            className="rounded-3xl object-cover"
           />
         </div>
       </section>

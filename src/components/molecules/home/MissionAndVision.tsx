@@ -9,6 +9,7 @@ export const MissionAndVision = () => {
           src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1743745210/Group_1_1_-min_qfn9md.png"
           alt="mission&vission"
           fill
+          className="object-cover"
         />
       </section>
       <section className="flex flex-col justify-between  gap-10 md:max-w-2xl lg:max-w-1/2 px-3 md:text-[20px]">

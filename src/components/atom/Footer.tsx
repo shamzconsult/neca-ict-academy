@@ -115,8 +115,8 @@ export const Footer = () => {
               Subscribe to our newsletter and be the first to know about our
               updates
             </p>
-            <div className="flex gap-3 text-sm">
-              <div className="flex items-center space-x-2 w-[65%] bg-white px-2.5 py-4">
+            <div className="flex flex-col md:flex-row gap-3 text-sm">
+              <div className="flex items-center space-x-2 w-full md:w-[65%] bg-white px-2.5 py-4">
                 <MdEmail className="text-[#27156F] w-[24px] h-[24px]" />
                 <input
                   type="email"
@@ -124,12 +124,12 @@ export const Footer = () => {
                   className="text-black outline-none w-full "
                 />
               </div>
-              <button className="bg-[#E02B20] text-white text-center  px-2 py-2 w-[35%] cursor-pointer hover:shadow-xl">
+              <button className="bg-[#E02B20] text-white text-center  px-2 py-2 w-full md:w-[35%] cursor-pointer hover:shadow-xl">
                 Subscribe
               </button>
             </div>
 
-            <div className="flex items-center gap-4 mt-4 lg:mt-8 text-sm">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 mt-4 lg:mt-8 text-sm">
               <h3 className="font-semibold text-nowrap">Follow Us:</h3>
               <div className="flex space-x-3 ">
                 <a

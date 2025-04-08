@@ -48,7 +48,7 @@ export const CourseCard = ({
                 src={course.image}
                 alt={course.title}
                 fill
-                className="rounded-md"
+                className="rounded-md object-cover"
               />
             </div>
 
