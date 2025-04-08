@@ -20,7 +20,7 @@ const POST = async (req: Request) => {
         await connectViaMongoose();
         const { name, startDate, endDate, applicationStartDate, applicationEndDate } = await req.json();
 
-        if (!name || !startDate || !endDate || !applicationStartDate || !applicationEndDate) {
+        if (!name || !startDate || !endDate || !applicationStartDate || !applicationEndDate ) {
             return NextResponse.json(
                 { message: "All fields are required" },
                 { status: 400 }
