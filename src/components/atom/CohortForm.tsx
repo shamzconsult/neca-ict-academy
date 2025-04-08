@@ -10,15 +10,16 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
   const [applicationStartDate, setApplicationStartDate] = useState("");
   const [applicationEndDate, setApplicationEndDate] = useState("");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
     const clearForm = () => {
-      setName(""),
-        setStartDate(""),
-        setEndDate(""),
-        setApplicationStartDate(""),
-        setApplicationEndDate("");
+      setName("");
+      setStartDate("");
+      setEndDate("");
+      setApplicationStartDate("");
+      setApplicationEndDate("");
     };
 
     if (
