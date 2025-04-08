@@ -47,7 +47,7 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
         }),
       });
       const details = res;
-      if (res.ok) {
+      if (details.ok) {
         toast("Cohort created successfully 🎉");
         clearForm();
         toggleModal();
