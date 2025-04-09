@@ -19,6 +19,7 @@ export const Cohorts = ({ cohortsData = [] }: CohortsProps) => {
     setShowModal(!showModal);
   };
 
+  console.log(cohortsData);
   return (
     <div className="px-4 space-y-8 w-full pb-10">
       <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4">
