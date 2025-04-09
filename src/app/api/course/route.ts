@@ -17,7 +17,7 @@ const POST = async (req: Request) => {
         await connectViaMongoose();
         const body = await req.json();
 
-        const requiredFields = ["programId", "title", "description", "lesson", "duration", "skillLevel", "coverImage", "isCertified", "mode", "courseOutlines"];
+        const requiredFields = ["review", "title", "description", "lesson", "duration", "skillLevel", "coverImage", "rating"];
         for (const field of requiredFields) {
             if (!body[field]) {
                 return NextResponse.json({ message: `${field} is required` }, { status: 400 });
