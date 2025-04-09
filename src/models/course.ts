@@ -1,15 +1,15 @@
 import mongoose, { Schema } from "mongoose";
 
 const ALLOWED_LEVEL = [ "Beginner", "Intermediate", "Advanced" ]
-const ALLOWED_MODE = ["Physical", "Self-Pace", "Hybrid"]
+// const ALLOWED_MODE = ["Physical", "Self-Pace", "Hybrid"]
 
 
 const CourseSchema = new Schema ({
-    programId: {
-        type: Schema.Types.ObjectId,
-        ref: "Program",
-        required: true
-    },
+    // programId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Program",
+    //     required: true
+    // },
     title: {
         type: String,
         required: true
@@ -27,22 +27,20 @@ const CourseSchema = new Schema ({
     },
     lesson: {
         count: {
-            type: Number,
+            type: String,
             required: true
         },
         description: {
             type: String,
-            required: true
         }
     },
     duration: {
         count: {
-            type: Number,
+            type: String,
             required: true
         },
         description: {
             type: String,
-            required: true
         }
     },
     skillLevel: {
@@ -57,28 +55,29 @@ const CourseSchema = new Schema ({
         type: String,
         required: true
     },
-    isCertified: {
-        type: Boolean,
-        required: true
-    },
-    mode: {
-        type: String,
-        enum: ALLOWED_MODE,
-        required: true
-    },
+    // isCertified: {
+    //     type: Boolean,
+    //     required: true
+    // },
+    // mode: {
+    //     type: String,
+    //     enum: ALLOWED_MODE,
+    //     required: true
+    // },
     rating: {
         type: Number,
         default: 1
+    },
+    review: {
+        type: String
     },
     courseOutlines: [
         {
             header: {
                 type: String,
-                required: true
             },
             lists: {
                 type: [String],
-                required: true
             }
         }
     ]
