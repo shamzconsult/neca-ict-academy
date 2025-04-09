@@ -20,14 +20,14 @@ const POST = async (req: Request) => {
         await connectViaMongoose();
         const { name, startDate, endDate, applicationStartDate, applicationEndDate, applicants } = await req.json();
 
-        if (!name || !startDate || !endDate || !applicationStartDate || !applicationEndDate || !applicants  ) {
+        if (!name || !startDate || !endDate || !applicationStartDate || !applicationEndDate ) {
             return NextResponse.json(
                 { message: "All fields are required" },
                 { status: 400 }
             )
         }
 
-        const newCohort = await Cohort.create({ name, startDate, endDate, applicationStartDate, applicationEndDate, applicants  });
+        const newCohort = await Cohort.create({ name, startDate, endDate, applicationStartDate, applicationEndDate, applicants: applicants || []  });
         return NextResponse.json(
             { message: "Cohort created successfully!", newCohort },
             { status: 200 }
