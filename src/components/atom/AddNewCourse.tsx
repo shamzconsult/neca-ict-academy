@@ -31,53 +31,6 @@ export const AddNewCourse = ({
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-
-  //   if (!file) {
-  //     console.error("No file selected");
-  //     return;
-  //   }
-
-  //   const formDataToSend = new FormData();
-  //   formDataToSend.append("title", formData.title);
-  //   formDataToSend.append("description", formData.description);
-  //   formDataToSend.append("lesson", formData.lesson);
-  //   formDataToSend.append("duration", formData.duration);
-  //   formDataToSend.append("rating", formData.rating);
-  //   formDataToSend.append("review", formData.review);
-  //   formDataToSend.append("skillLevel", formData.skillLevel);
-  //   formDataToSend.append("coverImage", file);
-
-  //   try {
-  //     const res = await fetch("/api/course", {
-  //       method: "POST",
-  //       body: formDataToSend,
-  //     });
-
-  //     if (!res.ok) {
-  //       const errorText = await res.text();
-  //       console.error("Error creating course:", errorText);
-  //       return;
-  //     }
-
-  //     const responseData = await res.json();
-  //     setCourseList((prevOffers) => [...prevOffers, responseData.newCourse]);
-  //     setFormData({
-  //       title: "",
-  //       description: "",
-  //       lesson: "",
-  //       duration: "",
-  //       rating: "",
-  //       review: "",
-  //       skillLevel: "",
-  //     });
-  //     setFile(null);
-  //   } catch (error) {
-  //     console.error("Error submitting form:", error);
-  //   }
-  // };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -99,7 +52,7 @@ export const AddNewCourse = ({
     try {
       const res = await fetch("/api/course", {
         method: "POST",
-        body: formDataToSend, // Send FormData, not JSON
+        body: formDataToSend,
       });
 
       if (!res.ok) {

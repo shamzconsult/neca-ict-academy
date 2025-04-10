@@ -45,10 +45,10 @@ const POST = async (req: Request) => {
       { message: "Course created successfully!", newCourse },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error creating course:", error);
     return NextResponse.json(
-      { message: "Error creating course", error: error.message || error },
+      { message: "Error creating course", error },
       { status: 500 }
     );
   }
