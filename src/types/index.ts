@@ -11,6 +11,9 @@ export type ApplicantDetail = {
 };
 
 export type CohortType = {
+  applicationStartDate: string;
+  applicationEndDate: string;
+  createdAt: string | number | Date;
   _id: number;
   slug: string;
   name: string;
@@ -25,4 +28,23 @@ export type CohortType = {
 
 export type CohortsProps = {
   cohortsData: CohortType[];
+};
+
+export type Courses = {
+  id: string;
+  slug?: string;
+  image: string;
+  title: string;
+  description: string;
+  ratings?: string;
+  reviews?: string;
+  lessons?: string;
+  duration?: string;
+  skillLevel?: string;
+  mode?: string;
+  category?: string;
+};
+
+export type CourseType = {
+  courses: Courses[];
 };
