@@ -33,25 +33,31 @@ const CourseSchema = new Schema({
     trim: true
   },
   lesson: {
-    count: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      trim: true
-    }
+    type: String
   },
   duration: {
-    count: {
-      type: String,
-      required: true
-    },
-    description: {
-      type: String,
-      trim: true
-    }
+    type: String
   },
+  // lesson: {
+  //   count: {
+  //     type: String,
+  //     required: true
+  //   },
+  //   description: {
+  //     type: String,
+  //     trim: true
+  //   }
+  // },
+  // duration: {
+  //   count: {
+  //     type: String,
+  //     required: true
+  //   },
+  //   description: {
+  //     type: String,
+  //     trim: true
+  //   }
+  // },
   skillLevel: {
     type: String,
     enum: ALLOWED_LEVEL,
