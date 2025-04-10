@@ -7,8 +7,8 @@ import Swal from "sweetalert2";
 export const CohortForm = ({
   toggleModal,
   setCohortsData,
-  handleUpdate,
-  editingMode,
+  // handleUpdate,
+  // editingMode,
 }: {
   toggleModal: () => void;
   handleUpdate?: (e: React.FormEvent<HTMLFormElement>) => void;

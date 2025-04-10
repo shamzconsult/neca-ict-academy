@@ -207,6 +207,7 @@ export const AddNewCourse = ({
               value={formData.skillLevel}
               onChange={handleChange}
             >
+              <option value="">Select skill level</option>
               <option value="Beginner">Beginner</option>
               <option value="Intermediate">Intermediate</option>
               <option value="Professional">Professional</option>
