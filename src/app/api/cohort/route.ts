@@ -28,6 +28,9 @@ const POST = async (req: Request) => {
         }
 
         const newCohort = await Cohort.create({ name, startDate, endDate, applicationStartDate, applicationEndDate, applicants: applicants || []  });
+
+        await newCohort.save();
+        
         return NextResponse.json(
             { message: "Cohort created successfully!", newCohort },
             { status: 200 }
