@@ -1,7 +1,7 @@
 import { Cohorts } from "@/components/molecules/admin/cohorts/Cohorts";
-import { fetchCohortData } from "@/utils/server";
+import { getAllCohorts } from "@/services/admin/admin.server";
 
 export default async function Page() {
-  const cohortsData = await fetchCohortData();
+  const cohortsData = await getAllCohorts();
   return <Cohorts cohortsData={cohortsData} />;
 }

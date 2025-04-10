@@ -138,10 +138,10 @@ export const CourseCard = ({
             </div>
             {admin && (
               <div className="mt-5 flex justify-between ">
-                <button className="bg-green-600 cursor-pointer text-white rounded-md py-1.5 px-4 w-24">
+                <button className="bg-green-600 hover:bg-green-500 duration-300 cursor-pointer text-white rounded-md py-1.5 px-4 w-24">
                   Edit
                 </button>
-                <button className="rounded-md cursor-pointer bg-red-500 text-white py-1.5 px-4 w-24">
+                <button className="rounded-md cursor-pointer  bg-[#E02B20] hover:bg-[#e02a20ce] duration-300  text-white py-1.5 px-4 w-24">
                   Delete
                 </button>
               </div>

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { CgMoreVertical } from "react-icons/cg";
+import { useEffect, useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
 import { CohortForm } from "@/components/atom/CohortForm";
 import Link from "next/link";
-import { CohortsProps } from "@/types";
+import { CohortsProps, CohortType } from "@/types";
+import EmptyState from "@/components/atom/EmptyState";
 
 const statsData = [
   { label: "Total applicants", value: "1,150,000" },
@@ -15,8 +15,25 @@ const statsData = [
   { label: "Total declined", value: "3,005" },
 ];
 
-export const AdminDashboard = ({ cohortsData = [] }: CohortsProps) => {
+export const AdminDashboard = ({
+  cohortsData: initialCohorts,
+}: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
+  const [cohortsData, setCohortsData] = useState<CohortType[]>(initialCohorts);
+
+  useEffect(() => {
+    async function fetchCohorts() {
+      try {
+        const res = await fetch("/api/cohort");
+        const data: CohortType[] = await res.json();
+        setCohortsData(data);
+      } catch (error) {
+        console.error("Error fetching cohorts: ", error);
+      }
+    }
+    fetchCohorts();
+  }, []);
+  console.log(cohortsData);
 
   const firstFiveCohorts = cohortsData.slice(0, 5);
 
@@ -70,7 +87,6 @@ export const AdminDashboard = ({ cohortsData = [] }: CohortsProps) => {
                     "Total Declined",
                     "Start Date",
                     "End Date",
-                    "Action",
                   ].map((header) => (
                     <th key={header} className="p-4 text-left font-medium">
                       {header}
@@ -82,31 +98,28 @@ export const AdminDashboard = ({ cohortsData = [] }: CohortsProps) => {
                 {firstFiveCohorts.map((cohort, index) => (
                   <tr key={index} className="border-t border-[#C4C4C4]">
                     <td className="p-4">{cohort.name}</td>
-                    <td className="p-4">{cohort.applicants || "Nill"}</td>
-                    <td className="p-4">{cohort.admitted || "Nill"}</td>
-                    <td className="p-4">{cohort.graduated || "Nill"}</td>
-                    <td className="p-4">{cohort.declined || "Nill"}</td>
+                    <td className="p-4">{cohort.applicants.length || "0"}</td>
+                    <td className="p-4">{cohort.admitted || "0"}</td>
+                    <td className="p-4">{cohort.graduated || "0"}</td>
+                    <td className="p-4">{cohort.declined || "0"}</td>
                     <td className="p-4">{cohort.startDate}</td>
                     <td className="p-4">{cohort.endDate}</td>
-                    <td className="p-4">
-                      <CgMoreVertical />
-                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           ) : (
-            <div className=" h-[70vh] mt2 flex flex-col justify-center items-center">
-              <h1 className="text-center font-bold  ">No Cohort Created yet</h1>
-              <p className="text-sm text-slate-400">
-                Click on the create Cohort button to start
-              </p>
-            </div>
+            <EmptyState
+              title="No Cohort Created yet"
+              message="Click on the create Cohort button to start"
+            />
           )}
         </div>
       </section>
 
-      {showModal && <CohortForm toggleModal={toggleModal} />}
+      {showModal && (
+        <CohortForm toggleModal={toggleModal} setCohortsData={setCohortsData} />
+      )}
     </div>
   );
 };

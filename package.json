@@ -11,8 +11,8 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.6",
     "bcryptjs": "^3.0.2",
-    "cloudinary": "^2.6.0",
     "chart.js": "^4.4.8",
+    "cloudinary": "^2.6.0",
     "leaflet": "^1.9.4",
     "mongoose": "^8.12.1",
     "next": "15.2.0",
@@ -24,7 +24,8 @@
     "react-leaflet": "^5.0.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1",
-    "sonner": "^2.0.3"
+    "sonner": "^2.0.3",
+    "sweetalert2": "^11.17.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
