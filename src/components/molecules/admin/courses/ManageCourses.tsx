@@ -9,7 +9,7 @@ import { HiOutlinePlusCircle } from "react-icons/hi";
 
 export const ManageCourses = ({ courses }: CourseType) => {
   const [showModal, setShowModal] = useState(false);
-  const [courseList, setCourseList] = useState<Courses[]>(courses);
+  const [, setCourseList] = useState<Courses[]>(courses);
 
   const toggleModal = () => {
     setShowModal(!showModal);
