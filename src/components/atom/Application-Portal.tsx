@@ -176,7 +176,7 @@ const ApplicationPortal = () => {
               </div>
 
               <div className="w-full md:w-1/2 text-center lg:text-left">
-                <SubHeading>Neca Academy Application Portal</SubHeading>
+                <SubHeading>NECA ICT Academy Application Portal</SubHeading>
                 <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">
                   Register Now!
                 </h2>
@@ -378,8 +378,6 @@ const ApplicationPortal = () => {
                       </div>
                     </div>
                   </div>
-
-                   
                   <button
                     type="submit"
                     className="w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer"
