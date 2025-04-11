@@ -1,18 +1,23 @@
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { courseModules } from "@/const/courses";
+import { CourseType } from "@/types";
 import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
-export const TrackCards = () => {
+export const TrackCards = ({
+  courseData: { title },
+}: {
+  courseData: CourseType;
+}) => {
   return (
     <div className="w-full my-16 lg:mt-28 bg-[#DBEAF6] py-16">
       <div className="max-w-6xl mx-auto p-4 lg:p-0 py-20">
         <div className="text-center lg:text-left">
-          <SubHeading>Software Engineering Track</SubHeading>
+          <SubHeading>{title}</SubHeading>
           <p className="md:text-2xl mt-4">
-            Join the Software Engineering Track to gain in-depth knowledge of
-            software development, from designing and building applications to
-            testing and deployment.
+            Join the <span className="mx-1">{title}</span> to gain in-depth
+            knowledge of software development, from designing and building
+            applications to testing and deployment.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">

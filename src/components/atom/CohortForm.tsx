@@ -1,71 +1,101 @@
 "use client";
 
-import React, { useState } from "react";
-import { Toaster, toast } from "sonner";
+import { CohortType } from "@/types";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import Swal from "sweetalert2";
 
-export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
-  const [name, setName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [applicationStartDate, setApplicationStartDate] = useState("");
-  const [applicationEndDate, setApplicationEndDate] = useState("");
+export const CohortForm = ({
+  toggleModal,
+  setCohortsData,
+  // handleUpdate,
+  // editingMode,
+}: {
+  toggleModal: () => void;
+  handleUpdate?: (e: React.FormEvent<HTMLFormElement>) => void;
+  editingMode?: CohortType | null;
+  setCohortsData: Dispatch<SetStateAction<CohortType[]>>;
+}) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    startDate: "",
+    endDate: "",
+    applicationStartDate: "",
+    applicationEndDate: "",
+  });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleSubmit = async (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const clearForm = () => {
-      setName("");
-      setStartDate("");
-      setEndDate("");
-      setApplicationStartDate("");
-      setApplicationEndDate("");
-    };
-
-    if (
-      !name ||
-      !applicationEndDate ||
-      !applicationStartDate ||
-      !startDate ||
-      !endDate
-    ) {
-      return;
-    }
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("startDate", formData.startDate);
+    formDataToSend.append("endDate", formData.endDate);
+    formDataToSend.append(
+      "applicationStartDate",
+      formData.applicationStartDate
+    );
+    formDataToSend.append("applicationEndDate", formData.applicationEndDate);
 
     try {
       const res = await fetch("/api/cohort", {
         method: "POST",
         headers: {
-          "content-type": "application/json",
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name,
-          applicationEndDate,
-          applicationStartDate,
-          startDate,
-          endDate,
-        }),
+        body: JSON.stringify(formData),
       });
-      const details = res;
-      console.log(details);
-      if (res.ok) {
-        toast.success("Cohort created successfully 🎉");
-        clearForm();
-        toggleModal();
-      } else {
-        throw new Error("Failed to Create cohort");
+
+      if (!res.ok) {
+        console.error("Failed to upload cohort:", await res.text());
+        return;
       }
+
+      const responseData = await res.json();
+      setCohortsData((prevCohort) => [...prevCohort, responseData.newCohort]);
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Cohort Created Successfully🎉🎉",
+      });
+
+      toggleModal();
+      setFormData({
+        name: "",
+        startDate: "",
+        endDate: "",
+        applicationStartDate: "",
+        applicationEndDate: "",
+      });
     } catch (error) {
-      console.log(error);
+      console.error("Error submitting form:", error);
     }
   };
 
   return (
     <>
-      <Toaster position="bottom-right" />
       <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
         <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
-          <h2 className="text-xl font-bold mb-4">Create Cohort</h2>
+          <h2 className="text-xl font-bold mb-4">
+            {/* {editingMode ? "Editing Cohort" : "Create Cohort"} */}
+            Create Cohort
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4 ">
             <div>
               <label className="block text-sm font-semibold mb-1">
@@ -73,13 +103,27 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
               </label>
               <input
                 type="text"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
                 required
                 className="w-full p-2 border border-[#C4C4C4] rounded-md"
                 placeholder="Enter cohort name"
               />
             </div>
+            {/* <div>
+              <label className="block text-sm font-semibold mb-1">
+                Cohort Slug
+              </label>
+              <input
+                type="text"
+                onChange={(e) => setSlug(e.target.value)}
+                value={slug}
+                required
+                className="w-full p-2 border border-[#C4C4C4] rounded-md"
+                placeholder="cohort-1.0"
+              />
+            </div> */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold mb-1">
@@ -87,8 +131,9 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
                 </label>
                 <input
                   type="date"
-                  onChange={(e) => setApplicationStartDate(e.target.value)}
-                  value={applicationStartDate}
+                  name="applicationStartDate"
+                  value={formData.applicationStartDate}
+                  onChange={handleChange}
                   required
                   className="w-full p-2 border border-[#C4C4C4] rounded-md"
                 />
@@ -99,8 +144,9 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
                 </label>
                 <input
                   type="date"
-                  onChange={(e) => setApplicationEndDate(e.target.value)}
-                  value={applicationEndDate}
+                  name="applicationEndDate"
+                  value={formData.applicationEndDate}
+                  onChange={handleChange}
                   required
                   className="w-full p-2 border border-[#C4C4C4] rounded-md"
                 />
@@ -113,8 +159,9 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
                 </label>
                 <input
                   type="date"
-                  onChange={(e) => setStartDate(e.target.value)}
-                  value={startDate}
+                  name="startDate"
+                  value={formData.startDate}
+                  onChange={handleChange}
                   required
                   className="w-full p-2 border border-[#C4C4C4] rounded-md"
                 />
@@ -125,8 +172,9 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
                 </label>
                 <input
                   type="date"
-                  onChange={(e) => setEndDate(e.target.value)}
-                  value={endDate}
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
                   required
                   className="w-full p-2 border border-[#C4C4C4] rounded-md"
                 />
@@ -135,8 +183,9 @@ export const CohortForm = ({ toggleModal }: { toggleModal: () => void }) => {
             <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] text-white w-full rounded-md cursor-pointer"
+                className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] duration-300 text-white w-full rounded-md cursor-pointer"
               >
+                {/* {editingMode ? "Update Cohort" : "Create Cohort"} */}
                 Create Cohort
               </button>
               <button
