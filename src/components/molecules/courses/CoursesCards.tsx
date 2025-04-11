@@ -1,9 +1,8 @@
-import { CourseButtons } from "@/components/atom/CourseButtons";
+// import { CourseButtons } from "@/components/atom/CourseButtons";
 import { CourseCard } from "@/components/atom/CourseCard";
 import { Heading } from "@/components/atom/headers/Heading";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { CourseType } from "@/types";
-// import { CourseType, maincourses } from "@/const/courses";
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
