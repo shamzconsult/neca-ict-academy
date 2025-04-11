@@ -2,15 +2,13 @@
 
 import { AddNewCourse } from "@/components/atom/AddNewCourse";
 import { CourseCard } from "@/components/atom/CourseCard";
-import { maincourses } from "@/const/courses";
-import { Courses, CourseType } from "@/types";
+import { CourseType } from "@/types";
 import React, { useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 
-export const ManageCourses = ({ courses }: CourseType) => {
+export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
   const [showModal, setShowModal] = useState(false);
-  const [, setCourseList] = useState<Courses[]>(courses);
-
+  const [courseList, setCourseList] = useState<CourseType[]>(courses);
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -25,7 +23,7 @@ export const ManageCourses = ({ courses }: CourseType) => {
           <HiOutlinePlusCircle /> Add New Course
         </button>
       </div>
-      <CourseCard courses={maincourses} />
+      <CourseCard courses={courseList} />
       {showModal && (
         <AddNewCourse toggleModal={toggleModal} setCourseList={setCourseList} />
       )}

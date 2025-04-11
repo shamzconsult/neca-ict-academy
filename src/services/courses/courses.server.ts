@@ -11,3 +11,15 @@ export const getAllCourses = async () => {
     return [];
   }
 };
+
+export const getCourseBySlug = async (slug: string) => {
+  try {
+    await connectViaMongoose();
+    const courses = await Course.findOne({ slug });
+    if (!courses) return null;
+    return JSON.parse(JSON.stringify(courses));
+  } catch (error) {
+    console.error("Error fetching courses by slug:", error);
+    return null;
+  }
+};

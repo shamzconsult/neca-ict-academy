@@ -1,10 +1,10 @@
 import { CourseCard } from "@/components/atom/CourseCard";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
-import { maincourses } from "@/const/courses";
+import { CourseType } from "@/types";
 import Link from "next/link";
 import React from "react";
 
-export const FeaturedCourses = () => {
+export const FeaturedCourses = ({ courses }: { courses: CourseType[] }) => {
   return (
     <div
       className="w-full my-16 lg:mt-28"
@@ -22,7 +22,7 @@ export const FeaturedCourses = () => {
             experts and advance your career today!
           </p>
         </div>
-        <CourseCard courses={maincourses} />
+        <CourseCard courses={courses} />
         <div className="flex justify-center items-center text-center">
           <Link
             href="/courses"
