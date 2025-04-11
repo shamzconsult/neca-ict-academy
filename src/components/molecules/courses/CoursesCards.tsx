@@ -2,26 +2,27 @@ import { CourseButtons } from "@/components/atom/CourseButtons";
 import { CourseCard } from "@/components/atom/CourseCard";
 import { Heading } from "@/components/atom/headers/Heading";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
-import { CourseType, maincourses } from "@/const/courses";
+import { CourseType } from "@/types";
+// import { CourseType, maincourses } from "@/const/courses";
 import React, { useState } from "react";
 import { GoSearch } from "react-icons/go";
 
-export const CoursesCards = () => {
+export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<CourseType[]>(maincourses);
+  const [filteredData, setFilteredData] = useState<CourseType[]>(courses);
 
-  const choice = (category: string) => {
-    setFilteredData(
-      maincourses.filter((course) => {
-        return course.category === category;
-      })
-    );
-    setSearchTerm("");
-  };
+  // const choice = (category: string) => {
+  //   setFilteredData(
+  //     courses.filter((course) => {
+  //       return course.category === category;
+  //     })
+  //   );
+  //   setSearchTerm("");
+  // };
 
   const handleSearch = () => {
     setFilteredData(
-      maincourses.filter((item) =>
+      courses.filter((item) =>
         Object.values(item).some((val) =>
           String(val).toLowerCase().includes(searchTerm.toLowerCase())
         )
@@ -41,11 +42,11 @@ export const CoursesCards = () => {
               digital world.
             </p>
           </div>
-          <CourseButtons
+          {/* <CourseButtons
             choice={choice}
             setFilteredData={setFilteredData}
-            generalCourses={maincourses}
-          />
+            generalCourses={courses}
+          /> */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
             <p className="text-[#1E1E1E]md:text-[20px] font-semibold">
               Search:

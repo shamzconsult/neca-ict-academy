@@ -9,8 +9,9 @@ import { FeaturedCourses } from "./FeaturedCourses";
 import { Testimonials } from "@/components/atom/Testimonials";
 import { Footer } from "@/components/atom/Footer";
 import { Navbar } from "@/components/atom/Navbar";
+import { CourseType } from "@/types";
 
-export const HomePage = () => {
+export const HomePage = ({ courses }: { courses: CourseType[] }) => {
   return (
     <div className="">
       <Navbar />
@@ -19,7 +20,7 @@ export const HomePage = () => {
       <MissionAndVision />
       <WhyUs />
       <Partners />
-      <FeaturedCourses />
+      <FeaturedCourses courses={courses} />
       <Testimonials />
       <Footer />
     </div>

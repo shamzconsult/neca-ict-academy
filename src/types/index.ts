@@ -33,12 +33,12 @@ export type CohortsProps = {
 export type Courses = {
   id: string;
   slug?: string;
-  image: string;
+  coverImage: string;
   title: string;
   description: string;
-  ratings?: string;
-  reviews?: string;
-  lessons?: string;
+  rating?: string;
+  review?: string;
+  lesson?: string;
   duration?: string;
   skillLevel?: string;
   mode?: string;
@@ -46,5 +46,15 @@ export type Courses = {
 };
 
 export type CourseType = {
+  duration: string;
+  skillLevel: string;
+  rating: string;
+  review: string;
+  mode: string;
+  lesson: string;
+  description: string;
+  slug: string;
+  title: string;
+  coverImage: string;
   courses: Courses[];
 };

@@ -110,43 +110,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     }
   };
 
-  // const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   if (!editingMode) return;
-
-  //   try {
-  //     const res = await fetch(`/api/cohort/${editingMode._id}`, {
-  //       method: "PUT",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         ...formData,
-  //       }),
-  //     });
-
-  //     if (!res.ok) {
-  //       console.error("Failed to update cohort");
-  //       return;
-  //     }
-
-  //     const updatedCohort = await res.json();
-  //     setCohortsData((prev) =>
-  //       prev.map((cohort) =>
-  //         cohort._id === editingMode._id ? updatedCohort.updatedCohort : cohort
-  //       )
-  //     );
-  //     setEditingMode(null);
-  //     setFormData({
-  //       name: "",
-  //       startDate: "",
-  //       endDate: "",
-  //       applicationStartDate: "",
-  //       applicationEndDate: "",
-  //     });
-  //   } catch (error) {
-  //     console.error("Error updating cohort:", error);
-  //   }
-  // };
-
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!editingMode) return;

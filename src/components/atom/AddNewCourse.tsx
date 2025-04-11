@@ -1,15 +1,16 @@
 "use client";
 
-import { Courses } from "@/types";
+import { CourseType } from "@/types";
 import React, { Dispatch, SetStateAction, useRef, useState } from "react";
 import { FiImage } from "react-icons/fi";
+import Swal from "sweetalert2";
 
 export const AddNewCourse = ({
   toggleModal,
   setCourseList,
 }: {
   toggleModal: () => void;
-  setCourseList: Dispatch<SetStateAction<Courses[]>>;
+  setCourseList: Dispatch<SetStateAction<CourseType[]>>;
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -63,6 +64,22 @@ export const AddNewCourse = ({
 
       const responseData = await res.json();
       setCourseList((prevOffers) => [...prevOffers, responseData.newCourse]);
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Course Created Successfully🎉🎉",
+      });
+
       setFormData({
         title: "",
         description: "",
@@ -73,6 +90,7 @@ export const AddNewCourse = ({
         skillLevel: "",
       });
       setFile(null);
+      toggleModal();
     } catch (error) {
       console.error("Error submitting form:", error);
     }
