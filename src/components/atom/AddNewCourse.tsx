@@ -1,28 +1,47 @@
 "use client";
 
 import { CourseType } from "@/types";
-import React, { Dispatch, SetStateAction, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
+
+type AddNewCourseProps = {
+  toggleModal: () => void;
+  setCourseList: React.Dispatch<React.SetStateAction<CourseType[]>>;
+  editingMode: CourseType | null;
+  setEditingMode: (course: CourseType | null) => void;
+  formData: {
+    title: string;
+    description: string;
+    lesson: string;
+    duration: string;
+    rating: string;
+    review: string;
+    skillLevel: string;
+  };
+  setFormData: React.Dispatch<
+    React.SetStateAction<{
+      title: string;
+      description: string;
+      lesson: string;
+      duration: string;
+      rating: string;
+      review: string;
+      skillLevel: string;
+    }>
+  >;
+};
 
 export const AddNewCourse = ({
   toggleModal,
   setCourseList,
-}: {
-  toggleModal: () => void;
-  setCourseList: Dispatch<SetStateAction<CourseType[]>>;
-}) => {
+  editingMode,
+  setEditingMode,
+  formData,
+  setFormData,
+}: AddNewCourseProps) => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    lesson: "",
-    duration: "",
-    rating: "",
-    review: "",
-    skillLevel: "",
-  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -96,12 +115,85 @@ export const AddNewCourse = ({
     }
   };
 
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingMode) return;
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("title", formData.title);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("lesson", formData.lesson);
+    formDataToSend.append("duration", formData.duration);
+    formDataToSend.append("rating", formData.rating);
+    formDataToSend.append("review", formData.review);
+    formDataToSend.append("skillLevel", formData.skillLevel);
+
+    if (file) {
+      formDataToSend.append("coverImage", file);
+    }
+
+    try {
+      const res = await fetch(`/api/course/${editingMode.slug}`, {
+        method: "PUT",
+        body: formDataToSend,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error updating course:", errorText);
+        return;
+      }
+
+      const responseData = await res.json();
+
+      setCourseList((prev) =>
+        prev.map((course) =>
+          course.slug === editingMode.slug ? responseData.updatedCourse : course
+        )
+      );
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Course Updated Successfully 🎉",
+      });
+
+      setEditingMode(null);
+      setFormData({
+        title: "",
+        description: "",
+        lesson: "",
+        duration: "",
+        rating: "",
+        review: "",
+        skillLevel: "",
+      });
+      setFile(null);
+      toggleModal();
+    } catch (error) {
+      console.error("Error updating course:", error);
+    }
+  };
+
   return (
     <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
         {/* <Toaster /> */}
-        <form onSubmit={handleSubmit} className="space-y-4 ">
+        <form
+          onSubmit={editingMode ? handleUpdate : handleSubmit}
+          className="space-y-4 "
+        >
           <div>
             <label className="block text-sm font-semibold mb-1">
               Course Title
@@ -234,13 +326,30 @@ export const AddNewCourse = ({
           <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
             <button
               type="submit"
-              className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] duration-300 text-white w-full rounded-md cursor-pointer"
+              className={`px-4 py-2 ${
+                editingMode
+                  ? "bg-green-600 hover:bg-green-500"
+                  : "bg-[#E02B20]  hover:bg-[#e02a20ce]"
+              }  duration-300 text-white w-full rounded-md cursor-pointer`}
             >
-              Add Course
+              {editingMode ? "Update Course" : "Add Course"}
             </button>
             <button
               className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
-              onClick={toggleModal}
+              onClick={() => {
+                toggleModal();
+                setEditingMode(null);
+                setFormData({
+                  title: "",
+                  description: "",
+                  lesson: "",
+                  duration: "",
+                  rating: "",
+                  review: "",
+                  skillLevel: "",
+                });
+                setFile(null);
+              }}
             >
               Cancel
             </button>
