@@ -26,7 +26,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
           ✕
         </button>
         
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col items-center justify-center text-center w-full max-w-lg">
           <Image
             src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742551374/tnddp2bamc3iu2pznihy.png"
             alt="Success Icon"
@@ -36,10 +36,10 @@ const SuccessModal: React.FC<SuccessModalProps> = ({ isOpen, onClose }) => {
           />
           <SubHeading>Thanks For Registering!</SubHeading>
 
-          <h2 className="text-[#27156F] text-2xl font-semibold mt-4">
+          <h2 className="text-[#27156F] text-3xl font-semibold mt-4">
             Check Your Email
           </h2>
-          <p className='mt-4 text-gray-600 text-lg'>
+          <p className='mt-4 text-gray-600 text-xl'>
             You will receive a confirmation email with details about the next steps.
           </p>
         </div>
