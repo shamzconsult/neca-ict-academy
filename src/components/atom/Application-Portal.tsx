@@ -116,7 +116,7 @@ const ApplicationPortal = () => {
           alt="Background Right"
           layout="fill"
           objectFit="cover"
-          className="opacity-40"
+          className="opacity-41"
         />
       </div>
 
