@@ -28,12 +28,30 @@ export const PUT = async (req: Request) => {
         const url = new URL(req.url);
         const slug = url.pathname.split("/").pop();
 
-        const data = await req.json();
+        if (!slug) {
+            return NextResponse.json(
+                { message: "Slug is required" },
+                { status: 400 }
+            );
+        }
+
+        // const data = await req.json();
+
+        const formData = await req.formData();
+        const title = formData.get("title") as string;
+        const description = formData.get("description") as string;
         
+        if (!title || !description) {
+            return NextResponse.json(
+                { message: "Title and description are required" },
+                { status: 400 }
+            );
+        }
+
         
         const updatedCourse = await Course.findOneAndUpdate(
             { slug },
-            data,
+            { title, description },
             { new: true }
         );
 
