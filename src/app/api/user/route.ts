@@ -32,7 +32,7 @@ const POST = async (req: Request) => {
         const hashedPassword = await bcrypt.hash(password, salt)
         const newUser = await User.create({firstName, lastName, email, password: hashedPassword, role});
         return NextResponse.json(
-            { message: "User created Successfully!", newUser },
+            { message: "User created Successfully", newUser },
             { status: 200 }
         )
     } catch (error) {

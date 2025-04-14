@@ -48,7 +48,12 @@ export const WhyUs = () => {
               className="bg-white rounded-b-xl  shadow-lg overflow-hidden h-full"
             >
               <div className=" h-[184px]  w-full  relative ">
-                <Image src={feature.image} alt="features-img" fill />
+                <Image
+                  src={feature.image}
+                  alt="features-img"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-3 my-4">
                 <h3 className="text-[16px]  text-[#1E1568]">{feature.title}</h3>

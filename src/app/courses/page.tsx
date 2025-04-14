@@ -1,10 +1,12 @@
 import { CoursePage } from "@/components/molecules/courses/CoursePage";
+import { getAllCourses } from "@/services/courses/courses.server";
 import React from "react";
 
-const page = () => {
+const page = async () => {
+  const courses = await getAllCourses();
   return (
     <div>
-      <CoursePage />
+      <CoursePage courses={courses} />
     </div>
   );
 };

@@ -6,7 +6,8 @@ import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { Heading } from "@/components/atom/headers/Heading";
-import { courseDetails, CourseType } from "@/const/courses";
+import { courseDetails } from "@/const/courses";
+import { CourseType } from "@/types";
 
 export const CourseDetails = ({
   courseData: { title },
