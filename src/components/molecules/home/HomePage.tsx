@@ -1,7 +1,6 @@
 "use client";
 
 import { MileStone } from "@/components/atom/MileStone";
-import { HomeHeroSection } from "./HomeHeroSection";
 import { MissionAndVision } from "./MissionAndVision";
 import { WhyUs } from "./WhyUs";
 import { Partners } from "@/components/atom/Partners";
@@ -10,6 +9,7 @@ import { Testimonials } from "@/components/atom/Testimonials";
 import { Footer } from "@/components/atom/Footer";
 import { Navbar } from "@/components/atom/Navbar";
 import { CourseType } from "@/types";
+import { HomeHeroSection } from "./HomeHerosection";
 
 export const HomePage = ({ courses }: { courses: CourseType[] }) => {
   return (

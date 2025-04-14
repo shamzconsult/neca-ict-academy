@@ -13,15 +13,32 @@ import Swal from "sweetalert2";
 export const CourseCard = ({
   courses,
   searchTerm,
+  setShowModal,
+  // showModal,
+  setEditingMode,
+  setFormData,
 }: {
   courses: CourseType[];
   searchTerm?: string;
+  setShowModal?: React.Dispatch<React.SetStateAction<boolean>>;
+  // showModal?: boolean;
+  setEditingMode?: (course: CourseType | null) => void;
+  setFormData?: (data: {
+    title: string;
+    description: string;
+    lesson: string;
+    duration: string;
+    rating: string;
+    review: string;
+    skillLevel: string;
+  }) => void;
 }) => {
   const [coursesData, setCoursesData] = useState<CourseType[]>(courses);
   const pathname = usePathname();
   const isCoursesPath = pathname === "/courses";
   const admin = pathname === "/admin/courses";
   const CardWrapper = admin ? "div" : Link;
+
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
@@ -74,6 +91,21 @@ export const CourseCard = ({
     }
   };
 
+  const handleEdit = (course: CourseType) => {
+    if (setEditingMode && setFormData && setShowModal) {
+      setEditingMode(course);
+      setFormData({
+        title: course.title,
+        description: course.description,
+        lesson: course.lesson,
+        duration: course.duration,
+        rating: course.rating,
+        review: course.review,
+        skillLevel: course.skillLevel,
+      });
+      setShowModal(true);
+    }
+  };
   return (
     <div
       className={`max-w-6xl mx-auto grid justify-center gap-8 mt-8 ${
@@ -170,7 +202,7 @@ export const CourseCard = ({
                 </p>
               )}
             </div>
-            <div className="flex justify-between items-end mt-3">
+            <div className="flex flex-col lg:flex-row justify-between lg:items-end mt-3">
               {(isCoursesPath || admin) && (
                 <div className="flex divide-x divide-[#525252] space-x-2  text-xs">
                   <span className="px-1">{course.skillLevel}</span>
@@ -187,7 +219,10 @@ export const CourseCard = ({
             </div>
             {admin && (
               <div className="mt-5 flex justify-between ">
-                <button className="bg-green-600 hover:bg-green-500 duration-300 cursor-pointer text-white rounded-md py-1.5 px-4 w-24">
+                <button
+                  onClick={() => handleEdit(course)}
+                  className="bg-green-600 hover:bg-green-500 duration-300 cursor-pointer text-white rounded-md py-1.5 px-4 w-24"
+                >
                   Edit
                 </button>
                 <button
