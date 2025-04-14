@@ -14,7 +14,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [cohortsData, setCohortsData] = useState<CohortType[]>(initialCohorts);
   const [editingMode, setEditingMode] = useState<CohortType | null>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
+  const [, setFormData] = useState({
     name: "",
     startDate: "",
     endDate: "",
