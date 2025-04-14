@@ -8,7 +8,7 @@ import Link from "next/link";
 import { CheckStatusModal } from "./CheckStatusModal";
 import { ApplicationReview } from "./ApplicationReview";
 import SuccessModal from "./SuccessPage";
-import { FiFileText, FiImage } from 'react-icons/fi';
+import { FiFileText, FiImage, FiX } from 'react-icons/fi';
 
 interface FormData {
   firstName: string;
@@ -31,11 +31,33 @@ const ApplicationPortal = () => {
     course: "",
   });
 
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showReview, setShowReview] = useState(false);
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState(""); // Add state for email error
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false); // State for SuccessModal
+  const [emailError, setEmailError] = useState("");
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e.target.files && e.target.files.length > 0) {
+      setCvFile(e.target.files[0]);
+    }
+  };
+
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    if (e.target.files && e.target.files.length > 0) {
+      setProfileImage(e.target.files[0]);
+    }
+  };
+
+  const clearCvFile = () => {
+    setCvFile(null);
+  };
+
+  const clearProfileImage = () => {
+    setProfileImage(null);
+  };
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -49,21 +71,17 @@ const ApplicationPortal = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Perform form validation or API call here
     console.log("Form submitted:", formData);
-
-    // Open the SuccessModal
     setIsSuccessModalOpen(true);
   };
 
   const handleCloseSuccessModal = () => {
-    setIsSuccessModalOpen(false); // Close the SuccessModal
+    setIsSuccessModalOpen(false);
   };
 
   const toggleModal = () => {
     setShowModal(!showModal);
-    setShowReview(false); // Reset review state when reopening the modal
+    setShowReview(false);
   };
 
   const handleCheckStatus = () => {
@@ -82,7 +100,7 @@ const ApplicationPortal = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative">
       <div className="absolute top-[-50px] left-0 w-[8%] h-[73%] z-0 transform rotate-[-0.47deg] origin-top-left">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
@@ -92,18 +110,17 @@ const ApplicationPortal = () => {
           className="opacity-40"
         />
       </div>
-      <div className="hidden lg:block absolute top-[90%] right-[-50] w-[20%]  h-[20%] z-10 transform">
+      <div className="hidden lg:block absolute top-[90%] right-0 w-[20%] h-[20%] z-10 transform">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
           alt="Background Right"
           layout="fill"
           objectFit="cover"
-          className="opacity-40"
+          className="opacity-41"
         />
       </div>
 
-      {!isSuccessModalOpen && (
-        <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-5">
+        <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
           <div className="relative z-10">
             <div className="flex flex-col lg:flex-row mt-10 lg:mt-0 justify-between items-center gap-5 lg:mb-30">
               <div className="w-36 h-auto relative right-0 lg:w-48 lg:right-7">
@@ -119,11 +136,11 @@ const ApplicationPortal = () => {
                 <h3 className="text-lg text-center md:text-left">
                   Already applied?{" "}
                   <Link
-                  href="#"
-                  className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
-                  onClick={toggleModal}
+                    href="#"
+                    className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
+                    onClick={toggleModal}
                   >
-                  Check Status
+                    Check Status
                   </Link>
                 </h3>
               </div>
@@ -181,22 +198,20 @@ const ApplicationPortal = () => {
                   Register Now!
                 </h2>
                 <p className="text-gray-600 text-xl mb-7">
-                  To apply for our training programs or opportunities, please
-                  fill out the form below with accurate information. Ensure all
+                  To apply for our training programs or opportunities, please fill
+                  out the form below with accurate information. Ensure all
                   required fields are completed to avoid delays in processing{" "}
                   <br /> your application.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
                     <div className="md:col-span-2">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                        <label className="block text-sm font-medium text-gray-700 text-left mb-2">
-                        First Name
-                      </label>
+                          <label className="block text-sm font-medium text-gray-700 text-left mb-2">
+                            First Name
+                          </label>
                           <input
                             type="text"
                             placeholder="First Name"
@@ -224,7 +239,6 @@ const ApplicationPortal = () => {
                       </div>
                     </div>
 
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Email Address
@@ -240,7 +254,6 @@ const ApplicationPortal = () => {
                       />
                     </div>
 
-                   
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Phone Number
@@ -257,9 +270,7 @@ const ApplicationPortal = () => {
                     </div>
                   </div>
 
-                
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         State
@@ -286,7 +297,6 @@ const ApplicationPortal = () => {
                       </div>
                     </div>
 
-                  
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Gender
@@ -311,7 +321,6 @@ const ApplicationPortal = () => {
                     </div>
                   </div>
 
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                       Course
@@ -336,9 +345,7 @@ const ApplicationPortal = () => {
                     </div>
                   </div>
 
-                 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Upload CV
@@ -351,14 +358,27 @@ const ApplicationPortal = () => {
                             name="cv"
                             accept=".pdf,.doc,.docx"
                             required
+                            onChange={handleCvChange}
                             className="w-full opacity-0 absolute inset-0 cursor-pointer"
                           />
-                          <span className="text-gray-500 text-sm truncate">Choose PDF or DOC file</span>
+                          {cvFile ? (
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-gray-700 text-sm truncate">{cvFile.name}</span>
+                              <button
+                                type="button"
+                                onClick={clearCvFile}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                <FiX />
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm truncate">Choose PDF or DOC file</span>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 text-left mb-2">
                         Upload Profile Image
@@ -371,9 +391,23 @@ const ApplicationPortal = () => {
                             name="profileImage"
                             accept="image/*"
                             required
+                            onChange={handleProfileImageChange}
                             className="w-full opacity-0 absolute inset-0 cursor-pointer"
                           />
-                          <span className="text-gray-500 text-sm truncate">Choose image file</span>
+                          {profileImage ? (
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-gray-700 text-sm truncate">{profileImage.name}</span>
+                              <button
+                                type="button"
+                                onClick={clearProfileImage}
+                                className="text-gray-500 hover:text-gray-700"
+                              >
+                                <FiX />
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500 text-sm truncate">Choose image file</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -402,13 +436,8 @@ const ApplicationPortal = () => {
               )}
             </div>
           )}
+          <SuccessModal isOpen={isSuccessModalOpen} onClose={handleCloseSuccessModal} />
         </div>
-      )}
-
-      <SuccessModal
-        isOpen={isSuccessModalOpen}
-        onClose={handleCloseSuccessModal}
-      />
     </div>
   );
 };
