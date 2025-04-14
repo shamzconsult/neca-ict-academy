@@ -110,41 +110,20 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     }
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!editingMode) return;
-
-    try {
-      const res = await fetch(`/api/cohort/${editingMode._id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData }),
-      });
-
-      if (!res.ok) {
-        console.error("Failed to update cohort");
-        return;
-      }
-
-      const updatedCohort = await res.json();
-      setCohortsData((prev) =>
-        prev.map((cohort) =>
-          cohort._id === editingMode._id ? updatedCohort.updatedCohort : cohort
-        )
-      );
-      setEditingMode(null);
+  const handleEdit = (cohort: CohortType, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (setEditingMode && setFormData && setShowModal) {
+      setEditingMode(cohort);
       setFormData({
-        name: "",
-        startDate: "",
-        endDate: "",
-        applicationStartDate: "",
-        applicationEndDate: "",
+        name: cohort.name,
+        startDate: cohort.startDate,
+        endDate: cohort.endDate,
+        applicationStartDate: cohort.applicationStartDate,
+        applicationEndDate: cohort.applicationEndDate,
       });
-    } catch (error) {
-      console.error("Error updating cohort:", error);
+      setShowModal(true);
     }
   };
-
   return (
     <div className="px-4 space-y-8 w-full pb-10">
       <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4">
@@ -199,11 +178,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
                       <div className="absolute right-10 mt-2 font-semibold bg-white text-white border  border-[#C4C4C4] rounded-md shadow-lg w-32 px-2">
                         <div className="py-1 flex flex-col gap-2">
                           <button
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              setEditingMode(cohort);
-                              setShowModal(true);
-                            }}
+                            onClick={(event) => handleEdit(cohort, event)}
                             className="px-4 rounded-md py-2 text-sm bg-green-600   hover:bg-green-500 durtion-300 cursor-pointer w-full"
                           >
                             Edit
@@ -235,8 +210,8 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
         <CohortForm
           toggleModal={toggleModal}
           setCohortsData={setCohortsData}
-          handleUpdate={handleUpdate}
           editingMode={editingMode}
+          setEditingMode={setEditingMode}
         />
       )}
     </div>

@@ -4,7 +4,7 @@ import { CourseType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
@@ -14,14 +14,12 @@ export const CourseCard = ({
   courses,
   searchTerm,
   setShowModal,
-  // showModal,
   setEditingMode,
   setFormData,
 }: {
   courses: CourseType[];
   searchTerm?: string;
   setShowModal?: React.Dispatch<React.SetStateAction<boolean>>;
-  // showModal?: boolean;
   setEditingMode?: (course: CourseType | null) => void;
   setFormData?: (data: {
     title: string;
@@ -38,6 +36,19 @@ export const CourseCard = ({
   const isCoursesPath = pathname === "/courses";
   const admin = pathname === "/admin/courses";
   const CardWrapper = admin ? "div" : Link;
+
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await fetch("/api/course");
+        const data: CourseType[] = await res.json();
+        setCoursesData(data);
+      } catch (error) {
+        console.error("Error fetching courses: ", error);
+      }
+    }
+    fetchCourses();
+  }, [coursesData]);
 
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
