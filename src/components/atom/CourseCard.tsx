@@ -87,7 +87,7 @@ export const CourseCard = ({
           <CardWrapper
             href={`/courses/${course.slug}`}
             key={index}
-            className={`bg-white border border-[#C4C4C480] ${
+            className={`bg-white border border-[#C4C4C480] mx-auto ${
               admin ? "hover:bg-white" : "hover:bg-[#DBEAF6]"
             }  rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath || admin

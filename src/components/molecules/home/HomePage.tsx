@@ -1,7 +1,7 @@
 "use client";
 
 import { MileStone } from "@/components/atom/MileStone";
-import { HomeHerosection } from "./HomeHerosection";
+import { HomeHeroSection } from "./HomeHeroSection";
 import { MissionAndVision } from "./MissionAndVision";
 import { WhyUs } from "./WhyUs";
 import { Partners } from "@/components/atom/Partners";
@@ -15,7 +15,7 @@ export const HomePage = ({ courses }: { courses: CourseType[] }) => {
   return (
     <div className="">
       <Navbar />
-      <HomeHerosection />
+      <HomeHeroSection />
       <MileStone />
       <MissionAndVision />
       <WhyUs />

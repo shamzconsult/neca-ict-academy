@@ -66,7 +66,7 @@ export const Footer = () => {
                 Contact Us
               </Link>
               <Link
-                href=""
+                href="/enroll"
                 className="hover:underline underline-offset-4 duration-150 text-nowrap"
               >
                 Enroll Now
