@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import Image from "next/image";
 
 const ProgramProcessBody = () => {
@@ -55,7 +55,11 @@ const ProgramProcessBody = () => {
                 Choose a Course
               </h2>
               <p className="lg:max-w-md mt-3">
-                Explore our wide range of tech courses and select the one that best fits your career goals. Whether you&apos;re interested in Software Development, Cybersecurity, UI/UX Design, Data Analytics, or Digital Marketing, we have the right program for you.
+                Explore our wide range of tech courses and select the one that
+                best fits your career goals. Whether you&apos;re interested in
+                Software Development, Cybersecurity, UI/UX Design, Data
+                Analytics, or Digital Marketing, we have the right program for
+                you.
               </p>
             </div>
           </div>
@@ -83,7 +87,9 @@ const ProgramProcessBody = () => {
                 Register & Enroll
               </h2>
               <p className="lg:max-w-md mt-3">
-                Sign up easily through our online portal and secure your spot in the training program. Our enrollment process is simple, and our support team is always available to assist you.
+                Sign up easily through our online portal and secure your spot in
+                the training program. Our enrollment process is simple, and our
+                support team is always available to assist you.
               </p>
             </div>
           </div>
@@ -111,7 +117,10 @@ const ProgramProcessBody = () => {
                 Learn from Experts
               </h2>
               <p className="lg:max-w-md mt-3">
-                Gain hands-on experience through interactive lessons, real-world projects, and mentorship from industry professionals. Our practical approach ensures you develop job-ready skills that employers are looking for.
+                Gain hands-on experience through interactive lessons, real-world
+                projects, and mentorship from industry professionals. Our
+                practical approach ensures you develop job-ready skills that
+                employers are looking for.
               </p>
             </div>
           </div>
@@ -129,7 +138,7 @@ const ProgramProcessBody = () => {
             </div>
             <div className="w-full lg:w-1/2 space-y-6">
               <Image
-                className="w-7 h-7"
+                className="w-7 h-7 object-cover"
                 src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/Frame_36392_3_cusjhi.png"
                 alt="Icon"
                 width={28}
@@ -139,11 +148,15 @@ const ProgramProcessBody = () => {
                 Get Certified & Start Your Career
               </h2>
               <p className="lg:max-w-md mt-3">
-                Earn a government-backed certification upon successful completion of your course. With career guidance, job placement support, and networking opportunities, you&apos;ll be fully equipped to launch or advance your tech career!
+                Earn a government-backed certification upon successful
+                completion of your course. With career guidance, job placement
+                support, and networking opportunities, you&apos;ll be fully
+                equipped to launch or advance your tech career!
               </p>
 
               <p className="bg-[#FFC80033] text-[17px] text-[#27156F] leading-relaxed p-2">
-                Gain the skills you need to succeed in today&apos;s digital world. Your journey to success starts here!
+                Gain the skills you need to succeed in today&apos;s digital
+                world. Your journey to success starts here!
               </p>
               <button className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer">
                 Get Started Now

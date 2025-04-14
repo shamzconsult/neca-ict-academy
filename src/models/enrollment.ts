@@ -53,6 +53,14 @@ const EnrollmentSchema = new Schema({
         ref: "Cohort",
         required: true
     },
+    cv: {
+        url: String,
+        public_id: String
+    },
+    profilePicture: {
+        url: String,
+        public_id: String
+    }
 });
 
 const Enrollment = mongoose.models.Enrollment || mongoose.model('Enrollment', EnrollmentSchema );

@@ -1,4 +1,3 @@
-import { maincourses } from "@/const/courses";
 import Link from "next/link";
 import React from "react";
 import { CoursePreviewHero } from "./CoursePreviewHero";
@@ -7,12 +6,10 @@ import { CourseDetails } from "./CourseDetails";
 import { JoinUs } from "@/components/atom/JoinUs";
 import { Navbar } from "@/components/atom/Navbar";
 import { Footer } from "@/components/atom/Footer";
+import { CourseType } from "@/types";
 
-export const CoursePreview = ({ slug }: { slug: string }) => {
-  const courseData = maincourses.find((course) => {
-    return course.slug == slug;
-  });
-  if (!courseData) {
+export const CoursePreview = ({ course }: { course: CourseType }) => {
+  if (!course) {
     return (
       <div className=" h-screen mt2 flex flex-col justify-center items-center">
         <h1 className="text-center font-bold  ">Course not found</h1>
@@ -28,10 +25,10 @@ export const CoursePreview = ({ slug }: { slug: string }) => {
   return (
     <div>
       <Navbar />
-      <CoursePreviewHero courseData={courseData} />
-      <TrackCards />
-      <CourseDetails courseData={courseData} />
-      <JoinUs />
+      <CoursePreviewHero courseData={course} />
+      <TrackCards courseData={course} />
+      <CourseDetails courseData={course} />
+      <JoinUs courseData={course} />
       <Footer />
     </div>
   );

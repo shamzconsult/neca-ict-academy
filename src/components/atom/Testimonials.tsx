@@ -69,7 +69,7 @@ export const Testimonials = () => {
                     alt={testimonial.name}
                     width={50}
                     height={50}
-                    className="rounded-full"
+                    className="rounded-full object-cover"
                   />
                   <div className="ml-3">
                     <h4 className="text-lg font-bold">{testimonial.name}</h4>
