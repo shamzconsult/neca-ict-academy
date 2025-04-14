@@ -101,7 +101,7 @@ export const CohortForm = ({
     formDataToSend.append("applicationEndDate", formData.applicationEndDate);
 
     try {
-      const res = await fetch(`/api/cohort/${editingMode._id}`, {
+      const res = await fetch(`/api/cohort/${editingMode.slug}`, {
         method: "PUT",
         body: formDataToSend,
       });
