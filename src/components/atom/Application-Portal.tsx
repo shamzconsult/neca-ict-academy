@@ -209,7 +209,7 @@ const ApplicationPortal = () => {
 
             {/* Scrollable Right Side */}
             <div className="w-full lg:w-1/2 lg:ml-[50%] bg-white overflow-y-auto h-full pt-5">
-              <div className="max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center">
+              <div className="max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left">
                 <SubHeading>NECA ICT Academy Application Portal</SubHeading>
                 <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">
                   Register Now!
