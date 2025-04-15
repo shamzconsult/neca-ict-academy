@@ -5,14 +5,15 @@ import Swal from "sweetalert2";
 export const CohortForm = ({
   toggleModal,
   setCohortsData,
-  editingMode,
-  setEditingMode,
+  cohortToEdit,
+  setCohortToEdit,
 }: {
   toggleModal: () => void;
-  editingMode?: CohortType | null;
+  cohortToEdit?: CohortType | null;
   setCohortsData: Dispatch<SetStateAction<CohortType[]>>;
-  setEditingMode?: (cohort: CohortType | null) => void;
+  setCohortToEdit?: (cohort: CohortType | null) => void;
 }) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     startDate: "",
@@ -29,6 +30,8 @@ export const CohortForm = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setLoading(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
@@ -83,12 +86,15 @@ export const CohortForm = ({
       });
     } catch (error) {
       console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!editingMode) return;
+    if (!cohortToEdit) return;
+    setLoading(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
@@ -101,7 +107,7 @@ export const CohortForm = ({
     formDataToSend.append("applicationEndDate", formData.applicationEndDate);
 
     try {
-      const res = await fetch(`/api/cohort/${editingMode.slug}`, {
+      const res = await fetch(`/api/cohort/${cohortToEdit.slug}`, {
         method: "PUT",
         body: formDataToSend,
       });
@@ -116,7 +122,9 @@ export const CohortForm = ({
 
       setCohortsData((prev) =>
         prev.map((cohort) =>
-          cohort.slug === editingMode.slug ? responseData.updatedCohort : cohort
+          cohort.slug === cohortToEdit.slug
+            ? responseData.updatedCohort
+            : cohort
         )
       );
 
@@ -136,7 +144,7 @@ export const CohortForm = ({
         title: "Cohort Updated Successfully 🎉",
       });
 
-      setEditingMode?.(null);
+      setCohortToEdit?.(null);
       setFormData({
         name: "",
         startDate: "",
@@ -147,29 +155,31 @@ export const CohortForm = ({
       toggleModal();
     } catch (error) {
       console.error("Error updating course:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (editingMode) {
+    if (cohortToEdit) {
       setFormData({
-        name: editingMode.name,
-        startDate: editingMode.startDate,
-        endDate: editingMode.endDate,
-        applicationStartDate: editingMode.applicationStartDate,
-        applicationEndDate: editingMode.applicationEndDate,
+        name: cohortToEdit.name,
+        startDate: cohortToEdit.startDate,
+        endDate: cohortToEdit.endDate,
+        applicationStartDate: cohortToEdit.applicationStartDate,
+        applicationEndDate: cohortToEdit.applicationEndDate,
       });
     }
-  }, [editingMode]);
+  }, [cohortToEdit]);
   return (
     <>
       <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
         <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
           <h2 className="text-xl font-bold mb-4">
-            {editingMode ? "Editing Cohort" : "Create Cohort"}
+            {cohortToEdit ? "Editing Cohort" : "Create Cohort"}
           </h2>
           <form
-            onSubmit={editingMode ? handleUpdate : handleSubmit}
+            onSubmit={cohortToEdit ? handleUpdate : handleSubmit}
             className="space-y-4 "
           >
             <div>
@@ -246,18 +256,24 @@ export const CohortForm = ({
               <button
                 type="submit"
                 className={`px-4 py-2 ${
-                  editingMode
+                  cohortToEdit
                     ? "bg-green-600 hover:bg-green-500"
                     : "bg-[#E02B20]  hover:bg-[#e02a20ce]"
-                } duration-300 text-white w-full rounded-md cursor-pointer`}
+                } duration-300 text-white w-full rounded-md cursor-pointer ${
+                  loading ? "opacity-60 cursor-not-allowed" : ""
+                }`}
               >
-                {editingMode ? "Update Cohort" : "Create Cohort"}
+                {loading
+                  ? "Loading..."
+                  : cohortToEdit
+                  ? "Update Cohort"
+                  : "Create Cohort"}
               </button>
               <button
                 className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
                 onClick={() => {
                   toggleModal();
-                  setEditingMode?.(null);
+                  setCohortToEdit?.(null);
                   setFormData({
                     name: "",
                     startDate: "",

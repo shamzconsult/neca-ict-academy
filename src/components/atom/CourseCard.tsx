@@ -14,13 +14,13 @@ export const CourseCard = ({
   courses,
   searchTerm,
   setShowModal,
-  setEditingMode,
+  setCourseToEdit,
   setFormData,
 }: {
   courses: CourseType[];
   searchTerm?: string;
   setShowModal?: React.Dispatch<React.SetStateAction<boolean>>;
-  setEditingMode?: (course: CourseType | null) => void;
+  setCourseToEdit?: (course: CourseType | null) => void;
   setFormData?: (data: {
     title: string;
     description: string;
@@ -59,7 +59,7 @@ export const CourseCard = ({
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#E02B20",
-      cancelButtonColor: "#6B7280",
+      cancelButtonColor: "#000000",
       confirmButtonText: "Yes, delete it!",
     });
 
@@ -103,8 +103,8 @@ export const CourseCard = ({
   };
 
   const handleEdit = (course: CourseType) => {
-    if (setEditingMode && setFormData && setShowModal) {
-      setEditingMode(course);
+    if (setCourseToEdit && setFormData && setShowModal) {
+      setCourseToEdit(course);
       setFormData({
         title: course.title,
         description: course.description,

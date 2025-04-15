@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
   const [cohortsData, setCohortsData] = useState<CohortType[]>(initialCohorts);
-  const [editingMode, setEditingMode] = useState<CohortType | null>(null);
+  const [cohortToEdit, setCohortToEdit] = useState<CohortType | null>(null);
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
   const [, setFormData] = useState({
     name: "",
@@ -67,7 +67,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#E02B20",
-      cancelButtonColor: "#6B7280",
+      cancelButtonColor: "#000000",
       confirmButtonText: "Yes, delete it!",
     });
 
@@ -112,8 +112,8 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
 
   const handleEdit = (cohort: CohortType, event: React.MouseEvent) => {
     event.stopPropagation();
-    if (setEditingMode && setFormData && setShowModal) {
-      setEditingMode(cohort);
+    if (setCohortToEdit && setFormData && setShowModal) {
+      setCohortToEdit(cohort);
       setFormData({
         name: cohort.name,
         startDate: cohort.startDate,
@@ -210,8 +210,8 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
         <CohortForm
           toggleModal={toggleModal}
           setCohortsData={setCohortsData}
-          editingMode={editingMode}
-          setEditingMode={setEditingMode}
+          cohortToEdit={cohortToEdit}
+          setCohortToEdit={setCohortToEdit}
         />
       )}
     </div>
