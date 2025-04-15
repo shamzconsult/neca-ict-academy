@@ -4,7 +4,7 @@ import { CourseType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
@@ -14,15 +14,13 @@ export const CourseCard = ({
   courses,
   searchTerm,
   setShowModal,
-  // showModal,
-  setEditingMode,
+  setCourseToEdit,
   setFormData,
 }: {
   courses: CourseType[];
   searchTerm?: string;
   setShowModal?: React.Dispatch<React.SetStateAction<boolean>>;
-  // showModal?: boolean;
-  setEditingMode?: (course: CourseType | null) => void;
+  setCourseToEdit?: (course: CourseType | null) => void;
   setFormData?: (data: {
     title: string;
     description: string;
@@ -39,6 +37,19 @@ export const CourseCard = ({
   const admin = pathname === "/admin/courses";
   const CardWrapper = admin ? "div" : Link;
 
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await fetch("/api/course");
+        const data: CourseType[] = await res.json();
+        setCoursesData(data);
+      } catch (error) {
+        console.error("Error fetching courses: ", error);
+      }
+    }
+    fetchCourses();
+  }, [coursesData]);
+
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
@@ -48,7 +59,7 @@ export const CourseCard = ({
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#E02B20",
-      cancelButtonColor: "#6B7280",
+      cancelButtonColor: "#000000",
       confirmButtonText: "Yes, delete it!",
     });
 
@@ -92,8 +103,8 @@ export const CourseCard = ({
   };
 
   const handleEdit = (course: CourseType) => {
-    if (setEditingMode && setFormData && setShowModal) {
-      setEditingMode(course);
+    if (setCourseToEdit && setFormData && setShowModal) {
+      setCourseToEdit(course);
       setFormData({
         title: course.title,
         description: course.description,
@@ -119,7 +130,7 @@ export const CourseCard = ({
           <CardWrapper
             href={`/courses/${course.slug}`}
             key={index}
-            className={`bg-white border border-[#C4C4C480] ${
+            className={`bg-white border border-[#C4C4C480] mx-auto ${
               admin ? "hover:bg-white" : "hover:bg-[#DBEAF6]"
             }  rounded-xl shadow-lg overflow-hidden p-4 text-left ${
               isCoursesPath || admin

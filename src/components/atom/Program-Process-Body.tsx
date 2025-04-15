@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const ProgramProcessBody = () => {
   return (
@@ -158,9 +159,12 @@ const ProgramProcessBody = () => {
                 Gain the skills you need to succeed in today&apos;s digital
                 world. Your journey to success starts here!
               </p>
-              <button className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer">
+              <Link
+                href="/enroll"
+                className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer"
+              >
                 Get Started Now
-              </button>
+              </Link>
             </div>
           </div>
         </div>

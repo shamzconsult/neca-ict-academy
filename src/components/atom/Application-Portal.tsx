@@ -8,7 +8,7 @@ import Link from "next/link";
 import { CheckStatusModal } from "./CheckStatusModal";
 import { ApplicationReview } from "./ApplicationReview";
 import SuccessModal from "./SuccessPage";
-import { FiFileText, FiImage, FiX } from 'react-icons/fi';
+import { FiFileText, FiImage, FiX } from "react-icons/fi";
 
 interface FormData {
   firstName: string;
@@ -45,7 +45,9 @@ const ApplicationPortal = () => {
     }
   };
 
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleProfileImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ): void => {
     if (e.target.files && e.target.files.length > 0) {
       setProfileImage(e.target.files[0]);
     }
@@ -100,17 +102,19 @@ const ApplicationPortal = () => {
   };
 
   return (
-    <div className="relative">
-      <div className="absolute top-[-50px] left-0 w-[8%] h-[73%] z-0 transform rotate-[-0.47deg] origin-top-left">
+    <div className="relative min-h-screen bg-white overflow-hidden">
+      {/* Background Elements */}
+      <div className="fixed top-0 left-0 w-[8%] h-[73%] z-[999] transform rotate-[-0.47deg] origin-top-left">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
           alt="Background Left"
           layout="fill"
           objectFit="cover"
           className="opacity-40"
+          priority
         />
       </div>
-      <div className="hidden lg:block absolute top-[90%] right-0 w-[20%] h-[20%] z-10 transform">
+      <div className="hidden lg:block absolute top-[90%] right-[-50] w-[20%] h-[20%] z-10 transform">
         <Image
           src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png"
           alt="Background Right"
@@ -120,49 +124,59 @@ const ApplicationPortal = () => {
         />
       </div>
 
-        <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row mt-10 lg:mt-0 justify-between items-center gap-5 lg:mb-30">
-              <div className="w-36 h-auto relative right-0 lg:w-48 lg:right-7">
-                <Image
-                  src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
-                  alt="NECA ICT ACADEMY Logo"
-                  width={144}
-                  height={72}
-                  className="object-contain w-full h-full cursor-pointer"
-                />
-              </div>
-              <div>
-                <h3 className="text-lg text-center md:text-left">
-                  Already applied?{" "}
-                  <Link
-                    href="#"
-                    className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
-                    onClick={toggleModal}
-                  >
-                    Check Status
-                  </Link>
-                </h3>
+      {!isSuccessModalOpen && (
+        <div className="h-screen overflow-hidden">
+          {/* Fixed Header */}
+          <header className="fixed top-0 left-0 right-0 bg-white z-50">
+            <div className="max-w-[1550px] mx-auto px-4 py-4">
+              <div className="flex flex-col gap-5 md:flex-row justify-between items-center">
+                <Link href="/" className="w-36 lg:w-48">
+                  <Image
+                    src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
+                    alt="NECA ICT ACADEMY Logo"
+                    width={144}
+                    height={72}
+                    className="object-contain w-full h-full cursor-pointer"
+                  />
+                </Link>
+                <div>
+                  <h3 className="text-lg">
+                    Already applied?{" "}
+                    <Link
+                      href="#"
+                      className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
+                      onClick={toggleModal}
+                    >
+                      Check Status
+                    </Link>
+                  </h3>
+                </div>
               </div>
             </div>
+          </header>
 
-            <div className="flex flex-col md:flex-row justify-evenly items-start my-10 gap-8">
-              <div className="w-full md:w-1/2 md:pr-8">
-                <div className="relative w-full h-[300px] mb-6 hidden sm:block">
-                  <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0 pl-20"></div>
-                  <Image
+          {/* Main Content */}
+          <div className="flex h-[calc(100vh-88px)] mt-[88px]">
+            {/* Static Left Side */}
+            <div className="hidden lg:block w-1/2 fixed left-0 top-[88px] bottom-0 bg-white p-8">
+              <div className="h-full flex flex-col justify-between pl-[15%]">
+                {/* Image Section */}
+                <div className="relative aspect-[4/3] w-full flex items-center justify-center">
+                  <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0" />
+                  <img
                     src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Online_education_and_virtual_learning_g0fzok.png"
                     alt="Online Education Image"
-                    fill
                     className="object-contain relative z-10"
                   />
                 </div>
-                <div className="lg:mt-58 mt-10 hidden sm:block">
-                  <h1 className="text-xl font-semibold text-left text-[#1E1E1E] mb-5 mt-10 pl-2">
+
+                {/* Timeline Section */}
+                <div className="pl-2 mb-8">
+                  <h1 className="text-xl font-semibold text-[#1E1E1E] mb-8">
                     Application Timeline
                   </h1>
                   <div className="flex gap-7 items-center">
-                    <div className=" bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
+                    <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
                       <p>1</p>
                     </div>
                     <div className="flex gap-2 items-center">
@@ -184,24 +198,27 @@ const ApplicationPortal = () => {
                       <p>3</p>
                     </div>
                   </div>
-                  <div className="flex lg:gap-23 gap-4 mt-4 items-center">
+                  <div className="flex gap-16 mt-4 items-center">
                     <p>Application</p>
                     <p>Interview</p>
                     <p>Selection</p>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div className="w-full md:w-1/2 text-center lg:text-left">
+            {/* Scrollable Right Side */}
+            <div className="w-full lg:w-1/2 lg:ml-[50%] bg-white overflow-y-auto h-full pt-5">
+              <div className="max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left">
                 <SubHeading>NECA ICT Academy Application Portal</SubHeading>
                 <h2 className="text-2xl font-semibold text-[#27156F] mb-4 mt-6">
                   Register Now!
                 </h2>
-                <p className="text-gray-600 text-xl mb-7">
-                  To apply for our training programs or opportunities, please fill
-                  out the form below with accurate information. Ensure all
-                  required fields are completed to avoid delays in processing{" "}
-                  <br /> your application.
+                <p className="text-gray-600 lg:text-xl mb-7">
+                  To apply for our training programs or opportunities, please
+                  fill out the form below with accurate information. Ensure all
+                  required fields are completed to avoid delays in processing
+                  your application.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -363,7 +380,9 @@ const ApplicationPortal = () => {
                           />
                           {cvFile ? (
                             <div className="flex items-center justify-between w-full">
-                              <span className="text-gray-700 text-sm truncate">{cvFile.name}</span>
+                              <span className="text-gray-700 text-sm truncate">
+                                {cvFile.name}
+                              </span>
                               <button
                                 type="button"
                                 onClick={clearCvFile}
@@ -373,7 +392,9 @@ const ApplicationPortal = () => {
                               </button>
                             </div>
                           ) : (
-                            <span className="text-gray-500 text-sm truncate">Choose PDF or DOC file</span>
+                            <span className="text-gray-500 text-sm truncate">
+                              Choose PDF or DOC file
+                            </span>
                           )}
                         </div>
                       </div>
@@ -396,7 +417,9 @@ const ApplicationPortal = () => {
                           />
                           {profileImage ? (
                             <div className="flex items-center justify-between w-full">
-                              <span className="text-gray-700 text-sm truncate">{profileImage.name}</span>
+                              <span className="text-gray-700 text-sm truncate">
+                                {profileImage.name}
+                              </span>
                               <button
                                 type="button"
                                 onClick={clearProfileImage}
@@ -406,7 +429,9 @@ const ApplicationPortal = () => {
                               </button>
                             </div>
                           ) : (
-                            <span className="text-gray-500 text-sm truncate">Choose image file</span>
+                            <span className="text-gray-500 text-sm truncate">
+                              Choose image file
+                            </span>
                           )}
                         </div>
                       </div>
@@ -422,8 +447,9 @@ const ApplicationPortal = () => {
               </div>
             </div>
           </div>
+
           {showModal && (
-            <div className="fixed inset-0 flex items-center justify-center z-30 bg-black/30">
+            <div className="fixed inset-0 flex items-center justify-center bg-black/30 z-[999999]">
               {!showReview ? (
                 <CheckStatusModal
                   email={email}
@@ -436,8 +462,12 @@ const ApplicationPortal = () => {
               )}
             </div>
           )}
-          <SuccessModal isOpen={isSuccessModalOpen} onClose={handleCloseSuccessModal} />
+          <SuccessModal
+            isOpen={isSuccessModalOpen}
+            onClose={handleCloseSuccessModal}
+          />
         </div>
+      )}
     </div>
   );
 };

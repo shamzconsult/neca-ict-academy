@@ -9,7 +9,7 @@ import { HiOutlinePlusCircle } from "react-icons/hi";
 export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
   const [showModal, setShowModal] = useState(false);
   const [courseList, setCourseList] = useState<CourseType[]>(courses);
-  const [editingMode, setEditingMode] = useState<CourseType | null>(null);
+  const [courseToEdit, setCourseToEdit] = useState<CourseType | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -35,17 +35,16 @@ export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
       </div>
       <CourseCard
         courses={courseList}
-        // showModal={showModal}
         setShowModal={setShowModal}
-        setEditingMode={setEditingMode}
+        setCourseToEdit={setCourseToEdit}
         setFormData={setFormData}
       />
       {showModal && (
         <AddNewCourse
           toggleModal={toggleModal}
           setCourseList={setCourseList}
-          editingMode={editingMode}
-          setEditingMode={setEditingMode}
+          courseToEdit={courseToEdit}
+          setCourseToEdit={setCourseToEdit}
           formData={formData}
           setFormData={setFormData}
         />
