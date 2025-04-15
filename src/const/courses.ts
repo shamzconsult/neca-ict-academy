@@ -10,20 +10,20 @@ import {
 import { MdAccessTime } from "react-icons/md";
 import { VscInbox } from "react-icons/vsc";
 
-export type CourseType = {
-  id: string;
-  slug?: string;
-  image: string;
-  title: string;
-  description: string;
-  ratings?: string;
-  reviews?: string;
-  lessons?: string;
-  duration?: string;
-  skillLevel?: string;
-  mode?: string;
-  category?: string;
-};
+// export type CourseType = {
+//   id: string;
+//   slug?: string;
+//   image: string;
+//   title: string;
+//   description: string;
+//   ratings?: string;
+//   reviews?: string;
+//   lessons?: string;
+//   duration?: string;
+//   skillLevel?: string;
+//   mode?: string;
+//   category?: string;
+// };
 
 // export const maincourses: CourseType[] = [
 //   {

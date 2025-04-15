@@ -71,7 +71,6 @@ export const CourseCard = ({
       });
 
       if (!res.ok) {
-        console.error("Failed to delete course");
         Swal.fire("Error", "Failed to delete the course.", "error");
         return;
       }
@@ -97,7 +96,6 @@ export const CourseCard = ({
         theme: "dark",
       });
     } catch (error) {
-      console.error("Error deleting course: ", error);
       Swal.fire("Error", "Something went wrong.", "error");
     }
   };

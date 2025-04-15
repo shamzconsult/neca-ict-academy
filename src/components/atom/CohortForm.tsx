@@ -11,7 +11,7 @@ export const CohortForm = ({
   toggleModal: () => void;
   editingMode?: CohortType | null;
   setCohortsData: Dispatch<SetStateAction<CohortType[]>>;
-  setEditingMode: (cohort: CohortType | null) => void;
+  setEditingMode?: (cohort: CohortType | null) => void;
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -136,7 +136,7 @@ export const CohortForm = ({
         title: "Cohort Updated Successfully 🎉",
       });
 
-      setEditingMode(null);
+      setEditingMode?.(null);
       setFormData({
         name: "",
         startDate: "",
@@ -167,7 +167,6 @@ export const CohortForm = ({
         <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
           <h2 className="text-xl font-bold mb-4">
             {editingMode ? "Editing Cohort" : "Create Cohort"}
-            {/* Create Cohort */}
           </h2>
           <form
             onSubmit={editingMode ? handleUpdate : handleSubmit}
@@ -187,19 +186,6 @@ export const CohortForm = ({
                 placeholder="Enter cohort name"
               />
             </div>
-            {/* <div>
-              <label className="block text-sm font-semibold mb-1">
-                Cohort Slug
-              </label>
-              <input
-                type="text"
-                onChange={(e) => setSlug(e.target.value)}
-                value={slug}
-                required
-                className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                placeholder="cohort-1.0"
-              />
-            </div> */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <label className="block text-sm font-semibold mb-1">
@@ -266,13 +252,12 @@ export const CohortForm = ({
                 } duration-300 text-white w-full rounded-md cursor-pointer`}
               >
                 {editingMode ? "Update Cohort" : "Create Cohort"}
-                {/* Create Cohort */}
               </button>
               <button
                 className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
                 onClick={() => {
                   toggleModal();
-                  setEditingMode(null);
+                  setEditingMode?.(null);
                   setFormData({
                     name: "",
                     startDate: "",

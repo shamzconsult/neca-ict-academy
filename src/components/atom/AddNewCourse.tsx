@@ -189,7 +189,6 @@ export const AddNewCourse = ({
     <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-        {/* <Toaster /> */}
         <form
           onSubmit={editingMode ? handleUpdate : handleSubmit}
           className="space-y-4 "
@@ -208,17 +207,7 @@ export const AddNewCourse = ({
               placeholder="Software Engineering"
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-semibold mb-1">
-              Course Slug
-            </label>
-            <input
-              type="text"
-              required
-              className="w-full p-2 border border-[#C4C4C4] rounded-md"
-              placeholder="software-engineering"
-            />
-          </div> */}
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Description
