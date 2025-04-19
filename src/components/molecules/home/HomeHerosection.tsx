@@ -20,16 +20,16 @@ export const HomeHerosection = () => {
       <section className="flex justify-between gap-8 w-full lg:max-w-1/2">
         <div className="lg:h-[456px]  relative hidden md:flex md:w-1/2 lg:w-[290px] ">
           <Image
-            src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743684060/Neca_web_6_zsloyh.png"
+            src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055744/NECA_Hall_2_zgahqk.jpg"
             alt="hero-image"
             fill
-            className="object-fit"
+            className="object-fit rounded"
           />
         </div>
         <div className="flex flex-col justify-between w-full gap-4 md:w-1/2">
           <div className=" h-[300px] md:w-full   lg:h-[205px] relative ">
             <Image
-              src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1743744742/NECA_Web_13_fniqfh.jpg"
+              src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1745055740/neca_web_11_lha995.jpg"
               alt="hero-image"
               className="rounded-lg border-4 border-white object-cover"
               fill
