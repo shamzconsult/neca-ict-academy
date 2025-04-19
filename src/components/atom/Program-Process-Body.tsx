@@ -129,8 +129,8 @@ const ProgramProcessBody = () => {
           <div className="flex flex-col lg:flex-row-reverse justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
               <Image
-                className="w-[400px] h-auto shadow-xl rounded-2xl bg-white py-2 px-4"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092795/NECA_Web_13_dj9vlt.png"
+                className="w-[400px] h-[300px] shadow-xl rounded bg-white"
+                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055739/NECA_Web_14_jfmm5f.jpg"
                 alt="Course Image"
                 width={400}
                 height={400}
