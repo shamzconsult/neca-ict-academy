@@ -8,8 +8,8 @@ import Swal from "sweetalert2";
 type AddNewCourseProps = {
   toggleModal: () => void;
   setCourseList: React.Dispatch<React.SetStateAction<CourseType[]>>;
-  editingMode: CourseType | null;
-  setEditingMode: (course: CourseType | null) => void;
+  courseToEdit: CourseType | null;
+  setCourseToEdit: (course: CourseType | null) => void;
   formData: {
     title: string;
     description: string;
@@ -35,13 +35,14 @@ type AddNewCourseProps = {
 export const AddNewCourse = ({
   toggleModal,
   setCourseList,
-  editingMode,
-  setEditingMode,
+  courseToEdit,
+  setCourseToEdit,
   formData,
   setFormData,
 }: AddNewCourseProps) => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -58,6 +59,8 @@ export const AddNewCourse = ({
       console.error("No file selected");
       return;
     }
+
+    setLoading(true);
 
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
@@ -112,13 +115,16 @@ export const AddNewCourse = ({
       toggleModal();
     } catch (error) {
       console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!editingMode) return;
+    if (!courseToEdit) return;
 
+    setLoading(true);
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
@@ -133,7 +139,7 @@ export const AddNewCourse = ({
     }
 
     try {
-      const res = await fetch(`/api/course/${editingMode.slug}`, {
+      const res = await fetch(`/api/course/${courseToEdit.slug}`, {
         method: "PUT",
         body: formDataToSend,
       });
@@ -148,7 +154,9 @@ export const AddNewCourse = ({
 
       setCourseList((prev) =>
         prev.map((course) =>
-          course.slug === editingMode.slug ? responseData.updatedCourse : course
+          course.slug === courseToEdit.slug
+            ? responseData.updatedCourse
+            : course
         )
       );
 
@@ -168,7 +176,7 @@ export const AddNewCourse = ({
         title: "Course Updated Successfully 🎉",
       });
 
-      setEditingMode(null);
+      setCourseToEdit(null);
       setFormData({
         title: "",
         description: "",
@@ -182,6 +190,8 @@ export const AddNewCourse = ({
       toggleModal();
     } catch (error) {
       console.error("Error updating course:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -189,9 +199,8 @@ export const AddNewCourse = ({
     <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-        {/* <Toaster /> */}
         <form
-          onSubmit={editingMode ? handleUpdate : handleSubmit}
+          onSubmit={courseToEdit ? handleUpdate : handleSubmit}
           className="space-y-4 "
         >
           <div>
@@ -208,17 +217,7 @@ export const AddNewCourse = ({
               placeholder="Software Engineering"
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-semibold mb-1">
-              Course Slug
-            </label>
-            <input
-              type="text"
-              required
-              className="w-full p-2 border border-[#C4C4C4] rounded-md"
-              placeholder="software-engineering"
-            />
-          </div> */}
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Description
@@ -327,18 +326,24 @@ export const AddNewCourse = ({
             <button
               type="submit"
               className={`px-4 py-2 ${
-                editingMode
+                courseToEdit
                   ? "bg-green-600 hover:bg-green-500"
                   : "bg-[#E02B20]  hover:bg-[#e02a20ce]"
-              }  duration-300 text-white w-full rounded-md cursor-pointer`}
+              }  duration-300 text-white w-full rounded-md cursor-pointer ${
+                loading ? "opacity-60 cursor-not-allowed" : ""
+              }`}
             >
-              {editingMode ? "Update Course" : "Add Course"}
+              {loading
+                ? "Loading..."
+                : courseToEdit
+                ? "Update Course"
+                : "Add Course"}
             </button>
             <button
               className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
               onClick={() => {
                 toggleModal();
-                setEditingMode(null);
+                setCourseToEdit(null);
                 setFormData({
                   title: "",
                   description: "",

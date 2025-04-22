@@ -48,5 +48,5 @@ body {
 }
 
 .animate-bg-move {
-  animation: bgMove 10s linear infinite;
+  animation: bgMove 40s linear infinite;
 }

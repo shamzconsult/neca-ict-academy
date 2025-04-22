@@ -47,9 +47,9 @@ export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
             generalCourses={courses}
           /> */}
           <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
-            <p className="text-[#1E1E1E]md:text-[20px] font-semibold">
+            {/* <p className="text-[#1E1E1E]md:text-[20px] font-semibold">
               Search:
-            </p>
+            </p> */}
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-2 flex items-center ">
                 <GoSearch className="h-5 w-5 text-[#C4C4C4]" />
