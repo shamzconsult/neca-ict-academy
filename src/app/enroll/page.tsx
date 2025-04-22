@@ -1,9 +1,11 @@
 import ApplicationPortal from '@/components/atom/Application-Portal';
+import { getAllCohorts, getCohortNames } from '@/services/admin/admin.server';
 
-export default function ApplicationPortalPage() {
-  return (
+export default async function ApplicationPortalPage() {
+  const cohorts = await getCohortNames();
+  const allCohorts = await getAllCohorts();
+  console.log('allCohorts: ', allCohorts);
 
-    <ApplicationPortal />
-
-  );
+  console.log('cohorts: ', cohorts);
+  return <ApplicationPortal cohorts={cohorts} />;
 }
