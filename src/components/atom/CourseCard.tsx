@@ -48,7 +48,7 @@ export const CourseCard = ({
       }
     }
     fetchCourses();
-  }, [coursesData]);
+  }, []);
 
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();

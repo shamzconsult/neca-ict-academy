@@ -17,6 +17,7 @@ export const POST = async (req: Request) => {
     const review = formData.get("review") as string;
     const skillLevel = formData.get("skillLevel") as string;
     const file = formData.get("coverImage") as File;
+    const programId = formData.get("programId") as string;
 
     if (!file) {
       return NextResponse.json(
@@ -47,6 +48,7 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
+      program: programId || undefined,
       coverImage: url
     });
 
