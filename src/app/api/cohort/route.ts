@@ -8,6 +8,7 @@ const GET = async () => {
         const cohort = await Cohort.find({});
         return NextResponse.json(cohort);
     } catch (error) {
+        console.error('Error fetching cohorts:', error);
         return NextResponse.json(
             { message: "Error fetching cohort", error},
             { status: 500 }

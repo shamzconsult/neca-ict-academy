@@ -3,10 +3,9 @@ import { getAllCohorts, getCohortNames } from '@/services/admin/admin.server';
 
 export default async function ApplicationPortalPage() {
   const cohorts = await getCohortNames();
-   await getAllCohorts();
-  // const allCohorts = await getAllCohorts();
-  // console.log('allCohorts: ', allCohorts);
+  const allCohorts = await getAllCohorts();
+  console.log('allCohorts: ', allCohorts);
 
-  // console.log('cohorts: ', cohorts);
+  console.log('cohorts: ', cohorts);
   return <ApplicationPortal cohorts={cohorts} />;
 }
