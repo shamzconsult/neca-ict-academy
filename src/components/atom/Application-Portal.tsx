@@ -50,13 +50,6 @@ const ApplicationPortal = () => {
     }));
   };
 
-  const handleFileChange = (file: File | null, fileType: string) => {
-    if (fileType === "cv") {
-      setCvFile(file);
-    } else if (fileType === "image") {
-      setProfileImage(file);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
