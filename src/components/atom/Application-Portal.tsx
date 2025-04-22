@@ -91,16 +91,7 @@ const ApplicationPortal = () => {
   };
 
   return (
-    // <div className="relative">
-    //   <div className="absolute top-[-50px] left-0 w-[8%] h-[73%] z-0 transform rotate-[-0.47deg] origin-top-left">
-    //     <Image
-    //       src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png"
-    //       alt="Background Left"
-    //       layout="fill"
-    //       objectFit="cover"
-    //       className="opacity-40"
-    //     />
-    //   </div>
+    
     <div className="relative min-h-screen bg-white overflow-hidden">
       {/* Background Elements */}
       <div className="fixed top-0 left-0 w-[8%] h-[73%] z-[999] transform rotate-[-0.47deg] origin-top-left">
@@ -123,31 +114,6 @@ const ApplicationPortal = () => {
         />
       </div>
 
-      {/* <div className="relative max-w-7xl mx-auto my-2 p-4 pb-0 bg-white rounded-lg overflow-hidden lg:top-20">
-          <div className="relative z-10">
-            <div className="flex flex-col lg:flex-row mt-10 lg:mt-0 justify-between items-center gap-5 lg:mb-30">
-              <div className="w-36 h-auto relative right-0 lg:w-48 lg:right-7">
-                <Image
-                  src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
-                  alt="NECA ICT ACADEMY Logo"
-                  width={144}
-                  height={72}
-                  className="object-contain w-full h-full cursor-pointer"
-                />
-              </div>
-              <div>
-                <h3 className="text-lg text-center md:text-left">
-                  Already applied?{" "}
-                  <Link
-                    href="#"
-                    className="underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1"
-                    onClick={toggleModal}
-                  >
-                    Check Status
-                  </Link>
-                </h3>
-              </div>
-            </div> */}
       <div className="h-screen overflow-hidden">
         {/* Fixed Header */}
         <header className="fixed top-0 left-0 right-0 bg-white z-50">
@@ -178,51 +144,6 @@ const ApplicationPortal = () => {
           </div>
         </header>
 
-        {/* <div className="flex flex-col md:flex-row justify-evenly items-start my-10 gap-8">
-          <div className="w-full md:w-1/2 md:pr-8">
-            <div className="relative w-full h-[300px] mb-6 hidden sm:block">
-              <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0 pl-20"></div>
-              <Image
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Online_education_and_virtual_learning_g0fzok.png"
-                alt="Online Education Image"
-                fill
-                className="object-contain relative z-10"
-              />
-            </div>
-            <div className="lg:mt-58 mt-10 hidden sm:block">
-              <h1 className="text-xl font-semibold text-left text-[#1E1E1E] mb-5 mt-10 pl-2">
-                Application Timeline
-              </h1>
-              <div className="flex gap-7 items-center">
-                <div className=" bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
-                  <p>1</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <div className="bg-[#525252] w-2 h-1"></div>
-                  <div className="bg-[#525252] w-3 h-1"></div>
-                  <div className="bg-[#525252] w-4 h-1"></div>
-                  <div className="bg-[#525252] w-5 h-1"></div>
-                </div>
-                <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
-                  <p>2</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <div className="bg-[#525252] w-2 h-1"></div>
-                  <div className="bg-[#525252] w-3 h-1"></div>
-                  <div className="bg-[#525252] w-4 h-1"></div>
-                  <div className="bg-[#525252] w-5 h-1"></div>
-                </div>
-                <div className="bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1">
-                  <p>3</p>
-                </div>
-              </div>
-              <div className="flex lg:gap-23 gap-4 mt-4 items-center">
-                <p>Application</p>
-                <p>Interview</p>
-                <p>Selection</p>
-              </div>
-            </div>
-          </div> */}
            {/* Main Content */}
            <div className="flex h-[calc(100vh-88px)] mt-[88px]">
             {/* Static Left Side */}

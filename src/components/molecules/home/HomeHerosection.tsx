@@ -18,9 +18,9 @@ export const HomeHerosection = () => {
         </div>
       </section>
       <section className="flex justify-between gap-8 w-full lg:max-w-1/2">
-        <div className="lg:h-[456px]  relative hidden md:flex md:w-1/2 lg:w-[350px] ">
+        <div className="lg:h-[456px]  relative hidden md:flex md:w-1/2 lg:w-[290px] ">
           <Image
-            src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055740/neca_web_7_ky46vh.jpg"
+            src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055743/NECA_Web_3_igode6.jpg"
             alt="hero-image"
             fill
             className="object-fit rounded"
