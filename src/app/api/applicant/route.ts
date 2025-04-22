@@ -19,7 +19,7 @@ interface ApplicantFormData {
     cv: File | null;
     profilePicture: File | null;
     [key: string]: string | File | null | undefined;
-  }
+}
 
 export const config = {
   api: {

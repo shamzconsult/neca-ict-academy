@@ -6,21 +6,54 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-export const uploadToCloudinary = async (file: string, folder: string): Promise<{url: string, public_id: string}> => {
+type UploadOptions = {
+  folder: string;
+  resource_type: 'auto' | 'image' | 'video' | 'raw';
+  [key: string]: string | File | null | undefined;
+};
+
+export const uploadToCloudinary = async (
+  file: File | string, 
+  folder: string
+): Promise<{url: string, public_id: string}> => {
   try {
-    const result = await cloudinary.uploader.upload(file, {
-      folder: `course/${folder}`,
-      resource_type: 'auto'
-    });
-    return {
-      url: result.secure_url,
-      public_id: result.public_id
+    const uploadOptions: UploadOptions = {
+      folder: `enrollment/${folder}`,
+      resource_type: 'auto' 
     };
+
+    if (typeof file === 'string') {
+      // Handle base64 string
+      const result = await cloudinary.uploader.upload(file, uploadOptions);
+      return {
+        url: result.secure_url,
+        public_id: result.public_id
+      };
+    } else {
+      // Handle File object
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      
+      return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          uploadOptions,
+          (error, result) => {
+            if (error) reject(error);
+            if (result) resolve({
+              url: result.secure_url,
+              public_id: result.public_id
+            });
+          }
+        );
+        uploadStream.end(buffer);
+      });
+    }
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    console.error('Upload error:', error);
     throw error;
   }
 };
+
 
 export const deleteFile = async (public_id: string): Promise<void> => {
   try {
