@@ -68,7 +68,7 @@ export const POST = async (req: Request) => {
 export const GET = async () => {
   try {
     await connectViaMongoose();
-    const courses = await Course.find({}).populate('program');
+    const courses = await Course.find({});
     return NextResponse.json(courses, { status: 200 });
   } catch (error) {
     return NextResponse.json(
