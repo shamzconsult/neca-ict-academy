@@ -38,15 +38,15 @@ const Contact = () => {
 
   return (
     <section className="max-w-6xl font-poppins mt-10">
-      <div className="max-w-6xl mx-auto py-5 px-4">
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-5">
-          <div className="w-full md:w-1/2 bg-white lg:text-left p-2 max-w-[584px]">
+      <div className="max-w-6xl mx-auto py-5 min-[1225px]:px-4">
+        <div className="flex flex-col min-[1225px]:flex-row space-y-2 md:space-y-0 md:space-x-5 gap-5">
+          <div className="w-full min-[1225px]:w-1/2 mx-auto bg-white min-[1225px]:text-left min-[1225px]:p-2 max-w-[584px]">
             <SubHeading>Contact Us</SubHeading>
             <br />
             <h2 className="font-bold text-[24px] md:text-[30px] text-[#27156F] leading-normal md:leading-[40px]">
               Get In Touch
             </h2>
-            <p className="lg:max-w-xl mt-2 mb-6.5 lg:text-left lg:text-[18px]">
+            <p className="min-[1225px]:max-w-xl mt-2 mb-6.5 min-[1225px]:text-left min-[1225px]:text-[18px]">
               We understand that you may have questions about our courses,
               enrollment process, certifications, and more. That&apos;s why
               we&apos;ve put together this FAQ section to provide clear answers
@@ -139,18 +139,18 @@ const Contact = () => {
               </div>
             </form>
 
-            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15 cursor-pointer">
+            <div className="flex flex-row items-center justify-between w-full gap-10 md:gap-2 mt-15 cursor-pointer">
               {[
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_831_cxgaus.png",
                   title: "PHONE",
                   value: "+234 809 938 7853",
                 },
-                {
-                  icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_835_cz07k8.png",
-                  title: "FAX",
-                  value: "0 809 938 7853",
-                },
+                // {
+                //   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_835_cz07k8.png",
+                //   title: "FAX",
+                //   value: "0 809 938 7853",
+                // },
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_833_czmxeu.png",
                   title: "EMAIL",
@@ -173,7 +173,11 @@ const Contact = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-1/2 bg-white p-6 gap-4 flex flex-col items-center justify-center max-w-[584px]">
+          <div className="w-full min-[1225px]:w-1/2 mx-auto bg-white pt-10 gap-4 flex flex-col items-center justify-center max-w-[584px]">
+            <h3 className="text-[#27156F] font-bold text-xl self-start ml-5">
+              Abuja Branch
+            </h3>
+
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.1500306894045!2d7.485448874049589!3d9.050076288660685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x104e0ba3d6cef4c9%3A0x818eab5a4834a347!2sUnity%20Bank%20PLC!5e0!3m2!1sen!2sng!4v1741878840642!5m2!1sen!2sng"
               width="100%"
@@ -181,8 +185,12 @@ const Contact = () => {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-[100%] h-94 md:w-[570px] md:h-[330px] md:ml-14"
+              className="w-[100%] h-94 min-[1225px]:w-[570px] min-[1225px]:h-[330px] min-[1225px]:ml-14"
             ></iframe>
+
+            <h3 className="text-[#27156F] font-bold text-xl self-start ml-5">
+              Lagos Branch
+            </h3>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.1892339823!2d3.352856074645217!3d6.623400993370829!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b93b89afbc06d%3A0xce547bf9cde23cfd!2sNECA%20Building!5e0!3m2!1sen!2sng!4v1744028951710!5m2!1sen!2sng"
               width="100%"
@@ -190,7 +198,7 @@ const Contact = () => {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-[100%] h-94 md:w-[570px] md:h-[330px] md:ml-14"
+              className="w-[100%] h-94 min-[1225px]:w-[570px] min-[1225px]:h-[330px] min-[1225px]:ml-14"
             ></iframe>
           </div>
         </div>

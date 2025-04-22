@@ -1,6 +1,6 @@
 "use client";
 
-import { CourseType } from "@/const/courses";
+import { CourseType } from "@/types";
 import { useState } from "react";
 
 interface CoursesButtonsProps {

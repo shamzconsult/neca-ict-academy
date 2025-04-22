@@ -2,9 +2,9 @@ import { EnrollBtn } from '@/components/atom/EnrollBtn';
 import { Heading } from '@/components/atom/headers/Heading';
 import Image from 'next/image';
 
-export const HomeHerosection = () => {
+export const HomeHeroSection = () => {
   return (
-    <div className=' max-w-6xl mx-auto flex flex-col justify-center items-center lg:flex-row lg:justify-between gap-8 mt-32  px-4 lg:px-0'>
+    <div className='max-w-6xl mx-auto flex flex-col justify-center items-center lg:flex-row lg:justify-between gap-8 mt-32 px-4 xl:px-0'>
       <section className='flex flex-col justify-center text-center lg:text-left max-w-2xl lg:max-w-1/2'>
         <Heading>Empowering the Future Through Digital Skills</Heading>
         <p className='my-[29px] lg:max-w-md md:text-[20px]'>
@@ -22,7 +22,7 @@ export const HomeHerosection = () => {
             src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1743684060/Neca_web_6_zsloyh.png'
             alt='hero-image'
             fill
-            className='object-fit'
+            className='object-cover'
           />
         </div>
         <div className='flex flex-col justify-between w-full gap-4 md:w-1/2'>
