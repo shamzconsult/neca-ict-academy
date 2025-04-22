@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
-import { uploadFile } from "@/lib/cloudinary";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export const POST = async (req: Request) => {
   try {
@@ -17,6 +17,7 @@ export const POST = async (req: Request) => {
     const review = formData.get("review") as string;
     const skillLevel = formData.get("skillLevel") as string;
     const file = formData.get("coverImage") as File;
+    const program = formData.get("program") as string;
 
     if (!file) {
       return NextResponse.json(
@@ -37,7 +38,7 @@ export const POST = async (req: Request) => {
     const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     // Upload to Cloudinary
-    const { url } = await uploadFile(base64, "course");
+    const { url } = await uploadToCloudinary(base64, "course");
 
     const newCourse = await Course.create({
       title,
@@ -47,6 +48,7 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
+      program: program || undefined,
       coverImage: url
     });
 

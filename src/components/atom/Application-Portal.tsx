@@ -14,11 +14,13 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   state: string;
   gender: string;
   course: string;
   cohort: string;
+  level: string;
+  status: string; 
 }
 
 type ApplicationFormProps = {
@@ -31,11 +33,13 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     firstName: '',
     lastName: '',
     email: '',
-    phone: '',
+    phoneNumber: '',
     state: '',
     gender: '',
     course: '',
     cohort: '',
+    level: 'Applied',
+    status: 'Pending'
   });
 
   const [cvFile, setCvFile] = useState<File | null>(null);
@@ -78,34 +82,42 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formDataToSubmit = {
-      ...formData,
-      cvFile,
-      profileImage,
-    };
-
+    const formDataToSend = new FormData();
+    
+    formDataToSend.append('firstName', formData.firstName);
+    formDataToSend.append('lastName', formData.lastName);
+    formDataToSend.append('email', formData.email);
+    formDataToSend.append('phoneNumber', formData.phoneNumber);
+    formDataToSend.append('state', formData.state);
+    formDataToSend.append('gender', formData.gender);
+    formDataToSend.append('course', formData.course);
+    formDataToSend.append('cohort', formData.cohort);
+    formDataToSend.append('level', formData.level);
+    formDataToSend.append('status', formData.status);
+    
+    if (cvFile) formDataToSend.append('cv', cvFile);
+    if (profileImage) formDataToSend.append('profilePicture', profileImage);
+  
     try {
       const res = await fetch('/api/applicant', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formDataToSubmit),
+        body: formDataToSend, 
       });
-
+  
       if (!res.ok) {
-        console.error('Failed to upload form:', await res.text());
-      } else {
-        const data = await res.json();
-        console.log('Application submitted:', data);
+        const errorData = await res.json();
+        console.error('Submission failed:', errorData);
+        alert(`Error: ${errorData.message || 'Submission failed'}`);
+        return;
       }
+  
+      const data = await res.json();
+      console.log('Application submitted:', data);
+      setIsSuccessModalOpen(true);
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error('Network error:', error);
+      alert('Network error - please try again');
     }
-
-    console.log('files', cvFile, profileImage);
-    console.log('Form:', formDataToSubmit);
-    // setIsSuccessModalOpen(true);
   };
 
   const handleCloseSuccessModal = () => {
@@ -297,8 +309,8 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Phone Number</label>
                       <input
                         type='tel'
-                        name='phone'
-                        value={formData.phone}
+                        name='phoneNumber'
+                        value={formData.phoneNumber}
                         onChange={handleInputChange}
                         required
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
@@ -355,20 +367,23 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                   <div>
                     <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Cohorts</label>
                     <div className='relative'>
-                      <select
-                        name='cohort'
-                        value={formData.cohort}
-                        onChange={handleInputChange}
-                        required
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
-                        {cohorts.map(cohort => (
-                          <option
-                            key={cohort._id}
-                            value={cohort._id}>
-                            {cohort.name}
-                          </option>
-                        ))}
-                      </select>
+                    <select
+                      name='cohort'
+                      value={formData.cohort}
+                      onChange={handleInputChange}
+                      required
+                      className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
+                    >
+                      <option value=''>Select a cohort</option> 
+                      {cohorts.map(cohort => (
+                        <option
+                          key={cohort._id}
+                          value={cohort._id}
+                        >
+                          {cohort.name}
+                        </option>
+                      ))}
+                    </select>
                       <MdArrowDropDown
                         size={24}
                         className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
