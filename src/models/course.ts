@@ -5,7 +5,7 @@ const ALLOWED_LEVEL = ["Beginner", "Intermediate", "Advanced"];
 
 
 const CourseSchema = new Schema({
-  programId: {
+  program: {
       type: Schema.Types.ObjectId,
       ref: "Program",
       // required: true

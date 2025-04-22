@@ -17,7 +17,7 @@ export const POST = async (req: Request) => {
     const review = formData.get("review") as string;
     const skillLevel = formData.get("skillLevel") as string;
     const file = formData.get("coverImage") as File;
-    const programId = formData.get("programId") as string;
+    const program = formData.get("program") as string;
 
     if (!file) {
       return NextResponse.json(
@@ -48,7 +48,7 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
-      program: programId || undefined,
+      program: program || undefined,
       coverImage: url
     });
 
@@ -68,7 +68,7 @@ export const POST = async (req: Request) => {
 export const GET = async () => {
   try {
     await connectViaMongoose();
-    const courses = await Course.find({});
+    const courses = await Course.find({}).populate('program');
     return NextResponse.json(courses, { status: 200 });
   } catch (error) {
     return NextResponse.json(
