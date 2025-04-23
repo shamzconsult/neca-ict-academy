@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 const generateSlug = (text: string): string => {
   return text
@@ -8,58 +8,66 @@ const generateSlug = (text: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
-const CohortSchema = new Schema({
-  name: {
-    type: String,
-    required: true
+const CohortSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
+      index: true,
+    },
+    startDate: {
+      type: String,
+      required: true,
+    },
+    endDate: {
+      type: String,
+      required: true,
+    },
+    applicationStartDate: {
+      type: String,
+      required: true,
+    },
+    applicationEndDate: {
+      type: String,
+      required: true,
+    },
+    applicants: [
+      {
+        _id: { type: Schema.Types.ObjectId, ref: 'Enrollment' },
+        fullName: String,
+        email: String,
+        course: String,
+        status: String,
+      },
+    ],
   },
-  slug: {
-    type: String,
-    unique: true,
-    index: true
-  },
-  startDate: {
-    type: String,
-    required: true
-  },
-  endDate: {
-    type: String,
-    required: true
-  },
-  applicationStartDate: {
-    type: String,
-    required: true
-  },
-  applicationEndDate: {
-    type: String,
-    required: true
-  },
-  applicants: [{
-    type: Schema.Types.ObjectId,
-    ref: "Enrollment"
-  }]
-}, {
-  timestamps: true
-});
+  {
+    timestamps: true,
+  }
+);
 
 // Updated pre-save hook
-CohortSchema.pre('save', async function(next) {
+CohortSchema.pre('save', async function (next) {
   if (!this.isModified('name') && this.slug) return next();
 
   try {
     let slug = generateSlug(this.name);
     let count = 1;
-    
+
     const model = mongoose.models.Cohort || mongoose.model('Cohort', CohortSchema);
-    
+
     while (true) {
-      const existing = await model.findOne({ 
+      const existing = await model.findOne({
         slug,
-        _id: { $ne: this._id } 
+        _id: { $ne: this._id },
       });
-      
+
       if (!existing) break;
-      
+
       slug = `${generateSlug(this.name)}-${count}`;
       count++;
     }
@@ -75,5 +83,5 @@ CohortSchema.pre('save', async function(next) {
   }
 });
 
-const Cohort = mongoose.models.Cohort || mongoose.model("Cohort", CohortSchema);
+const Cohort = mongoose.models.Cohort || mongoose.model('Cohort', CohortSchema);
 export default Cohort;
