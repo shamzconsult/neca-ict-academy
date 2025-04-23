@@ -50,13 +50,6 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const [emailError, setEmailError] = useState('');
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
-  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    if (e.target.files && e.target.files.length > 0) {
-      setCvFile(e.target.files[0]);
-      console.log(cvFile);
-    }
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
