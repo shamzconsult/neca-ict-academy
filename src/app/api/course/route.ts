@@ -23,7 +23,7 @@ export const POST = async (req: Request) => {
     if (courseOutlinesRaw) {
       try {
         courseOutlines = JSON.parse(courseOutlinesRaw);
-      } catch (err) {
+      } catch {
         return NextResponse.json(
           { message: "Invalid courseOutlines format" },
           { status: 400 }
