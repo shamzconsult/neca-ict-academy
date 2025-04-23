@@ -9,6 +9,7 @@ import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
 import Swal from "sweetalert2";
+import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 
 export const CourseCard = ({
   courses,
@@ -29,6 +30,7 @@ export const CourseCard = ({
     rating: string;
     review: string;
     skillLevel: string;
+    courseOutlines: CourseOutline[];
   }) => void;
 }) => {
   const [coursesData, setCoursesData] = useState<CourseType[]>(courses);
@@ -113,10 +115,12 @@ export const CourseCard = ({
         rating: course.rating,
         review: course.review,
         skillLevel: course.skillLevel,
+        courseOutlines: course.courseOutlines,
       });
       setShowModal(true);
     }
   };
+
   return (
     <div
       className={`max-w-6xl mx-auto grid justify-center gap-8 mt-8 ${
@@ -161,7 +165,9 @@ export const CourseCard = ({
                 <p className="font-bold mt-2 text-sm">About The Course</p>
               )}
               <p
-                className={`mt-1 ${isCoursesPath ? "text-[12px]" : " text-sm"}`}
+                className={`mt-1 ${
+                  isCoursesPath ? "text-[12px]" : " text-sm"
+                } break-words overflow-hidden text-ellipsis`}
               >
                 {course.description}
               </p>

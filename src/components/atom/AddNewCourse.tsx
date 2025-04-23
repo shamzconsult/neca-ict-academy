@@ -4,6 +4,7 @@ import { CourseType } from "@/types";
 import React, { useRef, useState } from "react";
 import { FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
+import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 
 type AddNewCourseProps = {
   toggleModal: () => void;
@@ -18,6 +19,7 @@ type AddNewCourseProps = {
     rating: string;
     review: string;
     skillLevel: string;
+    courseOutlines: CourseOutline[];
   };
   setFormData: React.Dispatch<
     React.SetStateAction<{
@@ -28,6 +30,7 @@ type AddNewCourseProps = {
       rating: string;
       review: string;
       skillLevel: string;
+      courseOutlines: CourseOutline[];
     }>
   >;
 };
@@ -71,6 +74,10 @@ export const AddNewCourse = ({
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
     formDataToSend.append("coverImage", file);
+    formDataToSend.append(
+      "courseOutlines",
+      JSON.stringify(formData.courseOutlines)
+    );
 
     try {
       const res = await fetch("/api/course", {
@@ -110,6 +117,7 @@ export const AddNewCourse = ({
         rating: "",
         review: "",
         skillLevel: "",
+        courseOutlines: [],
       });
       setFile(null);
       toggleModal();
@@ -133,6 +141,10 @@ export const AddNewCourse = ({
     formDataToSend.append("rating", formData.rating);
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
+    formDataToSend.append(
+      "courseOutlines",
+      JSON.stringify(formData.courseOutlines)
+    );
 
     if (file) {
       formDataToSend.append("coverImage", file);
@@ -185,6 +197,7 @@ export const AddNewCourse = ({
         rating: "",
         review: "",
         skillLevel: "",
+        courseOutlines: [],
       });
       setFile(null);
       toggleModal();
@@ -196,7 +209,7 @@ export const AddNewCourse = ({
   };
 
   return (
-    <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
+    <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center scroll-auto">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
         <form
@@ -322,6 +335,69 @@ export const AddNewCourse = ({
               <option value="Professional">Professional</option>
             </select>
           </div>
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold mb-2">Course Outline</h3>
+            {formData.courseOutlines.map((outline, index) => (
+              <div
+                key={index}
+                className="mb-4  border border-gray-200 p-4 rounded-md"
+              >
+                <div className="flex justify-end items-end">
+                  <button
+                    type="button"
+                    className=" text-[#e02a20ce] text-sm hover:underline duration-300 cursor-pointer"
+                    onClick={() => {
+                      const newOutlines = formData.courseOutlines.filter(
+                        (_, i) => i !== index
+                      );
+                      setFormData({ ...formData, courseOutlines: newOutlines });
+                    }}
+                  >
+                    Remove Section
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Outline Header"
+                  className="w-full mb-2 p-2 border border-[#C4C4C4] rounded-md"
+                  value={outline.header}
+                  onChange={(e) => {
+                    const newOutlines = [...formData.courseOutlines];
+                    newOutlines[index].header = e.target.value;
+                    setFormData({ ...formData, courseOutlines: newOutlines });
+                  }}
+                />
+                <textarea
+                  rows={3}
+                  placeholder="Use Comma(,) to separated Outlines items"
+                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
+                  value={outline.lists.join(", ")}
+                  onChange={(e) => {
+                    const newOutlines = [...formData.courseOutlines];
+                    newOutlines[index].lists = e.target.value
+                      .split(",")
+                      .map((item) => item.trim());
+                    setFormData({ ...formData, courseOutlines: newOutlines });
+                  }}
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              className="mt-2  text-green-600 hover:underline duration-300 cursor-pointer"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  courseOutlines: [
+                    ...formData.courseOutlines,
+                    { header: "", lists: [] },
+                  ],
+                })
+              }
+            >
+              + Add Section
+            </button>
+          </div>
           <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
             <button
               type="submit"
@@ -352,6 +428,7 @@ export const AddNewCourse = ({
                   rating: "",
                   review: "",
                   skillLevel: "",
+                  courseOutlines: [],
                 });
                 setFile(null);
               }}
