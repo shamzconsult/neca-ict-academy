@@ -1,4 +1,4 @@
-type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
+type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
 
 export type ApplicantDetail = {
   applicantName: string;
@@ -29,6 +29,13 @@ export type CohortType = {
 export type CohortsProps = {
   cohortsData: CohortType[];
 };
+
+export type DashboardStats =
+  | {
+      name: string;
+      value: number;
+    }[]
+  | undefined;
 
 export type Courses = {
   id: string;
