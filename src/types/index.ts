@@ -1,5 +1,10 @@
 type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
 
+export type CourseOutline = {
+  header: string;
+  lists: string[];
+};
+
 export type ApplicantDetail = {
   applicantName: string;
   applicantEmail: string;
@@ -53,6 +58,7 @@ export type Courses = {
 };
 
 export type CourseType = {
+  courseOutlines: CourseOutline[];
   duration: string;
   skillLevel: string;
   rating: string;

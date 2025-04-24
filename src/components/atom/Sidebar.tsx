@@ -97,7 +97,7 @@ export const Sidebar = () => {
               }`}
             >
               <FaBook size={20} className="mr-3" />
-              Manage Courses
+              Courses
             </Link>
           </nav>
         </div>
