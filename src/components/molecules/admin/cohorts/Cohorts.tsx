@@ -28,6 +28,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     router.push(`/admin/cohorts/${slug}`);
   };
 
+  console.log(cohortsData);
   const toggleModal = () => {
     setShowModal(!showModal);
   };

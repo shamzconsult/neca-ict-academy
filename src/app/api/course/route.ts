@@ -17,6 +17,19 @@ export const POST = async (req: Request) => {
     const review = formData.get("review") as string;
     const skillLevel = formData.get("skillLevel") as string;
     const file = formData.get("coverImage") as File;
+    const courseOutlinesRaw = formData.get("courseOutlines") as string;
+
+    let courseOutlines = [];
+    if (courseOutlinesRaw) {
+      try {
+        courseOutlines = JSON.parse(courseOutlinesRaw);
+      } catch {
+        return NextResponse.json(
+          { message: "Invalid courseOutlines format" },
+          { status: 400 }
+        );
+      }
+    }
 
     if (!file) {
       return NextResponse.json(
@@ -25,7 +38,10 @@ export const POST = async (req: Request) => {
       );
     }
 
-    if (!skillLevel || !["Beginner", "Intermediate", "Advanced"].includes(skillLevel)) {
+    if (
+      !skillLevel ||
+      !["Beginner", "Intermediate", "Advanced"].includes(skillLevel)
+    ) {
       return NextResponse.json(
         { message: "Valid skill level is required" },
         { status: 400 }
@@ -47,7 +63,8 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
-      coverImage: url
+      coverImage: url,
+      courseOutlines,
     });
 
     return NextResponse.json(

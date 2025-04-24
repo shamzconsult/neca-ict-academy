@@ -6,11 +6,25 @@ import { CourseType } from "@/types";
 import React, { useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 
+export type CourseOutline = {
+  header: string;
+  lists: string[];
+};
+
 export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
   const [showModal, setShowModal] = useState(false);
   const [courseList, setCourseList] = useState<CourseType[]>(courses);
   const [courseToEdit, setCourseToEdit] = useState<CourseType | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    lesson: string;
+    duration: string;
+    rating: string;
+    review: string;
+    skillLevel: string;
+    courseOutlines: CourseOutline[];
+  }>({
     title: "",
     description: "",
     lesson: "",
@@ -18,6 +32,7 @@ export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
     rating: "",
     review: "",
     skillLevel: "",
+    courseOutlines: [],
   });
   const toggleModal = () => {
     setShowModal(!showModal);
