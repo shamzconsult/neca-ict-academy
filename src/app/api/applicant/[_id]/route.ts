@@ -1,7 +1,11 @@
 import { deleteFile, uploadFile } from "@/lib/cloudinary";
 import connectViaMongoose from "@/lib/db"
+import Cohort from "@/models/cohort";
 import Enrollment from "@/models/enrollment";
 import { NextResponse } from "next/server";
+
+const ALLOWED_STATUS = ['Admitted', 'Declined', 'Pending', 'Graduated'];
+const ALLOWED_LEVEL = ['Dropped', 'Applied', 'Interviewed', 'Admitted', 'Completed'];
 
 interface UpdateApplicantData {
     firstName?: string;
@@ -67,15 +71,42 @@ const PUT = async (req: Request) => {
         }
 
         const contentType = req.headers.get('content-type');
+        let updatedApplicant;
         
         if (contentType?.includes('application/json')) {
             const updateData = await req.json();
+
+            if (updateData.status && !ALLOWED_STATUS.includes(updateData.status)) {
+                return NextResponse.json(
+                    { message: "Invalid status value" },
+                    { status: 400 }
+                );
+            }
+
+            // This is for level incase it is needed
+            if (updateData.level && !ALLOWED_LEVEL.includes(updateData.level)) {
+                return NextResponse.json(
+                    { message: "Invalid level value" },
+                    { status: 400 }
+                );
+            }
+
             
             const updatedApplicant = await Enrollment.findByIdAndUpdate(
                 id,
                 updateData,
                 { new: true, runValidators: true }
             );
+
+            if (updateData.status && updatedApplicant?.cohort) {
+                await Cohort.updateOne(
+                    { 
+                        _id: updatedApplicant.cohort,
+                        "applicants._id": updatedApplicant._id 
+                    },
+                    { $set: { "applicants.$.status": updateData.status } }
+                );
+            }
             
             return NextResponse.json(
                 { message: "Applicant updated successfully", updatedApplicant }, 
@@ -106,6 +137,22 @@ const PUT = async (req: Request) => {
                 status: formData.get('status') as string || existingApplicant.status,
             };
 
+             // Validate status
+             if (updateData.status && !ALLOWED_STATUS.includes(updateData.status)) {
+                return NextResponse.json(
+                    { message: "Invalid status value" },
+                    { status: 400 }
+                );
+            }
+
+            // Validate level
+            if (updateData.level && !ALLOWED_LEVEL.includes(updateData.level)) {
+                return NextResponse.json(
+                    { message: "Invalid level value" },
+                    { status: 400 }
+                );
+            }
+
             // Handle file uploads
             const cvFile = formData.get('cv') as File | null;
             const profileFile = formData.get('profilePicture') as File | null;
@@ -131,11 +178,18 @@ const PUT = async (req: Request) => {
                 updateData,
                 { new: true, runValidators: true }
             );
+
+            // If status was updated, sync with Cohort
+            if (updateData.status && updatedApplicant?.cohort) {
+                await Cohort.updateOne(
+                    { 
+                        _id: updatedApplicant.cohort,
+                        "applicants._id": updatedApplicant._id 
+                    },
+                    { $set: { "applicants.$.status": updateData.status } }
+                );
+            }
             
-            return NextResponse.json(
-                { message: "Applicant updated successfully", updatedApplicant }, 
-                { status: 200 }
-            );
         }
         else {
             return NextResponse.json(
@@ -143,6 +197,18 @@ const PUT = async (req: Request) => {
                 { status: 415 }
             );
         }
+
+        if (!updatedApplicant) {
+            return NextResponse.json(
+                { message: "Applicant not found" },
+                { status: 404 }
+            );
+        }
+        
+        return NextResponse.json(
+            { message: "Applicant updated successfully", updatedApplicant }, 
+            { status: 200 }
+        );
     } catch (error) {
         console.error("Error updating applicant:", error);
         return NextResponse.json(
@@ -172,6 +238,11 @@ const DELETE = async (req: Request) => {
                 { status: 404 }
             );
         }
+
+        await Cohort.updateOne(
+            { _id: applicant.cohort },
+            { $pull: { applicants: { _id: applicant._id } } }
+        );
 
         if (applicant.cv?.public_id) {
             await deleteFile(applicant.cv.public_id);
