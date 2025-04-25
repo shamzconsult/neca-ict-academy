@@ -53,6 +53,7 @@ export const PUT = async (req: Request) => {
     const endDate = formData.get("endDate") as string;
     const applicationStartDate = formData.get("applicationStartDate") as string;
     const applicationEndDate = formData.get("applicationEndDate") as string;
+    const active = formData.get("active") === "true";
 
     if (
       !name ||
@@ -67,6 +68,13 @@ export const PUT = async (req: Request) => {
       );
     }
 
+    if (active === true) {
+      await Cohort.updateMany(
+        { slug: { $ne: slug } },
+        { $set: { active: false } }
+      );
+    }
+
     const updatedCohort = await Cohort.findOneAndUpdate(
       { slug },
       {
@@ -75,6 +83,7 @@ export const PUT = async (req: Request) => {
         endDate,
         applicationStartDate,
         applicationEndDate,
+        active
       },
       { new: true }
     );

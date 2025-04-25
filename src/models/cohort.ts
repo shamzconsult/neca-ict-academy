@@ -35,6 +35,10 @@ const CohortSchema = new Schema(
       type: String,
       required: true,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
     applicants: [
       {
         _id: { type: Schema.Types.ObjectId, ref: 'Enrollment' },
@@ -50,7 +54,7 @@ const CohortSchema = new Schema(
   }
 );
 
-// Updated pre-save hook
+// Updated pre-save 
 CohortSchema.pre('save', async function (next) {
   if (!this.isModified('name') && this.slug) return next();
 
