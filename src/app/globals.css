@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -25,14 +25,8 @@ body {
 
 @layer utilities {
   .mask-box {
-    --mask: radial-gradient(
-          26.83rem at 50% calc(100% - 36rem),
-          #000 99%,
-          #0000 101%
-        )
-        calc(50% - 24rem) 0/48rem 100%,
-      radial-gradient(26.83rem at 50% calc(100% + 24rem), #0000 99%, #000 101%)
-        50% calc(100% - 12rem) / 48rem 100% repeat-x;
+    --mask: radial-gradient(26.83rem at 50% calc(100% - 36rem), #000 99%, #0000 101%) calc(50% - 24rem) 0/48rem 100%,
+      radial-gradient(26.83rem at 50% calc(100% + 24rem), #0000 99%, #000 101%) 50% calc(100% - 12rem) / 48rem 100% repeat-x;
     -webkit-mask: var(--mask);
     mask: var(--mask);
   }
@@ -49,4 +43,10 @@ body {
 
 .animate-bg-move {
   animation: bgMove 40s linear infinite;
+}
+
+@layer components {
+  .bg-ellipse {
+    @apply absolute w-full h-[100px] rounded-[50%] bg-[#dbeaf6] -z-1 -top-13 overflow-hidden;
+  }
 }
