@@ -75,7 +75,7 @@ export const AdminDashboard = ({
           </Link>
         </div>
         <div className="overflow-x-auto border border-[#C4C4C4]  ">
-          {cohortsData.length > 0 ? (
+          {cohortsData?.length > 0 ? (
             <table className="w-full table-auto   bg-white">
               <thead>
                 <tr className="text-nowrap">
@@ -98,7 +98,7 @@ export const AdminDashboard = ({
                 {firstFiveCohorts.map((cohort, index) => (
                   <tr key={index} className="border-t border-[#C4C4C4]">
                     <td className="p-4">{cohort.name}</td>
-                    <td className="p-4">{cohort.applicants.length || "0"}</td>
+                    <td className="p-4">{cohort.applicants?.length || "0"}</td>
                     <td className="p-4">{cohort.admitted || "0"}</td>
                     <td className="p-4">{cohort.graduated || "0"}</td>
                     <td className="p-4">{cohort.declined || "0"}</td>
