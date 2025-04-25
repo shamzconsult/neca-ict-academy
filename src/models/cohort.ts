@@ -54,7 +54,6 @@ const CohortSchema = new Schema(
   }
 );
 
-// Updated pre-save hook
 CohortSchema.pre('save', async function (next) {
   if (!this.isModified('name') && this.slug) return next();
 
