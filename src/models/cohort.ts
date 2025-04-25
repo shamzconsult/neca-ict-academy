@@ -35,6 +35,10 @@ const CohortSchema = new Schema(
       type: String,
       required: true,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
     applicants: [
       {
         _id: { type: Schema.Types.ObjectId, ref: 'Enrollment' },

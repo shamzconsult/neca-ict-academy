@@ -1,4 +1,3 @@
-// app/api/applicant/route.ts
 import connectViaMongoose from '@/lib/db';
 import Enrollment from '@/models/enrollment';
 import { NextResponse } from 'next/server';
