@@ -136,7 +136,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
           <HiOutlinePlusCircle /> Create Cohort
         </button>
       </div>
-      {cohortsData.length > 0 ? (
+      {cohortsData?.length > 0 ? (
         <div className="overflow-x-auto   border border-[#C4C4C4]">
           <table className="w-full table-auto bg-white">
             <thead className="">
@@ -167,7 +167,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
                   className="border-t border-[#C4C4C4] cursor-pointer hover:bg-slate-50"
                 >
                   <td className="p-4">{cohort.name}</td>
-                  <td className="p-4">{cohort.applicants.length || "0"}</td>
+                  <td className="p-4">{cohort.applicants?.length || "0"}</td>
                   <td className="p-4">{cohort.admitted || "0"}</td>
                   <td className="p-4">{cohort.graduated || "0"}</td>
                   <td className="p-4">{cohort.declined || "0"}</td>
