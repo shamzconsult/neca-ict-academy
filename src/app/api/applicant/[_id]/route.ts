@@ -55,8 +55,40 @@ const PUT = async (req: Request) => {
 
     if (contentType?.includes('application/json')) {
       const updateData = await req.json();
+      const existingApplicant = await Enrollment.findById(id);
+
+      if (!existingApplicant) {
+        return NextResponse.json({ message: 'Applicant not found' }, { status: 404 });
+      }
+
+      if (!updateData.level) {
+        updateData.level = existingApplicant.level;
+      } 
+
+      if (!updateData.status) {
+        updateData.status = existingApplicant.status
+      }
 
       const updatedApplicant = await Enrollment.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+      if (!updatedApplicant) {
+        return NextResponse.json({ message: 'Applicant not found' }, { status: 404 });
+      }
+
+       await Cohort.updateOne(
+        { 'applicants._id': id },
+        {
+          $set: {
+            'applicants.$.fullName': `${updatedApplicant.firstName} ${updatedApplicant.lastName}`,
+            'applicants.$.email': updatedApplicant.email,
+            'applicants.$.course': updatedApplicant.course,
+            'applicants.$.status': updatedApplicant.status,
+            'applicants.$.state': updatedApplicant.state,
+            'applicants.$.level': updatedApplicant.level,
+            'applicants.$.appliedAt': updatedApplicant.date
+          }
+        }
+      );
 
       return NextResponse.json({ message: 'Applicant updated successfully', updatedApplicant }, { status: 200 });
     } else if (contentType?.includes('multipart/form-data')) {
