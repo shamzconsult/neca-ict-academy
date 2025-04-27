@@ -6,12 +6,12 @@ export type CourseOutline = {
 };
 
 export type ApplicantDetail = {
-  applicantName: string;
-  applicantEmail: string;
+  fullName: string;
+  email: string;
   course: string;
   level: number;
-  location: string;
-  date: string;
+  state: string;
+  appliedAt: string;
   status: Status;
 };
 
@@ -22,13 +22,13 @@ export type CohortType = {
   _id: number;
   slug: string;
   name: string;
-  applicants: string;
+  active: boolean;
+  applicants: ApplicantDetail[];
   admitted: string;
   graduated: string;
   declined: string;
   startDate: string;
   endDate: string;
-  applicantDetails: ApplicantDetail[];
 };
 
 export type CohortsProps = {

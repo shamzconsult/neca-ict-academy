@@ -46,6 +46,9 @@ const CohortSchema = new Schema(
         email: String,
         course: String,
         status: String,
+        state: String,
+        level: String,
+        appliedAt: Date,
       },
     ],
   },
@@ -54,7 +57,7 @@ const CohortSchema = new Schema(
   }
 );
 
-// Updated pre-save 
+// Updated pre-save
 CohortSchema.pre('save', async function (next) {
   if (!this.isModified('name') && this.slug) return next();
 
