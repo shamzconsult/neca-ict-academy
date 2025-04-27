@@ -6,6 +6,7 @@ export type CourseOutline = {
 };
 
 export type ApplicantDetail = {
+  _id: string;
   fullName: string;
   email: string;
   course: string;

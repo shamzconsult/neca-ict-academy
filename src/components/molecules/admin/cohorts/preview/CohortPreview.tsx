@@ -1,27 +1,44 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import React, { useState, useTransition } from 'react';
+
 import EmptyState from '@/components/atom/EmptyState';
 import { CohortType } from '@/types';
 import Link from 'next/link';
-import React, { useState, useTransition } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { MdKeyboardArrowDown, MdOutlineArrowCircleDown } from 'react-icons/md';
+import { MdOutlineArrowCircleDown } from 'react-icons/md';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const statusOptions = ['Admitted', 'Declined', 'Pending', 'Graduated'];
 const levelOptions = ['Dropped', 'Applied', 'Interviewed', 'Admitted', 'Completed'];
 
 export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
   const [searchTerm, setSearchTerm] = useState('');
+  const [status, setStatus] = useState('all');
+
   const [formData, setFormData] = useState({
     status: '',
     level: '',
   });
 
-  console.log('form', formData);
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedStatus = e.target.value;
+    setStatus(selectedStatus);
+  };
 
-  const [isPending, startTransition] = useTransition();
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   if (!cohort) {
     return (
       <div className=' h-screen mt2 flex flex-col justify-center items-center'>
@@ -35,15 +52,24 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     );
   }
 
-  const filteredData =
-    cohort.applicants?.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(searchTerm.toLowerCase()))) || [];
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  let filteredData = cohort.applicants || [];
+
+  if (searchTerm) {
+    filteredData = filteredData.filter(applicant => {
+      return (
+        applicant.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.status?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
+  }
+
+  if (status !== 'all') {
+    filteredData = filteredData.filter(applicant => applicant.status === status);
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, id: string) => {
     e.preventDefault();
 
@@ -76,6 +102,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           status: formData.status,
           level: formData.level,
         });
+        router.refresh();
       } catch (error) {
         console.error('Error updating applicant:', error);
       }
@@ -100,9 +127,22 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
             </div>
 
             <div className='flex gap-2'>
-              <button className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
+              <select
+                value={status}
+                onChange={handleStatusChange}
+                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
+                <option value='all'>All Status</option>
+                {statusOptions.map((status, index) => (
+                  <option
+                    value={status}
+                    key={index}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+              {/* <button className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
                 All Status <MdKeyboardArrowDown />
-              </button>
+              </button> */}
 
               <button className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
                 <MdOutlineArrowCircleDown />
@@ -168,24 +208,6 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                   onSubmit={e => handleSubmit(e, applicant._id)}
                                   className='space-y-4'>
                                   <div className='space-y-6 mt-5'>
-                                    <label htmlFor='status'>Status</label>
-                                    <select
-                                      name='status'
-                                      id='status'
-                                      value={formData.status}
-                                      onChange={handleChange}
-                                      className='w-full p-2 border border-[#C4C4C4] rounded-md'
-                                      disabled={isPending}>
-                                      <option value=''>Select Status</option>
-                                      {statusOptions.map((status, index) => (
-                                        <option
-                                          key={index}
-                                          value={status}>
-                                          {status}
-                                        </option>
-                                      ))}
-                                    </select>
-
                                     <label htmlFor='level'>Level</label>
                                     <select
                                       name='level'
@@ -203,6 +225,24 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                         </option>
                                       ))}
                                     </select>
+
+                                    <label htmlFor='status'>Status</label>
+                                    <select
+                                      name='status'
+                                      id='status'
+                                      value={formData.status}
+                                      onChange={handleChange}
+                                      className='w-full p-2 border border-[#C4C4C4] rounded-md'
+                                      disabled={isPending}>
+                                      <option value=''>Select Status</option>
+                                      {statusOptions.map((status, index) => (
+                                        <option
+                                          key={index}
+                                          value={status}>
+                                          {status}
+                                        </option>
+                                      ))}
+                                    </select>
                                   </div>
 
                                   <div className='mt-10 flex justify-end gap-4'>
@@ -211,11 +251,13 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                       disabled={isPending}>
                                       {isPending ? 'Updating...' : 'Update Applicant'}
                                     </button>
-                                    <button
-                                      className='bg-black text-white py-2 px-4 rounded-lg cursor-pointer'
-                                      type='button'>
-                                      Cancel
-                                    </button>
+                                    <DialogClose>
+                                      <button
+                                        className='bg-black text-white py-2 px-4 rounded-lg cursor-pointer'
+                                        type='button'>
+                                        Cancel
+                                      </button>
+                                    </DialogClose>
                                   </div>
                                 </form>
                               </DialogDescription>
