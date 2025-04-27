@@ -229,6 +229,7 @@ export const CourseCard = ({
               )}
               <Link
                 href={`/courses/${course.slug}`}
+                target="_blank"
                 className="text-[#E02B20]  mt-3 inline-flex items-center hover:underline-offset-4 hover:underline"
               >
                 Learn More <span className="ml-2">→</span>

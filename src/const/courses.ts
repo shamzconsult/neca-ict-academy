@@ -83,21 +83,21 @@ export const courseDetails = [
     title: "Lessons",
     value: "128",
     description:
-      "Carefully structured lessons designed to take you from the basics of software engineering to advanced development skills. Each lesson is crafted to provide hands-on experience, covering front-end and back-end development, API integration, version control, testing, and deployment.",
+      "Carefully structured lessons designed to take you from foundational concepts to advanced skills. Each lesson is crafted to provide hands-on experience, covering key principles, practical applications, and essential techniques to ensure a well-rounded learning experience.",
     icon: BsPlayBtn,
   },
   {
     title: "Duration",
     value: "6 Months",
     description:
-      "Flexible and self-paced with live sessions and hands-on projects. You’ll have access to live sessions, recorded classes, and hands-on projects throughout the course. Learn at your own pace while receiving real-time support from instructors and peers.",
+      "Flexible and self-paced learning with interactive sessions and practical projects. Gain access to live sessions, recorded classes, and hands-on activities throughout your journey. Learn at a pace that suits you while benefiting from real-time guidance and support from mentors and fellow learners.",
     icon: MdAccessTime,
   },
   {
     title: "Skill Level",
     value: "Beginner to Advanced",
     description:
-      "This course is designed for learners at all levels. Whether you’re a complete beginner or someone looking to advance your software engineering skills, the structured lessons and hands-on projects will take you from the fundamentals to mastering full-stack development.",
+      "This course is designed for learners at all levels. Whether you’re a complete beginner or seeking to deepen your expertise, the structured lessons and practical projects will guide you from foundational concepts to mastering advanced skills in your chosen field",
     icon: FiBarChart,
   },
 ];
