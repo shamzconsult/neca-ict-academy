@@ -10,6 +10,7 @@ import { MdKeyboardArrowDown, MdOutlineArrowCircleDown } from "react-icons/md";
 export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
+  console.log(cohort);
   if (!cohort) {
     return (
       <div className=" h-screen mt2 flex flex-col justify-center items-center">
@@ -36,7 +37,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
       <h1 className="md:text-[20px] font-semibold mb-6 p-3 bg-white w-full">
         {cohort.name}
       </h1>
-      {filteredData && filteredData.length > 0 ? (
+      {filteredData && filteredData?.length > 0 ? (
         <section className="border border-[#C4C4C4] w-full">
           <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full">
             <div className="relative w-full md:w-[70%]">

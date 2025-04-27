@@ -1,4 +1,9 @@
-type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
+type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
+
+export type CourseOutline = {
+  header: string;
+  lists: string[];
+};
 
 export type ApplicantDetail = {
   applicantName: string;
@@ -30,6 +35,13 @@ export type CohortsProps = {
   cohortsData: CohortType[];
 };
 
+export type DashboardStats =
+  | {
+      name: string;
+      value: number;
+    }[]
+  | undefined;
+
 export type Courses = {
   id: string;
   slug?: string;
@@ -46,6 +58,7 @@ export type Courses = {
 };
 
 export type CourseType = {
+  courseOutlines: CourseOutline[];
   duration: string;
   skillLevel: string;
   rating: string;

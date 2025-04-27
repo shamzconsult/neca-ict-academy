@@ -4,12 +4,13 @@ import { CourseType } from "@/types";
 import React, { useRef, useState } from "react";
 import { FiImage } from "react-icons/fi";
 import Swal from "sweetalert2";
+import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 
 type AddNewCourseProps = {
   toggleModal: () => void;
   setCourseList: React.Dispatch<React.SetStateAction<CourseType[]>>;
-  editingMode: CourseType | null;
-  setEditingMode: (course: CourseType | null) => void;
+  courseToEdit: CourseType | null;
+  setCourseToEdit: (course: CourseType | null) => void;
   formData: {
     title: string;
     description: string;
@@ -18,6 +19,7 @@ type AddNewCourseProps = {
     rating: string;
     review: string;
     skillLevel: string;
+    courseOutlines: CourseOutline[];
   };
   setFormData: React.Dispatch<
     React.SetStateAction<{
@@ -28,6 +30,7 @@ type AddNewCourseProps = {
       rating: string;
       review: string;
       skillLevel: string;
+      courseOutlines: CourseOutline[];
     }>
   >;
 };
@@ -35,13 +38,14 @@ type AddNewCourseProps = {
 export const AddNewCourse = ({
   toggleModal,
   setCourseList,
-  editingMode,
-  setEditingMode,
+  courseToEdit,
+  setCourseToEdit,
   formData,
   setFormData,
 }: AddNewCourseProps) => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -59,6 +63,8 @@ export const AddNewCourse = ({
       return;
     }
 
+    setLoading(true);
+
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
@@ -68,6 +74,10 @@ export const AddNewCourse = ({
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
     formDataToSend.append("coverImage", file);
+    formDataToSend.append(
+      "courseOutlines",
+      JSON.stringify(formData.courseOutlines)
+    );
 
     try {
       const res = await fetch("/api/course", {
@@ -107,18 +117,22 @@ export const AddNewCourse = ({
         rating: "",
         review: "",
         skillLevel: "",
+        courseOutlines: [],
       });
       setFile(null);
       toggleModal();
     } catch (error) {
       console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!editingMode) return;
+    if (!courseToEdit) return;
 
+    setLoading(true);
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
     formDataToSend.append("description", formData.description);
@@ -127,13 +141,17 @@ export const AddNewCourse = ({
     formDataToSend.append("rating", formData.rating);
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
+    formDataToSend.append(
+      "courseOutlines",
+      JSON.stringify(formData.courseOutlines)
+    );
 
     if (file) {
       formDataToSend.append("coverImage", file);
     }
 
     try {
-      const res = await fetch(`/api/course/${editingMode.slug}`, {
+      const res = await fetch(`/api/course/${courseToEdit.slug}`, {
         method: "PUT",
         body: formDataToSend,
       });
@@ -148,7 +166,9 @@ export const AddNewCourse = ({
 
       setCourseList((prev) =>
         prev.map((course) =>
-          course.slug === editingMode.slug ? responseData.updatedCourse : course
+          course.slug === courseToEdit.slug
+            ? responseData.updatedCourse
+            : course
         )
       );
 
@@ -168,7 +188,7 @@ export const AddNewCourse = ({
         title: "Course Updated Successfully 🎉",
       });
 
-      setEditingMode(null);
+      setCourseToEdit(null);
       setFormData({
         title: "",
         description: "",
@@ -177,21 +197,23 @@ export const AddNewCourse = ({
         rating: "",
         review: "",
         skillLevel: "",
+        courseOutlines: [],
       });
       setFile(null);
       toggleModal();
     } catch (error) {
       console.error("Error updating course:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
+    <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center scroll-auto">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
         <h2 className="text-xl font-bold mb-4">Add New Course</h2>
-        {/* <Toaster /> */}
         <form
-          onSubmit={editingMode ? handleUpdate : handleSubmit}
+          onSubmit={courseToEdit ? handleUpdate : handleSubmit}
           className="space-y-4 "
         >
           <div>
@@ -208,17 +230,7 @@ export const AddNewCourse = ({
               placeholder="Software Engineering"
             />
           </div>
-          {/* <div>
-            <label className="block text-sm font-semibold mb-1">
-              Course Slug
-            </label>
-            <input
-              type="text"
-              required
-              className="w-full p-2 border border-[#C4C4C4] rounded-md"
-              placeholder="software-engineering"
-            />
-          </div> */}
+
           <div>
             <label className="block text-sm font-semibold mb-1">
               Description
@@ -323,22 +335,91 @@ export const AddNewCourse = ({
               <option value="Professional">Professional</option>
             </select>
           </div>
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold mb-2">Course Outline</h3>
+            {formData.courseOutlines.map((outline, index) => (
+              <div
+                key={index}
+                className="mb-4  border border-gray-200 p-4 rounded-md"
+              >
+                <div className="flex justify-end items-end">
+                  <button
+                    type="button"
+                    className=" text-[#e02a20ce] text-sm hover:underline duration-300 cursor-pointer"
+                    onClick={() => {
+                      const newOutlines = formData.courseOutlines.filter(
+                        (_, i) => i !== index
+                      );
+                      setFormData({ ...formData, courseOutlines: newOutlines });
+                    }}
+                  >
+                    Remove Section
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Outline Header"
+                  className="w-full mb-2 p-2 border border-[#C4C4C4] rounded-md"
+                  value={outline.header}
+                  onChange={(e) => {
+                    const newOutlines = [...formData.courseOutlines];
+                    newOutlines[index].header = e.target.value;
+                    setFormData({ ...formData, courseOutlines: newOutlines });
+                  }}
+                />
+                <textarea
+                  rows={3}
+                  placeholder="Use Comma(,) to separated Outlines items"
+                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
+                  value={outline.lists.join(", ")}
+                  onChange={(e) => {
+                    const newOutlines = [...formData.courseOutlines];
+                    newOutlines[index].lists = e.target.value
+                      .split(",")
+                      .map((item) => item.trim());
+                    setFormData({ ...formData, courseOutlines: newOutlines });
+                  }}
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              className="mt-2  text-green-600 hover:underline duration-300 cursor-pointer"
+              onClick={() =>
+                setFormData({
+                  ...formData,
+                  courseOutlines: [
+                    ...formData.courseOutlines,
+                    { header: "", lists: [] },
+                  ],
+                })
+              }
+            >
+              + Add Section
+            </button>
+          </div>
           <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
             <button
               type="submit"
               className={`px-4 py-2 ${
-                editingMode
+                courseToEdit
                   ? "bg-green-600 hover:bg-green-500"
                   : "bg-[#E02B20]  hover:bg-[#e02a20ce]"
-              }  duration-300 text-white w-full rounded-md cursor-pointer`}
+              }  duration-300 text-white w-full rounded-md cursor-pointer ${
+                loading ? "opacity-60 cursor-not-allowed" : ""
+              }`}
             >
-              {editingMode ? "Update Course" : "Add Course"}
+              {loading
+                ? "Loading..."
+                : courseToEdit
+                ? "Update Course"
+                : "Add Course"}
             </button>
             <button
               className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
               onClick={() => {
                 toggleModal();
-                setEditingMode(null);
+                setCourseToEdit(null);
                 setFormData({
                   title: "",
                   description: "",
@@ -347,6 +428,7 @@ export const AddNewCourse = ({
                   rating: "",
                   review: "",
                   skillLevel: "",
+                  courseOutlines: [],
                 });
                 setFile(null);
               }}

@@ -20,11 +20,7 @@ export const POST = async (req: Request) => {
         }
 
         // Convert file to base64
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const base64 = `data:${file.type};base64,${buffer.toString('base64')}`;
-
-        // Upload to Cloudinary
-        const { url, public_id } = await uploadFile(base64, type);
+        const { url, public_id } = await uploadFile(file, type);
 
         // Update enrollment
         const updateData = {

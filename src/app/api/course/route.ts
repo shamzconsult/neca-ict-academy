@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
-import { uploadFile } from "@/lib/cloudinary";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 export const POST = async (req: Request) => {
   try {
@@ -18,6 +18,20 @@ export const POST = async (req: Request) => {
     const skillLevel = formData.get("skillLevel") as string;
     const file = formData.get("coverImage") as File;
 
+    const courseOutlinesRaw = formData.get("courseOutlines") as string;
+
+    let courseOutlines = [];
+    if (courseOutlinesRaw) {
+      try {
+        courseOutlines = JSON.parse(courseOutlinesRaw);
+      } catch {
+        return NextResponse.json(
+          { message: "Invalid courseOutlines format" },
+          { status: 400 }
+        );
+      }
+    }
+
     if (!file) {
       return NextResponse.json(
         { message: "Cover image is required" },
@@ -25,7 +39,10 @@ export const POST = async (req: Request) => {
       );
     }
 
-    if (!skillLevel || !["Beginner", "Intermediate", "Advanced"].includes(skillLevel)) {
+    if (
+      !skillLevel ||
+      !["Beginner", "Intermediate", "Advanced"].includes(skillLevel)
+    ) {
       return NextResponse.json(
         { message: "Valid skill level is required" },
         { status: 400 }
@@ -37,7 +54,7 @@ export const POST = async (req: Request) => {
     const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
 
     // Upload to Cloudinary
-    const { url } = await uploadFile(base64, "course");
+    const { url } = await uploadToCloudinary(base64, "course");
 
     const newCourse = await Course.create({
       title,
@@ -47,7 +64,9 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
-      coverImage: url
+    
+      coverImage: url,
+      courseOutlines,
     });
 
     return NextResponse.json(

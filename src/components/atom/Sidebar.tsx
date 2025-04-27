@@ -17,9 +17,6 @@ export const Sidebar = () => {
 
   const isActive = (path: string) => pathname === path;
 
-  const handleLogout = () => {
-    setShowModal(false);
-  };
   return (
     <div className="relative">
       <div className="flex justify-between items-center">
@@ -97,25 +94,12 @@ export const Sidebar = () => {
               }`}
             >
               <FaBook size={20} className="mr-3" />
-              Manage Courses
+              Courses
             </Link>
           </nav>
         </div>
 
         <div className="mb-6">
-          {/* <Link
-            href="/admin/settings"
-            onClick={() => setIsOpen(false)}
-            className={`flex items-center px-6 py-3 text-sm font-medium mx-1 ${
-              isActive("/admin/settings")
-                ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
-                : " hover:text-[#27156F]"
-            }`}
-          >
-            <FiSettings size={20} className="mr-3" />
-            Settings
-          </Link> */}
-
           <button
             onClick={() => setShowModal(true)}
             className="flex items-center px-6 py-3 text-sm text-[#E02B20] hover:text-red-800 w-full cursor-pointer"
@@ -126,11 +110,7 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      <LogoutModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onConfirm={handleLogout}
-      />
+      <LogoutModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 };

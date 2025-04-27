@@ -1,11 +1,25 @@
+"use client";
+
 import Link from "next/link";
 import { BsTwitterX } from "react-icons/bs";
 import { FaFacebookF, FaLinkedinIn, FaInstagram } from "react-icons/fa";
 import { Logo } from "./Logo";
 import { MdEmail } from "react-icons/md";
+import { useState } from "react";
 
 export const Footer = () => {
+  const [email, setEmail] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const today = new Date();
+
+  const handleSubmit = () => {
+    if (!email) {
+      return;
+    }
+    setIsSubmitted(true);
+    setEmail("");
+  };
+
   return (
     <footer className="bg-[#27156F] text-white py-12 px-6 md:px-16">
       <div className="max-w-6xl mx-auto ">
@@ -66,7 +80,7 @@ export const Footer = () => {
                 Contact Us
               </Link>
               <Link
-                href=""
+                href="/enroll"
                 className="hover:underline underline-offset-4 duration-150 text-nowrap"
               >
                 Enroll Now
@@ -78,35 +92,35 @@ export const Footer = () => {
             <h3 className="font-semibold mb-3">Links</h3>
             <div className="text-sm flex flex-col space-y-2">
               <Link
-                href="/privacy"
+                href="/"
                 className="hover:underline underline-offset-4 duration-150 text-nowrap"
               >
                 Privacy Policy
               </Link>
               <Link
-                href="/terms"
+                href="/"
                 className="hover:underline underline-offset-4 duration-150 text-nowrap"
               >
                 Terms of Use
               </Link>
               <Link
-                href=""
+                href="/"
                 className="hover:underline underline-offset-4 duration-150 "
               >
                 Downloads
               </Link>
               <Link
-                href="/member"
+                href="/"
                 className="hover:underline underline-offset-4 duration-150 "
               >
                 Membership
               </Link>
-              <Link
+              {/* <Link
                 href=""
                 className="hover:underline underline-offset-4 duration-150"
               >
                 Subscriptions
-              </Link>
+              </Link> */}
             </div>
           </div>
 
@@ -115,19 +129,32 @@ export const Footer = () => {
               Subscribe to our newsletter and be the first to know about our
               updates
             </p>
-            <div className="flex flex-col md:flex-row gap-3 text-sm">
-              <div className="flex items-center space-x-2 w-full md:w-[65%] bg-white px-2.5 py-4">
-                <MdEmail className="text-[#27156F] w-[24px] h-[24px]" />
-                <input
-                  type="email"
-                  placeholder="Enter Email Address"
-                  className="text-black outline-none w-full "
-                />
+            {isSubmitted ? (
+              <h2 className="text-lg font-semibold p-2 bg-[#E02B20]">
+                You&#8217;ve subscribed to our newsletter Successfully🎉🎉
+              </h2>
+            ) : (
+              <div className="flex flex-col md:flex-row gap-3 text-sm">
+                <div className="flex items-center space-x-2 w-full md:w-[65%] bg-white px-2.5 py-4">
+                  <MdEmail className="text-[#27156F] w-[24px] h-[24px]" />
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter Email Address"
+                    className="text-black outline-none w-full "
+                  />
+                </div>
+                <button
+                  onClick={handleSubmit}
+                  className="bg-[#E02B20] hover:bg-[#e02a20ce] duration-300 text-white text-center  px-2 py-2 w-full md:w-[35%] cursor-pointer hover:shadow-xl"
+                >
+                  Subscribe
+                </button>
               </div>
-              <button className="bg-[#E02B20] hover:bg-[#e02a20ce] duration-300 text-white text-center  px-2 py-2 w-full md:w-[35%] cursor-pointer hover:shadow-xl">
-                Subscribe
-              </button>
-            </div>
+            )}
 
             <div className="flex flex-col md:flex-row md:items-center gap-4 mt-4 lg:mt-8 text-sm">
               <h3 className="font-semibold text-nowrap">Follow Us:</h3>

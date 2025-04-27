@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const ProgramProcessBody = () => {
   return (
@@ -129,8 +130,8 @@ const ProgramProcessBody = () => {
           <div className="flex flex-col lg:flex-row-reverse justify-center items-center gap-10">
             <div className="w-full lg:w-1/2">
               <Image
-                className="w-[400px] h-auto shadow-xl rounded-2xl bg-white py-2 px-4"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092795/NECA_Web_13_dj9vlt.png"
+                className="w-[400px] h-[300px] shadow-xl rounded bg-white"
+                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055739/NECA_Web_14_jfmm5f.jpg"
                 alt="Course Image"
                 width={400}
                 height={400}
@@ -158,9 +159,12 @@ const ProgramProcessBody = () => {
                 Gain the skills you need to succeed in today&apos;s digital
                 world. Your journey to success starts here!
               </p>
-              <button className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer">
+              <Link
+                href="/enroll"
+                className="bg-[#E02B20] text-white py-2 px-4 rounded mt-2 cursor-pointer"
+              >
                 Get Started Now
-              </button>
+              </Link>
             </div>
           </div>
         </div>
