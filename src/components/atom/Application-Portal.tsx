@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { SubHeading } from '@/components/atom/headers/SubHeading';
 import Link from 'next/link';
 import { CheckStatusModal } from './CheckStatusModal';
@@ -29,6 +29,7 @@ type ApplicationFormProps = {
 }[];
 
 const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -76,39 +77,41 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     if (cvFile) formDataToSend.append('cv', cvFile);
     if (profileImage) formDataToSend.append('profilePicture', profileImage);
 
-    try {
-      const res = await fetch('/api/applicant', {
-        method: 'POST',
-        body: formDataToSend,
-      });
+    startTransition(async () => {
+      try {
+        const res = await fetch('/api/applicant', {
+          method: 'POST',
+          body: formDataToSend,
+        });
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error('Submission failed:', errorData);
-        alert(`Error: ${errorData.message || 'Submission failed'}`);
-        return;
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error('Submission failed:', errorData);
+          alert(`Error: ${errorData.message || 'Submission failed'}`);
+          return;
+        }
+        setIsSuccessModalOpen(true);
+
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNumber: '',
+          state: '',
+          gender: '',
+          course: '',
+          cohort: '',
+          level: 'Applied',
+          status: 'Pending',
+        });
+
+        setCvFile(null);
+        setProfileImage(null);
+      } catch (error) {
+        console.error('Network error:', error);
+        alert('Network error - please try again');
       }
-      setIsSuccessModalOpen(true);
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        state: '',
-        gender: '',
-        course: '',
-        cohort: '',
-        level: 'Applied',
-        status: 'Pending',
-      });
-
-      setCvFile(null);
-      setProfileImage(null);
-    } catch (error) {
-      console.error('Network error:', error);
-      alert('Network error - please try again');
-    }
+    });
   };
 
   const handleCloseSuccessModal = () => {
@@ -263,6 +266,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           onChange={handleInputChange}
                           className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                           required
+                          disabled={isPending}
                         />
                       </div>
                       <div>
@@ -275,6 +279,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           onChange={handleInputChange}
                           className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                           required
+                          disabled={isPending}
                         />
                       </div>
                     </div>
@@ -288,6 +293,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       value={formData.email}
                       onChange={handleInputChange}
                       required
+                      disabled={isPending}
                       className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                       placeholder='Enter your email address'
                     />
@@ -301,6 +307,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       value={formData.phoneNumber}
                       onChange={handleInputChange}
                       required
+                      disabled={isPending}
                       className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                       placeholder='Enter your phone number'
                     />
@@ -316,6 +323,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         value={formData.state}
                         onChange={handleInputChange}
                         required
+                        disabled={isPending}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
                         <option value=''>Select your state</option>
                         <option value='Abuja'>Abuja</option>
@@ -339,6 +347,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         value={formData.gender}
                         onChange={handleInputChange}
                         required
+                        disabled={isPending}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
                         <option value=''>Select gender</option>
                         <option value='Male'>Male</option>
@@ -359,15 +368,18 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       value={formData.cohort}
                       onChange={handleInputChange}
                       required
+                      disabled={isPending}
                       className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
-                      <option value=''>Select a cohort</option>
-                      {cohorts.map(cohort => (
-                        <option
-                          key={cohort._id}
-                          value={cohort._id}>
-                          {cohort.name}
-                        </option>
-                      ))}
+                      <option value=''>{!cohorts || cohorts.length === 0 ? 'No cohorts available' : 'Select a cohort'}</option>
+
+                      {cohorts.length > 0 &&
+                        cohorts.map(cohort => (
+                          <option
+                            key={cohort._id}
+                            value={cohort._id}>
+                            {cohort.name}
+                          </option>
+                        ))}
                     </select>
                     <MdArrowDropDown
                       size={24}
@@ -384,6 +396,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       value={formData.course}
                       onChange={handleInputChange}
                       required
+                      disabled={isPending}
                       className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
                       <option value=''>Select a course</option>
                       <option value='Web Development'>Web Development</option>
@@ -422,8 +435,9 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                 </div>
                 <button
                   type='submit'
+                  disabled={isPending}
                   className='w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer'>
-                  SUBMIT
+                  {isPending ? 'Submitting...' : 'Submit Application'}
                 </button>
               </form>
             </div>
