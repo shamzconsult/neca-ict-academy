@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { FaSearch } from 'react-icons/fa';
 import { MdOutlineArrowCircleDown } from 'react-icons/md';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 const statusOptions = ['Admitted', 'Declined', 'Pending', 'Graduated'];
 const levelOptions = ['Dropped', 'Applied', 'Interviewed', 'Admitted', 'Completed'];
