@@ -69,7 +69,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
       try {
         const res = await fetch('/api/cohort');
         const data: CohortType[] = await res.json();
-        setCohortsData(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        setCohortsData(data?.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       } catch (error) {
         console.error('Error fetching cohorts: ', error);
       }

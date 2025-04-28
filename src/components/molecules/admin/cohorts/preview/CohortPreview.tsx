@@ -3,6 +3,10 @@
 import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import Swal from 'sweetalert2';
+
 import EmptyState from '@/components/atom/EmptyState';
 import { CohortType } from '@/types';
 import Link from 'next/link';
@@ -37,6 +41,48 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text(`${cohort.name} - Applicants List`, 14, 15);
+    doc.setFontSize(12);
+
+    const tableData = filteredData.map(applicant => [
+      `${applicant.fullName}\n${applicant.email}`,
+      applicant.course,
+      applicant.level,
+      applicant.state,
+      new Date(applicant.appliedAt).toDateString(),
+      applicant.status,
+    ]);
+
+    autoTable(doc, {
+      head: [['Applicants', 'Course', 'Level', 'Location', 'Date', 'Status']],
+      body: tableData,
+      startY: 25,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [33, 33, 33],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+      },
+      columnStyles: {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 25 },
+        4: { cellWidth: 35 },
+        5: { cellWidth: 25 },
+      },
+    });
+
+    doc.save(`${cohort.name}-applicants.pdf`);
   };
 
   if (!cohort) {
@@ -103,6 +149,21 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           level: formData.level,
         });
         router.refresh();
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: toast => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          },
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'Applicant updated',
+        });
       } catch (error) {
         console.error('Error updating applicant:', error);
       }
@@ -130,7 +191,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
               <select
                 value={status}
                 onChange={handleStatusChange}
-                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
+                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'>
                 <option value='all'>All Status</option>
                 {statusOptions.map((status, index) => (
                   <option
@@ -140,11 +201,10 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                   </option>
                 ))}
               </select>
-              {/* <button className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
-                All Status <MdKeyboardArrowDown />
-              </button> */}
 
-              <button className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] rounded-md'>
+              <button
+                className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'
+                onClick={handleDownloadPDF}>
                 <MdOutlineArrowCircleDown />
                 Download Data
               </button>
@@ -203,65 +263,64 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Edit Applicant Profile</DialogTitle>
-                              <DialogDescription>
-                                <form
-                                  onSubmit={e => handleSubmit(e, applicant._id)}
-                                  className='space-y-4'>
-                                  <div className='space-y-6 mt-5'>
-                                    <label htmlFor='level'>Level</label>
-                                    <select
-                                      name='level'
-                                      id='level'
-                                      value={formData.level}
-                                      onChange={handleChange}
-                                      className='w-full p-2 border border-[#C4C4C4] rounded-md'
-                                      disabled={isPending}>
-                                      <option value=''>Select Level</option>
-                                      {levelOptions.map((level, index) => (
-                                        <option
-                                          key={index}
-                                          value={level}>
-                                          {level}
-                                        </option>
-                                      ))}
-                                    </select>
-
-                                    <label htmlFor='status'>Status</label>
-                                    <select
-                                      name='status'
-                                      id='status'
-                                      value={formData.status}
-                                      onChange={handleChange}
-                                      className='w-full p-2 border border-[#C4C4C4] rounded-md'
-                                      disabled={isPending}>
-                                      <option value=''>Select Status</option>
-                                      {statusOptions.map((status, index) => (
-                                        <option
-                                          key={index}
-                                          value={status}>
-                                          {status}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
-
-                                  <div className='mt-10 flex justify-end gap-4'>
-                                    <button
-                                      className=' bg-green-600 py-2 px-4 text-white rounded-lg cursor-pointer'
-                                      disabled={isPending}>
-                                      {isPending ? 'Updating...' : 'Update Applicant'}
-                                    </button>
-                                    <DialogClose>
-                                      <button
-                                        className='bg-black text-white py-2 px-4 rounded-lg cursor-pointer'
-                                        type='button'>
-                                        Cancel
-                                      </button>
-                                    </DialogClose>
-                                  </div>
-                                </form>
-                              </DialogDescription>
                             </DialogHeader>
+
+                            <form
+                              onSubmit={e => handleSubmit(e, applicant._id)}
+                              className='space-y-4'>
+                              <div className='space-y-6 mt-5'>
+                                <label htmlFor='level'>Level</label>
+                                <select
+                                  name='level'
+                                  id='level'
+                                  value={formData.level}
+                                  onChange={handleChange}
+                                  className='w-full p-2 border border-[#C4C4C4] rounded-md'
+                                  disabled={isPending}>
+                                  <option value=''>Select Level</option>
+                                  {levelOptions.map((level, index) => (
+                                    <option
+                                      key={index}
+                                      value={level}>
+                                      {level}
+                                    </option>
+                                  ))}
+                                </select>
+
+                                <label htmlFor='status'>Status</label>
+                                <select
+                                  name='status'
+                                  id='status'
+                                  value={formData.status}
+                                  onChange={handleChange}
+                                  className='w-full p-2 border border-[#C4C4C4] rounded-md'
+                                  disabled={isPending}>
+                                  <option value=''>Select Status</option>
+                                  {statusOptions.map((status, index) => (
+                                    <option
+                                      key={index}
+                                      value={status}>
+                                      {status}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div className='mt-10 flex justify-end gap-4'>
+                                <button
+                                  className=' bg-green-600 py-2 px-4 text-white rounded-lg cursor-pointer'
+                                  disabled={isPending}>
+                                  {isPending ? 'Updating...' : 'Update Applicant'}
+                                </button>
+                                <DialogClose asChild>
+                                  <button
+                                    className='bg-black text-white py-2 px-4 rounded-lg cursor-pointer'
+                                    type='button'>
+                                    Cancel
+                                  </button>
+                                </DialogClose>
+                              </div>
+                            </form>
                           </DialogContent>
                         </Dialog>
                       </td>
