@@ -85,6 +85,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     doc.save(`${cohort.name}-applicants.pdf`);
   };
 
+  console.log(cohort);
   if (!cohort) {
     return (
       <div className=' h-screen mt2 flex flex-col justify-center items-center'>

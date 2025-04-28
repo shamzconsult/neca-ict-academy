@@ -56,6 +56,7 @@ export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
       />
       {showModal && (
         <AddNewCourse
+          open={showModal}
           toggleModal={toggleModal}
           setCourseList={setCourseList}
           courseToEdit={courseToEdit}
