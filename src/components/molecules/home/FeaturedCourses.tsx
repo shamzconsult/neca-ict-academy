@@ -23,14 +23,16 @@ export const FeaturedCourses = ({ courses }: { courses: CourseType[] }) => {
           </p>
         </div>
         <CourseCard courses={courses} />
-        <div className="flex justify-center items-center text-center">
-          <Link
-            href="/courses"
-            className="bg-[#E02B20] cursor-pointer  text-white px-6 py-3  rounded-md mt-16 hover:shadow-xl transition"
-          >
-            Browse All Courses
-          </Link>
-        </div>
+        {courses.length > 0 && (
+          <div className="flex justify-center items-center text-center">
+            <Link
+              href="/courses"
+              className="bg-[#E02B20] cursor-pointer  text-white px-6 py-3  rounded-md mt-16 hover:shadow-xl transition"
+            >
+              Browse All Courses
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
