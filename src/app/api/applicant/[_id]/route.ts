@@ -4,9 +4,6 @@ import Cohort from '@/models/cohort';
 import Enrollment from '@/models/enrollment';
 import { NextResponse } from 'next/server';
 
-const ALLOWED_STATUS = ['Admitted', 'Declined', 'Pending', 'Graduated'];
-const ALLOWED_LEVEL = ['Dropped', 'Applied', 'Interviewed', 'Admitted', 'Completed'];
-
 interface UpdateApplicantData {
   firstName?: string;
   lastName?: string;
@@ -55,31 +52,43 @@ const PUT = async (req: Request) => {
     }
 
     const contentType = req.headers.get('content-type');
-    let updatedApplicant;
 
     if (contentType?.includes('application/json')) {
       const updateData = await req.json();
+      const existingApplicant = await Enrollment.findById(id);
 
-      if (updateData.status && !ALLOWED_STATUS.includes(updateData.status)) {
-        return NextResponse.json({ message: 'Invalid status value' }, { status: 400 });
+      if (!existingApplicant) {
+        return NextResponse.json({ message: 'Applicant not found' }, { status: 404 });
       }
 
-      // This is for level incase it is needed
-      if (updateData.level && !ALLOWED_LEVEL.includes(updateData.level)) {
-        return NextResponse.json({ message: 'Invalid level value' }, { status: 400 });
+      if (!updateData.level) {
+        updateData.level = existingApplicant.level;
       }
 
-      updatedApplicant = await Enrollment.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+      if (!updateData.status) {
+        updateData.status = existingApplicant.status;
+      }
 
-      if (updateData.status && updatedApplicant?.cohort) {
-        await Cohort.updateOne(
-          {
-            _id: updatedApplicant.cohort,
-            'applicants._id': updatedApplicant._id,
+      const updatedApplicant = await Enrollment.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+      if (!updatedApplicant) {
+        return NextResponse.json({ message: 'Applicant not found' }, { status: 404 });
+      }
+
+      await Cohort.updateOne(
+        { 'applicants._id': id },
+        {
+          $set: {
+            'applicants.$.fullName': `${updatedApplicant.firstName} ${updatedApplicant.lastName}`,
+            'applicants.$.email': updatedApplicant.email,
+            'applicants.$.course': updatedApplicant.course,
+            'applicants.$.status': updatedApplicant.status,
+            'applicants.$.state': updatedApplicant.state,
+            'applicants.$.level': updatedApplicant.level,
+            'applicants.$.appliedAt': updatedApplicant.date,
           },
-          { $set: { 'applicants.$.status': updateData.status } }
-        );
-      }
+        }
+      );
 
       return NextResponse.json({ message: 'Applicant updated successfully', updatedApplicant }, { status: 200 });
     } else if (contentType?.includes('multipart/form-data')) {
@@ -103,16 +112,6 @@ const PUT = async (req: Request) => {
         status: (formData.get('status') as string) || existingApplicant.status,
       };
 
-      // Validate status
-      if (updateData.status && !ALLOWED_STATUS.includes(updateData.status)) {
-        return NextResponse.json({ message: 'Invalid status value' }, { status: 400 });
-      }
-
-      // Validate level
-      if (updateData.level && !ALLOWED_LEVEL.includes(updateData.level)) {
-        return NextResponse.json({ message: 'Invalid level value' }, { status: 400 });
-      }
-
       // Handle file uploads
       const cvFile = formData.get('cv') as File | null;
       const profileFile = formData.get('profilePicture') as File | null;
@@ -133,7 +132,19 @@ const PUT = async (req: Request) => {
         updateData.profilePicture = profileUpload;
       }
 
-      updatedApplicant = await Enrollment.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+      const updatedApplicant = await Enrollment.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+      const updatedCohort = await Cohort.updateOne(
+        { 'applicants._id': id },
+        {
+          $set: {
+            'applicants.$.status': updatedApplicant.status,
+            'applicants.$.level': updatedApplicant.level,
+          },
+        }
+      );
+
+      console.log('Updated Cohort:', updatedCohort);
 
       return NextResponse.json({ message: 'Applicant updated successfully', updatedApplicant }, { status: 200 });
     } else {
@@ -159,8 +170,6 @@ const DELETE = async (req: Request) => {
     if (!applicant) {
       return NextResponse.json({ message: 'Applicant not found' }, { status: 404 });
     }
-
-    await Cohort.updateOne({ _id: applicant.cohort }, { $pull: { applicants: { _id: applicant._id } } });
 
     if (applicant.cv?.public_id) {
       await deleteFile(applicant.cv.public_id);
