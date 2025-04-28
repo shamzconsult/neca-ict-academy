@@ -4,11 +4,11 @@ import { Heading } from "@/components/atom/headers/Heading";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import { CourseType } from "@/types";
 import React, { useState } from "react";
-import { GoSearch } from "react-icons/go";
+// import { GoSearch } from "react-icons/go";
 
 export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredData, setFilteredData] = useState<CourseType[]>(courses);
+  // const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData] = useState<CourseType[]>(courses);
 
   // const choice = (category: string) => {
   //   setFilteredData(
@@ -19,20 +19,20 @@ export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
   //   setSearchTerm("");
   // };
 
-  const handleSearch = () => {
-    setFilteredData(
-      courses.filter((item) =>
-        Object.values(item).some((val) =>
-          String(val).toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      )
-    );
-  };
+  // const handleSearch = () => {
+  //   setFilteredData(
+  //     courses.filter((item) =>
+  //       Object.values(item).some((val) =>
+  //         String(val).toLowerCase().includes(searchTerm.toLowerCase())
+  //       )
+  //     )
+  //   );
+  // };
   return (
     <div>
       <section className="mb-20 flex flex-col justify-center items-center">
         <div className="bg-[#DBEAF6] w-full py-16">
-          <div className="max-w-6xl mx-auto flex flex-col justify-center items-center gap-3 text-center mb-10">
+          <div className="max-w-6xl mx-auto flex flex-col justify-center items-center gap-3 text-center mb-4">
             <SubHeading>Explore Courses</SubHeading>
             <Heading>Build the Skills for a Future in Tech!</Heading>
             <p className="max-w-4xl md:text-[20px]">
@@ -46,10 +46,8 @@ export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
             setFilteredData={setFilteredData}
             generalCourses={courses}
           /> */}
-          <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
-            {/* <p className="text-[#1E1E1E]md:text-[20px] font-semibold">
-              Search:
-            </p> */}
+          {/* <div className="flex flex-col md:flex-row justify-center items-center gap-3 max-w-5xl  mx-auto px-4">
+       
             <div className="relative w-full">
               <span className="absolute inset-y-0 left-2 flex items-center ">
                 <GoSearch className="h-5 w-5 text-[#C4C4C4]" />
@@ -68,9 +66,9 @@ export const CoursesCards = ({ courses }: { courses: CourseType[] }) => {
             >
               Search
             </button>
-          </div>
+          </div> */}
         </div>
-        <CourseCard courses={filteredData} searchTerm={searchTerm} />
+        <CourseCard courses={filteredData} />
       </section>
     </div>
   );
