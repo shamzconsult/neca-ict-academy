@@ -14,7 +14,6 @@ import EmptyState from "./EmptyState";
 
 export const CourseCard = ({
   courses,
-  searchTerm,
   setShowModal,
   setCourseToEdit,
   setFormData,
