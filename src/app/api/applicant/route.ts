@@ -95,6 +95,9 @@ const POST = async (req: NextRequest) => {
             email: newApplicant.email,
             course: newApplicant.course,
             status: newApplicant.status,
+            state: newApplicant.state,
+            level: newApplicant.level,
+            appliedAt: new Date(),
           },
         },
       }

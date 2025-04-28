@@ -17,7 +17,9 @@ export const getAllCohorts = async () => {
 export const getCohortNames = async () => {
   try {
     await connectViaMongoose();
-    const cohortNames = await Cohort.find().select('_id, name ');
+    const cohortNames = await Cohort.find({
+      active: true,
+    }).select('_id, name ');
     return JSON.parse(JSON.stringify(cohortNames));
   } catch (error) {
     console.error('Error fetching cohort names: ', error);
