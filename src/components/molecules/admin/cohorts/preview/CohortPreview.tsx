@@ -32,8 +32,10 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [status, setStatus] = useState('all');
+  const [isOpen, setIsOpen] = useState(false);
+
 
   const [formData, setFormData] = useState({
     status: "",
@@ -182,6 +184,8 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           icon: "success",
           title: "Applicant updated",
         });
+
+        setIsOpen(false);
       } catch (error) {
         console.error("Error updating applicant:", error);
       }
@@ -189,15 +193,14 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="md:text-[20px] font-semibold mb-6 p-3 bg-white w-full">
-        {cohort.name}
-      </h1>
-      {filteredData && filteredData?.length > 0 ? (
-        <section className="border border-[#C4C4C4] w-full">
-          <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full">
-            <div className="relative w-full md:w-[70%]">
-              <FaSearch className="absolute left-3 top-3 " />
+    <div className='p-6'>
+      <h1 className='md:text-[20px] font-semibold mb-6 p-3 bg-white w-full'>{cohort.name}</h1>
+      {cohort.applicants && cohort.applicants.length > 0 ? (
+        <section className='border border-[#C4C4C4] w-full'>
+          <div className='flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full'>
+            <div className='relative w-full md:w-[70%]'>
+              <FaSearch className='absolute left-3 top-3 ' />
+
               <input
                 type="text"
                 placeholder="Search..."
@@ -230,8 +233,9 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
               </button>
             </div>
           </div>
-          <div className="overflow-x-auto ">
-            <table className="w-full table-auto bg-white">
+          <div className='overflow-x-auto'>
+            <table className='w-full table-auto bg-white'>
+
               <thead>
                 <tr>
                   {[
@@ -253,17 +257,16 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData && filteredData.length > 0 ? (
-                  filteredData?.map((applicant, index) => (
-                    <tr key={index} className="border-t border-[#C4C4C4]">
-                      <td className="p-4">
-                        <div className="flex flex-col">
-                          <span className="text-nowrap">
-                            {applicant.fullName}
-                          </span>
-                          <span className="text-sm text-nowrap">
-                            {applicant.email}
-                          </span>
+                {filteredData.length > 0 ? (
+                  filteredData.map((applicant, index) => (
+                    <tr
+                      key={index}
+                      className='border-t border-[#C4C4C4]'>
+                      <td className='p-4'>
+                        <div className='flex flex-col'>
+                          <span className='text-nowrap'>{applicant.fullName}</span>
+                          <span className='text-sm text-nowrap'>{applicant.email}</span>
+
                         </div>
                       </td>
                       <td className="p-4 text-nowrap">{applicant.course}</td>
@@ -287,33 +290,38 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                           {applicant.status}
                         </span>
                       </td>
-                      <td className="p-4">
-                        <Dialog>
-                          <DialogTrigger className="cursor-pointer" asChild>
-                            <button className="hover:underline cursor-pointer">
-                              Update
-                            </button>
+                      <td className='p-4'>
+                        <Dialog
+                          open={isOpen}
+                          onOpenChange={() => setIsOpen(open => !open)}>
+                          <DialogTrigger
+                            className='cursor-pointer'
+                            asChild>
+                            <button className='hover:underline cursor-pointer'>Update</button>
+
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Edit Applicant Profile</DialogTitle>
                             </DialogHeader>
 
-                            <form
-                              onSubmit={(e) => handleSubmit(e, applicant._id)}
-                              className="space-y-4"
-                            >
-                              <div className="space-y-6 mt-5">
-                                <label htmlFor="level">Level</label>
+                            <form onSubmit={e => handleSubmit(e, applicant._id)}>
+                              <div className='space-y-6 mt-5'>
+                                <label
+                                  htmlFor='level'
+                                  className='mb-10'>
+                                  Level
+                                </label>
+
                                 <select
                                   name="level"
                                   id="level"
                                   value={formData.level}
                                   onChange={handleChange}
-                                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                                  disabled={isPending}
-                                >
-                                  <option value="">Select Level</option>
+                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
+                                  disabled={isPending}>
+                                  <option value=''>Select Level</option>
+
                                   {levelOptions.map((level, index) => (
                                     <option key={index} value={level}>
                                       {level}
@@ -327,10 +335,10 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                   id="status"
                                   value={formData.status}
                                   onChange={handleChange}
-                                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                                  disabled={isPending}
-                                >
-                                  <option value="">Select Status</option>
+                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
+                                  disabled={isPending}>
+                                  <option value=''>Select Status</option>
+
                                   {statusOptions.map((status, index) => (
                                     <option key={index} value={status}>
                                       {status}
@@ -366,11 +374,14 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                 ) : (
                   <tr className="border-t border-[#C4C4C4]">
                     <td colSpan={7}>
-                      <div className="text-center  font-bold py-24">
-                        No results found for{" "}
-                        <span className="text-red-400">
-                          &#34;{searchTerm}&#34;{" "}
-                        </span>
+                      <div className='text-center font-bold py-24'>
+                        No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
+                        {status !== 'all' && (
+                          <span className='text-red-500'>
+                            {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
+                          </span>
+                        )}
+
                       </div>
                     </td>
                   </tr>
@@ -381,8 +392,9 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
         </section>
       ) : (
         <EmptyState
-          title=" No applicants for this cohort"
-          message="Check back later"
+          title='No applicants found in this cohort'
+          message='Check back later'
+
         />
       )}
     </div>
