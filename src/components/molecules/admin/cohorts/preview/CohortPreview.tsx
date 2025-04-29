@@ -1,22 +1,32 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import React, { useState, useTransition } from 'react';
+import { useRouter } from "next/navigation";
+import React, { useState, useTransition } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import Swal from "sweetalert2";
+import EmptyState from "@/components/atom/EmptyState";
+import { CohortType } from "@/types";
+import Link from "next/link";
+import { FaSearch } from "react-icons/fa";
+import { MdOutlineArrowCircleDown } from "react-icons/md";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import Swal from 'sweetalert2';
-
-import EmptyState from '@/components/atom/EmptyState';
-import { CohortType } from '@/types';
-import Link from 'next/link';
-import { FaSearch } from 'react-icons/fa';
-import { MdOutlineArrowCircleDown } from 'react-icons/md';
-
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-
-const statusOptions = ['Admitted', 'Declined', 'Pending', 'Graduated'];
-const levelOptions = ['Dropped', 'Applied', 'Interviewed', 'Admitted', 'Completed'];
+const statusOptions = ["Admitted", "Declined", "Pending", "Graduated"];
+const levelOptions = [
+  "Dropped",
+  "Applied",
+  "Interviewed",
+  "Admitted",
+  "Completed",
+];
 
 export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   const [isPending, startTransition] = useTransition();
@@ -26,9 +36,10 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   const [status, setStatus] = useState('all');
   const [isOpen, setIsOpen] = useState(false);
 
+
   const [formData, setFormData] = useState({
-    status: '',
-    level: '',
+    status: "",
+    level: "",
   });
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -36,9 +47,11 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     setStatus(selectedStatus);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -51,7 +64,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     doc.text(`${cohort.name} - Applicants List`, 14, 15);
     doc.setFontSize(12);
 
-    const tableData = filteredData.map(applicant => [
+    const tableData = filteredData.map((applicant) => [
       `${applicant.fullName}\n${applicant.email}`,
       applicant.course,
       applicant.level,
@@ -61,7 +74,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     ]);
 
     autoTable(doc, {
-      head: [['Applicants', 'Course', 'Level', 'Location', 'Date', 'Status']],
+      head: [["Applicants", "Course", "Level", "Location", "Date", "Status"]],
       body: tableData,
       startY: 25,
       styles: {
@@ -71,7 +84,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
       headStyles: {
         fillColor: [33, 33, 33],
         textColor: [255, 255, 255],
-        fontStyle: 'bold',
+        fontStyle: "bold",
       },
       columnStyles: {
         0: { cellWidth: 50 },
@@ -88,11 +101,12 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
 
   if (!cohort) {
     return (
-      <div className=' h-screen mt2 flex flex-col justify-center items-center'>
-        <h1 className='text-center font-bold  '>Cohort not found</h1>
+      <div className=" h-screen mt2 flex flex-col justify-center items-center">
+        <h1 className="text-center font-bold  ">Cohort not found</h1>
         <Link
-          className='text-sm text-slate-400 hover:underline cursor-pointer'
-          href='/admin/cohorts'>
+          className="text-sm text-slate-400 hover:underline cursor-pointer"
+          href="/admin/cohorts"
+        >
           Click here to check other Cohort
         </Link>
       </div>
@@ -102,7 +116,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   let filteredData = cohort.applicants || [];
 
   if (searchTerm) {
-    filteredData = filteredData.filter(applicant => {
+    filteredData = filteredData.filter((applicant) => {
       return (
         applicant.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -113,38 +127,43 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     });
   }
 
-  if (status !== 'all') {
-    filteredData = filteredData.filter(applicant => applicant.status === status);
+  if (status !== "all") {
+    filteredData = filteredData.filter(
+      (applicant) => applicant.status === status
+    );
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, id: string) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+    id: string
+  ) => {
     e.preventDefault();
 
     const formDataToSend = new FormData();
-    formDataToSend.append('status', formData.status);
-    formDataToSend.append('level', formData.level);
+    formDataToSend.append("status", formData.status);
+    formDataToSend.append("level", formData.level);
 
     startTransition(async () => {
       try {
         const res = await fetch(`/api/applicant/${id}`, {
-          method: 'PUT',
+          method: "PUT",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             status: formData.status,
             level: formData.level,
           }),
         });
-        console.log('res', res);
+        console.log("res", res);
 
         if (!res.ok) {
-          console.error('Failed to update applicant:', await res.text());
+          console.error("Failed to update applicant:", await res.text());
           return;
         }
 
         const responseData = await res.json();
-        console.log('Applicant updated successfully:', responseData);
+        console.log("Applicant updated successfully:", responseData);
         setFormData({
           status: formData.status,
           level: formData.level,
@@ -152,23 +171,23 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
         router.refresh();
         const Toast = Swal.mixin({
           toast: true,
-          position: 'top-end',
+          position: "top-end",
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
-          didOpen: toast => {
+          didOpen: (toast) => {
             toast.onmouseenter = Swal.stopTimer;
             toast.onmouseleave = Swal.resumeTimer;
           },
         });
         Toast.fire({
-          icon: 'success',
-          title: 'Applicant updated',
+          icon: "success",
+          title: "Applicant updated",
         });
 
         setIsOpen(false);
       } catch (error) {
-        console.error('Error updating applicant:', error);
+        console.error("Error updating applicant:", error);
       }
     });
   };
@@ -181,33 +200,34 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           <div className='flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full'>
             <div className='relative w-full md:w-[70%]'>
               <FaSearch className='absolute left-3 top-3 ' />
+
               <input
-                type='text'
-                placeholder='Search...'
+                type="text"
+                placeholder="Search..."
                 value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className='pl-10 pr-4 py-2 border w-full border-[#C4C4C4] rounded-md focus:outline-none focus:ring-none focus:border-gray-400'
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border w-full border-[#C4C4C4] rounded-md focus:outline-none focus:ring-none focus:border-gray-400"
               />
             </div>
 
-            <div className='flex gap-2'>
+            <div className="flex gap-2">
               <select
                 value={status}
                 onChange={handleStatusChange}
-                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'>
-                <option value='all'>All Status</option>
+                className="flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md"
+              >
+                <option value="all">All Status</option>
                 {statusOptions.map((status, index) => (
-                  <option
-                    value={status}
-                    key={index}>
+                  <option value={status} key={index}>
                     {status}
                   </option>
                 ))}
               </select>
 
               <button
-                className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'
-                onClick={handleDownloadPDF}>
+                className="flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md"
+                onClick={handleDownloadPDF}
+              >
                 <MdOutlineArrowCircleDown />
                 Download Data
               </button>
@@ -215,12 +235,22 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           </div>
           <div className='overflow-x-auto'>
             <table className='w-full table-auto bg-white'>
+
               <thead>
                 <tr>
-                  {['Applicants', 'Course', 'Level', 'Location', 'Date', 'Status', 'Action'].map(header => (
+                  {[
+                    "Applicants",
+                    "Course",
+                    "Level",
+                    "Location",
+                    "Date",
+                    "Status",
+                    "Action",
+                  ].map((header) => (
                     <th
                       key={header}
-                      className='p-4 border-t border-[#C4C4C4] text-left font-medium'>
+                      className="p-4 border-t border-[#C4C4C4] text-left font-medium"
+                    >
                       {header}
                     </th>
                   ))}
@@ -236,23 +266,27 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                         <div className='flex flex-col'>
                           <span className='text-nowrap'>{applicant.fullName}</span>
                           <span className='text-sm text-nowrap'>{applicant.email}</span>
+
                         </div>
                       </td>
-                      <td className='p-4 text-nowrap'>{applicant.course}</td>
-                      <td className='p-4'>{applicant.level}</td>
-                      <td className='p-4 text-nowrap'>{applicant.state}</td>
-                      <td className='p-4 text-nowrap'>{new Date(applicant.appliedAt).toDateString()}</td>
-                      <td className='p-4'>
+                      <td className="p-4 text-nowrap">{applicant.course}</td>
+                      <td className="p-4">{applicant.level}</td>
+                      <td className="p-4 text-nowrap">{applicant.state}</td>
+                      <td className="p-4 text-nowrap">
+                        {new Date(applicant.appliedAt).toDateString()}
+                      </td>
+                      <td className="p-4">
                         <span
                           className={`px-3 py-1 text-nowrap rounded-md text-sm ${
-                            applicant.status === 'Admitted'
-                              ? 'bg-green-100 text-[#78A55A]'
-                              : applicant.status === 'Pending'
-                              ? 'bg-yellow-100 text-[#F29D38]'
-                              : applicant.status === 'Declined'
-                              ? 'bg-red-100 text-[#E02B20]'
-                              : 'bg-gray-100 text-[#525252]'
-                          }`}>
+                            applicant.status === "Admitted"
+                              ? "bg-green-100 text-[#78A55A]"
+                              : applicant.status === "Pending"
+                              ? "bg-yellow-100 text-[#F29D38]"
+                              : applicant.status === "Declined"
+                              ? "bg-red-100 text-[#E02B20]"
+                              : "bg-gray-100 text-[#525252]"
+                          }`}
+                        >
                           {applicant.status}
                         </span>
                       </td>
@@ -264,6 +298,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                             className='cursor-pointer'
                             asChild>
                             <button className='hover:underline cursor-pointer'>Update</button>
+
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
@@ -277,52 +312,55 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                   className='mb-10'>
                                   Level
                                 </label>
+
                                 <select
-                                  name='level'
-                                  id='level'
+                                  name="level"
+                                  id="level"
                                   value={formData.level}
                                   onChange={handleChange}
                                   className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
                                   disabled={isPending}>
                                   <option value=''>Select Level</option>
+
                                   {levelOptions.map((level, index) => (
-                                    <option
-                                      key={index}
-                                      value={level}>
+                                    <option key={index} value={level}>
                                       {level}
                                     </option>
                                   ))}
                                 </select>
 
-                                <label htmlFor='status'>Status</label>
+                                <label htmlFor="status">Status</label>
                                 <select
-                                  name='status'
-                                  id='status'
+                                  name="status"
+                                  id="status"
                                   value={formData.status}
                                   onChange={handleChange}
                                   className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
                                   disabled={isPending}>
                                   <option value=''>Select Status</option>
+
                                   {statusOptions.map((status, index) => (
-                                    <option
-                                      key={index}
-                                      value={status}>
+                                    <option key={index} value={status}>
                                       {status}
                                     </option>
                                   ))}
                                 </select>
                               </div>
 
-                              <div className='mt-10 flex justify-end gap-4'>
+                              <div className="mt-10 flex justify-end gap-4">
                                 <button
-                                  className=' bg-green-600 py-2 px-4 text-white rounded-lg cursor-pointer'
-                                  disabled={isPending}>
-                                  {isPending ? 'Updating...' : 'Update Applicant'}
+                                  className=" bg-green-600 py-2 px-4 text-white rounded-lg cursor-pointer"
+                                  disabled={isPending}
+                                >
+                                  {isPending
+                                    ? "Updating..."
+                                    : "Update Applicant"}
                                 </button>
                                 <DialogClose asChild>
                                   <button
-                                    className='bg-black text-white py-2 px-4 rounded-lg cursor-pointer'
-                                    type='button'>
+                                    className="bg-black text-white py-2 px-4 rounded-lg cursor-pointer"
+                                    type="button"
+                                  >
                                     Cancel
                                   </button>
                                 </DialogClose>
@@ -334,7 +372,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                     </tr>
                   ))
                 ) : (
-                  <tr className='border-t border-[#C4C4C4]'>
+                  <tr className="border-t border-[#C4C4C4]">
                     <td colSpan={7}>
                       <div className='text-center font-bold py-24'>
                         No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
@@ -343,6 +381,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                             {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
                           </span>
                         )}
+
                       </div>
                     </td>
                   </tr>
@@ -355,6 +394,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
         <EmptyState
           title='No applicants found in this cohort'
           message='Check back later'
+
         />
       )}
     </div>

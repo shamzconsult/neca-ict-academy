@@ -12,6 +12,7 @@ export const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
   const router = useRouter();
 
   const handleConfirm = () => {
+    localStorage.removeItem("isSignedIn");
     router.push("/");
   };
 

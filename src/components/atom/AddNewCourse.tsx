@@ -347,7 +347,7 @@ export const AddNewCourse = ({
               <SelectContent>
                 <SelectItem value="Beginner">Beginner</SelectItem>
                 <SelectItem value="Intermediate">Intermediate</SelectItem>
-                <SelectItem value="Professional">Professional</SelectItem>
+                <SelectItem value="Advanced">Advanced</SelectItem>
               </SelectContent>
             </Select>
           </div>
