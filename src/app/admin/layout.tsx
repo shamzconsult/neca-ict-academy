@@ -1,11 +1,30 @@
+"use client";
+
 import { AdminLogo } from "@/components/atom/AdminLogo";
 import { Sidebar } from "@/components/atom/Sidebar";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isSignedIn") === "true";
+    if (!isLoggedIn) {
+      router.push("/");
+    } else {
+      setAuthenticated(true);
+    }
+  }, [router]);
+
+  if (authenticated === null) {
+    return null;
+  }
   return (
     <div className="flex flex-col lg:flex-row bg-[#FAFAFA] px-4  h-screen overflow-y-auto  ">
       <Sidebar />
