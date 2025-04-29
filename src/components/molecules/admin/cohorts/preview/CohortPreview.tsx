@@ -24,6 +24,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [status, setStatus] = useState('all');
+  const [isOpen, setIsOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     status: '',
@@ -85,7 +86,6 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     doc.save(`${cohort.name}-applicants.pdf`);
   };
 
-  console.log(cohort);
   if (!cohort) {
     return (
       <div className=' h-screen mt2 flex flex-col justify-center items-center'>
@@ -165,6 +165,8 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
           icon: 'success',
           title: 'Applicant updated',
         });
+
+        setIsOpen(false);
       } catch (error) {
         console.error('Error updating applicant:', error);
       }
@@ -174,7 +176,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   return (
     <div className='p-6'>
       <h1 className='md:text-[20px] font-semibold mb-6 p-3 bg-white w-full'>{cohort.name}</h1>
-      {filteredData && filteredData?.length > 0 ? (
+      {cohort.applicants && cohort.applicants.length > 0 ? (
         <section className='border border-[#C4C4C4] w-full'>
           <div className='flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full'>
             <div className='relative w-full md:w-[70%]'>
@@ -211,7 +213,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
               </button>
             </div>
           </div>
-          <div className='overflow-x-auto '>
+          <div className='overflow-x-auto'>
             <table className='w-full table-auto bg-white'>
               <thead>
                 <tr>
@@ -225,8 +227,8 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData && filteredData.length > 0 ? (
-                  filteredData?.map((applicant, index) => (
+                {filteredData.length > 0 ? (
+                  filteredData.map((applicant, index) => (
                     <tr
                       key={index}
                       className='border-t border-[#C4C4C4]'>
@@ -255,7 +257,9 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                         </span>
                       </td>
                       <td className='p-4'>
-                        <Dialog>
+                        <Dialog
+                          open={isOpen}
+                          onOpenChange={() => setIsOpen(open => !open)}>
                           <DialogTrigger
                             className='cursor-pointer'
                             asChild>
@@ -266,17 +270,19 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                               <DialogTitle>Edit Applicant Profile</DialogTitle>
                             </DialogHeader>
 
-                            <form
-                              onSubmit={e => handleSubmit(e, applicant._id)}
-                              className='space-y-4'>
+                            <form onSubmit={e => handleSubmit(e, applicant._id)}>
                               <div className='space-y-6 mt-5'>
-                                <label htmlFor='level'>Level</label>
+                                <label
+                                  htmlFor='level'
+                                  className='mb-10'>
+                                  Level
+                                </label>
                                 <select
                                   name='level'
                                   id='level'
                                   value={formData.level}
                                   onChange={handleChange}
-                                  className='w-full p-2 border border-[#C4C4C4] rounded-md'
+                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
                                   disabled={isPending}>
                                   <option value=''>Select Level</option>
                                   {levelOptions.map((level, index) => (
@@ -294,7 +300,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                                   id='status'
                                   value={formData.status}
                                   onChange={handleChange}
-                                  className='w-full p-2 border border-[#C4C4C4] rounded-md'
+                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
                                   disabled={isPending}>
                                   <option value=''>Select Status</option>
                                   {statusOptions.map((status, index) => (
@@ -330,8 +336,13 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                 ) : (
                   <tr className='border-t border-[#C4C4C4]'>
                     <td colSpan={7}>
-                      <div className='text-center  font-bold py-24'>
-                        No results found for <span className='text-red-400'>&#34;{searchTerm}&#34; </span>
+                      <div className='text-center font-bold py-24'>
+                        No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
+                        {status !== 'all' && (
+                          <span className='text-red-500'>
+                            {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -342,7 +353,7 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
         </section>
       ) : (
         <EmptyState
-          title=' No applicants for this cohort'
+          title='No applicants found in this cohort'
           message='Check back later'
         />
       )}
