@@ -4,42 +4,47 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
+import Link from "next/link";
 
 export default function SignIn() {
   const [inputEmail, setInputEmail] = useState("");
   const [inputPassword, setInputPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  // const callbackUrl = searchParams.get("callbackUrl") || "/admin/dashboard";
   const router = useRouter();
 
-  const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
-  const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
-
-  useEffect(() => {
-    const loggedInStatus = localStorage.getItem("isSignedIn");
-    if (loggedInStatus === "true") {
-      setIsLoggedIn(true);
-      router.push("/admin/dashboard");
-    }
-  }, [router]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (inputEmail === adminEmail && inputPassword === adminPassword) {
-      setIsLoggedIn(true);
-      localStorage.setItem("isSignedIn", "true");
-      router.push("/admin/dashboard");
-    } else {
+    setIsLoading(true);
+
+    const csrfResponse = await fetch("/api/auth/csrf");
+    const { csrfToken } = await csrfResponse.json();
+
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: inputEmail,
+      csrfToken,
+      password: inputPassword,
+      callbackUrl: "/admin/dashboard"
+    });
+
+    if (result?.error) {
       Swal.fire({
         position: "center",
         icon: "error",
-        title: "Wrong email or password",
+        title: result.error,
         showConfirmButton: false,
         timer: 1500,
       });
+    } else {
+      router.push("/admin/dashboard");
     }
+
+    setIsLoading(false);
   };
 
   const togglePasswordVisibility = () => {
@@ -92,11 +97,18 @@ export default function SignIn() {
               </div>
             </div>
 
+            <div className="text-right mb-4">
+              <Link href="/admin/forgot-password" className="text-sm text-[#E02B20] hover:underline">
+                Forgot password?
+              </Link>
+            </div>
+
             <Button
               type="submit"
               className="btn text-white font-semibold cursor-pointer bg-[#E02B20] hover:bg-[#e02a20ce] w-full py-2.5"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? "Signing in..." : "Sign in"}
             </Button>
           </form>
         </div>
