@@ -7,11 +7,9 @@ const ALLOWED_ROLES = [ "Super_Admin", "Admin", "Students" ]
 const UserSchema = new Schema({
     firstName: {
         type: String,
-        required: true,
     },
     lastName: {
         type: String,
-        required: true
     },
     email: {
         type: String,
@@ -25,8 +23,11 @@ const UserSchema = new Schema({
     role: {
         type: String,
         enum: ALLOWED_ROLES,
-        required: true
-    }
+        required: true,
+        default: "Students"
+    },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date
 }, { timestamps: true });
 
 UserSchema.pre("save", async function (next) {
