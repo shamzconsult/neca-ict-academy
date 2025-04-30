@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { AdminLogo } from "@/components/atom/AdminLogo";
 import { Sidebar } from "@/components/atom/Sidebar";
@@ -7,10 +7,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import AdminSessionProvider from "./AdminSessionProvider";
 
-const PUBLIC_ADMIN_ROUTES = [
-  '/admin/forgot-password',
-  '/admin/reset-password'
-];
+const PUBLIC_ADMIN_ROUTES = ["/admin/forgot-password", "/admin/reset-password"];
 
 function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
@@ -25,9 +22,12 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
     }
 
     if (status === "unauthenticated") {
-      router.push("/signin?callbackUrl=" + encodeURIComponent(pathname));
+      router.push("/" + encodeURIComponent(pathname));
     } else if (status === "authenticated") {
-      if (session?.user?.role === 'Admin' || session?.user?.role === 'Super_Admin') {
+      if (
+        session?.user?.role === "Admin" ||
+        session?.user?.role === "Super_Admin"
+      ) {
         setAuthenticated(true);
       } else {
         router.push("/unauthorized");
@@ -60,12 +60,14 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <AdminSessionProvider>
-      <AdminAuthWrapper>
-        {children}
-      </AdminAuthWrapper>
+      <AdminAuthWrapper>{children}</AdminAuthWrapper>
     </AdminSessionProvider>
   );
 }

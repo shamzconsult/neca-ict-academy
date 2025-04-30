@@ -29,16 +29,16 @@ export default function SignIn() {
       email: inputEmail,
       csrfToken,
       password: inputPassword,
-      callbackUrl: "/admin/dashboard"
+      callbackUrl: "/admin/dashboard",
     });
 
     if (result?.error) {
       Swal.fire({
         position: "center",
         icon: "error",
-        title: result.error,
+        title: "Invalid password or email address",
         showConfirmButton: false,
-        timer: 1500,
+        timer: 2500,
       });
     } else {
       router.push("/admin/dashboard");
@@ -98,7 +98,10 @@ export default function SignIn() {
             </div>
 
             <div className="text-right mb-4">
-              <Link href="/admin/forgot-password" className="text-sm text-[#E02B20] hover:underline">
+              <Link
+                href="/admin/forgot-password"
+                className="text-sm text-[#E02B20] hover:underline"
+              >
                 Forgot password?
               </Link>
             </div>
