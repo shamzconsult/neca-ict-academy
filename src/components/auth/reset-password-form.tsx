@@ -7,6 +7,7 @@ export default function ResetPasswordForm({ token }: { token?: string }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading,] = useState(false);
   const [success, setSuccess] = useState("");
   const router = useRouter();
 
@@ -86,9 +87,9 @@ export default function ResetPasswordForm({ token }: { token?: string }) {
         
         <button
           type="submit"
-          className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700"
+          className="w-full px-4 py-2 text-white bg-[#E02B20] hover:bg-[#e02a20ce]"
         >
-          Reset Password
+          {isLoading ? "Resetting..." : "Reset Password"}
         </button>
       </form>
     </div>
