@@ -33,9 +33,6 @@ const POST = async (req: NextRequest) => {
     await connectViaMongoose();
     const formData = await req.formData();
 
-    // const entries = Array.from(formData.entries());
-    // console.log("Received form data:", entries);
-
     const data: ApplicantFormData = {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
