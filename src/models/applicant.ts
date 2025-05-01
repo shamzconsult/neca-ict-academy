@@ -47,4 +47,4 @@ const ApplicantSchema = new Schema(
 const Applicant =
   mongoose.models.Applicant || mongoose.model("Applicant", ApplicantSchema);
 
-export { Applicant };
+export default Applicant;

@@ -1,5 +1,5 @@
 import connectViaMongoose from "@/lib/db";
-import Enrollment from "@/models/applicant";
+import { Enrollment } from "@/models/enrollment";
 import { NextResponse } from "next/server";
 
 const GET = async (req: Request) => {
@@ -34,4 +34,4 @@ const GET = async (req: Request) => {
   }
 };
 
-export { GET };
+export default { GET };
