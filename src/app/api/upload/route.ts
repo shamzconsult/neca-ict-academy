@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { uploadFile } from "@/lib/cloudinary";
 import connectViaMongoose from "@/lib/db";
-import Enrollment from "@/models/applicant";
+import { Enrollment } from "@/models/enrollment";
 
 export const POST = async (req: Request) => {
   try {
