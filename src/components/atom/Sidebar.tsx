@@ -4,21 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiUsers, FiLogOut, FiMenu, FiX } from "react-icons/fi";
-import { MdDashboard } from "react-icons/md";
+import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { AdminLogo } from "./AdminLogo";
 import { LogoutModal } from "./LogoutModal";
-import { FaBook } from "react-icons/fa";
-import {
-  Book,
-  BookA,
-  BookOpen,
-  ChartPieIcon,
-  SquareLibrary,
-  UserCog,
-  UserCog2,
-  Users2,
-} from "lucide-react";
+import { BookOpen, ChartPieIcon, SquareLibrary, UserCog } from "lucide-react";
 
 export const Sidebar = () => {
   const pathname = usePathname();
