@@ -7,6 +7,7 @@ import { CohortForm } from "@/components/atom/CohortForm";
 import Link from "next/link";
 import { CohortsProps, CohortType, DashboardStats } from "@/types";
 import EmptyState from "@/components/atom/EmptyState";
+import Swal from "sweetalert2";
 
 export const AdminDashboard = ({
   cohortsData: initialCohorts,
@@ -35,8 +36,27 @@ export const AdminDashboard = ({
 
   const firstFiveCohorts = cohortsData.slice(0, 5);
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
+  const checkAllCohortStatus = () => {
+    if (cohortsData.some((cohort) => cohort.active)) {
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "error",
+        title: "There is an active cohort",
+        theme: "dark",
+      });
+    } else {
+      setShowModal(!showModal);
+    }
   };
 
   return (
@@ -44,13 +64,13 @@ export const AdminDashboard = ({
       <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white">
         <h1 className="md:text-[20px] font-medium">Dashboard Overview</h1>
         <button
-          onClick={toggleModal}
+          onClick={checkAllCohortStatus}
           className="bg-[#E02B20] text-nowrap flex items-center gap-1 text-white px-6 py-2.5 rounded-md cursor-pointer"
         >
           <HiOutlinePlusCircle /> Create Cohort
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         {dashboardStats?.map((stat, index) => (
           <div
             key={index}
@@ -98,7 +118,7 @@ export const AdminDashboard = ({
                 {firstFiveCohorts.map((cohort, index) => (
                   <tr key={index} className="border-t border-[#C4C4C4]">
                     <td className="p-4">{cohort.name}</td>
-                    <td className="p-4">{cohort.applicants?.length || "0"}</td>
+                    <td className="p-4">{cohort.applicantCount || "0"}</td>
                     <td className="p-4">{cohort.admitted || "0"}</td>
                     <td className="p-4">{cohort.graduated || "0"}</td>
                     <td className="p-4">{cohort.declined || "0"}</td>
@@ -118,7 +138,10 @@ export const AdminDashboard = ({
       </section>
 
       {showModal && (
-        <CohortForm toggleModal={toggleModal} setCohortsData={setCohortsData} />
+        <CohortForm
+          toggleModal={checkAllCohortStatus}
+          setCohortsData={setCohortsData}
+        />
       )}
     </div>
   );

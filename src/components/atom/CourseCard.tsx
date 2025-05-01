@@ -4,7 +4,7 @@ import { CourseType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
@@ -39,19 +39,6 @@ export const CourseCard = ({
   const admin = pathname === "/admin/courses";
   const CardWrapper = admin ? "div" : Link;
 
-  useEffect(() => {
-    async function fetchCourses() {
-      try {
-        const res = await fetch("/api/course");
-        const data: CourseType[] = await res.json();
-        setCoursesData(data);
-      } catch (error) {
-        console.error("Error fetching courses: ", error);
-      }
-    }
-    fetchCourses();
-  }, [coursesData]);
-
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
@@ -78,8 +65,8 @@ export const CourseCard = ({
         return;
       }
 
-      setCoursesData((prevCours) =>
-        prevCours.filter((course) => course.slug !== slug)
+      setCoursesData((prevCourse) =>
+        prevCourse.filter((course) => course.slug !== slug)
       );
 
       const Toast = Swal.mixin({
@@ -131,10 +118,10 @@ export const CourseCard = ({
               : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           }`}
         >
-          {coursesData.map((course, index) => (
+          {coursesData.map((course) => (
             <CardWrapper
               href={`/courses/${course.slug}`}
-              key={index}
+              key={course._id}
               className={`bg-white border border-[#C4C4C480] mx-auto ${
                 admin ? "hover:bg-white" : "hover:bg-[#DBEAF6]"
               }  rounded-xl shadow-lg overflow-hidden p-4 text-left ${

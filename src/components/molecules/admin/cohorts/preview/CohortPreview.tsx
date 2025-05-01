@@ -1,61 +1,32 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React, { useState, useTransition } from "react";
+import React, { useState } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import Swal from "sweetalert2";
 import EmptyState from "@/components/atom/EmptyState";
-import { CohortType } from "@/types";
+import { EnrollmentsType } from "@/types";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 import { MdOutlineArrowCircleDown } from "react-icons/md";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
-const statusOptions = ["Admitted", "Declined", "Pending", "Graduated"];
-const levelOptions = [
-  "Dropped",
-  "Applied",
-  "Interviewed",
-  "Admitted",
-  "Completed",
-];
+import { statusOptions } from "@/const";
+import { ApplicantTr } from "./applicant-tr";
 
-export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [status, setStatus] = useState('all');
-  const [isOpen, setIsOpen] = useState(false);
-
-
-  const [formData, setFormData] = useState({
-    status: "",
-    level: "",
-  });
+export const CohortPreview = ({
+  enrollments,
+}: {
+  enrollments: EnrollmentsType;
+}) => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [status, setStatus] = useState("all");
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedStatus = e.target.value;
     setStatus(selectedStatus);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const cohort = enrollments[0]?.cohort;
+  let filteredEnrollment = enrollments || [];
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
@@ -64,17 +35,19 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     doc.text(`${cohort.name} - Applicants List`, 14, 15);
     doc.setFontSize(12);
 
-    const tableData = filteredData.map((applicant) => [
-      `${applicant.fullName}\n${applicant.email}`,
-      applicant.course,
-      applicant.level,
-      applicant.state,
-      new Date(applicant.appliedAt).toDateString(),
-      applicant.status,
-    ]);
+    const tableData = filteredEnrollment.map(
+      ({ level, course, applicant, createdAt }) => [
+        `${applicant.firstName} ${applicant.lastName}\n${applicant.email}`,
+        applicant.state,
+        course.title,
+        level,
+        status,
+        new Date(createdAt).toDateString(),
+      ]
+    );
 
     autoTable(doc, {
-      head: [["Applicants", "Course", "Level", "Location", "Date", "Status"]],
+      head: [["Applicants", "Location", "Course", "Level", "Status", "Date"]],
       body: tableData,
       startY: 25,
       styles: {
@@ -113,12 +86,11 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
     );
   }
 
-  let filteredData = cohort.applicants || [];
-
   if (searchTerm) {
-    filteredData = filteredData.filter((applicant) => {
+    filteredEnrollment = filteredEnrollment.filter(({ applicant }) => {
       return (
-        applicant.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        applicant.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         applicant.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         applicant.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -128,78 +100,21 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
   }
 
   if (status !== "all") {
-    filteredData = filteredData.filter(
-      (applicant) => applicant.status === status
+    filteredEnrollment = filteredEnrollment.filter(
+      ({ applicant }) => applicant.status === status
     );
   }
 
-  const handleSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-    id: string
-  ) => {
-    e.preventDefault();
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("status", formData.status);
-    formDataToSend.append("level", formData.level);
-
-    startTransition(async () => {
-      try {
-        const res = await fetch(`/api/applicant/${id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: formData.status,
-            level: formData.level,
-          }),
-        });
-        console.log("res", res);
-
-        if (!res.ok) {
-          console.error("Failed to update applicant:", await res.text());
-          return;
-        }
-
-        const responseData = await res.json();
-        console.log("Applicant updated successfully:", responseData);
-        setFormData({
-          status: formData.status,
-          level: formData.level,
-        });
-        router.refresh();
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: "Applicant updated",
-        });
-
-        setIsOpen(false);
-      } catch (error) {
-        console.error("Error updating applicant:", error);
-      }
-    });
-  };
-
   return (
-    <div className='p-6'>
-      <h1 className='md:text-[20px] font-semibold mb-6 p-3 bg-white w-full'>{cohort.name}</h1>
-      {cohort.applicants && cohort.applicants.length > 0 ? (
-        <section className='border border-[#C4C4C4] w-full'>
-          <div className='flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full'>
-            <div className='relative w-full md:w-[70%]'>
-              <FaSearch className='absolute left-3 top-3 ' />
+    <div className="p-6">
+      <h1 className="md:text-[20px] font-semibold mb-6 p-3 bg-white w-full">
+        {cohort.name}
+      </h1>
+      {enrollments && enrollments.length > 0 ? (
+        <section className="border border-[#C4C4C4] w-full">
+          <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full">
+            <div className="relative w-full md:w-[70%]">
+              <FaSearch className="absolute left-3 top-3 " />
 
               <input
                 type="text"
@@ -233,17 +148,16 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
               </button>
             </div>
           </div>
-          <div className='overflow-x-auto'>
-            <table className='w-full table-auto bg-white'>
-
+          <div className="overflow-x-auto">
+            <table className="w-full table-auto bg-white">
               <thead>
                 <tr>
                   {[
                     "Applicants",
-                    "Course",
-                    "Level",
                     "Location",
                     "Date",
+                    "Course",
+                    "Level",
                     "Status",
                     "Action",
                   ].map((header) => (
@@ -257,131 +171,25 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.length > 0 ? (
-                  filteredData.map((applicant, index) => (
-                    <tr
-                      key={index}
-                      className='border-t border-[#C4C4C4]'>
-                      <td className='p-4'>
-                        <div className='flex flex-col'>
-                          <span className='text-nowrap'>{applicant.fullName}</span>
-                          <span className='text-sm text-nowrap'>{applicant.email}</span>
-
-                        </div>
-                      </td>
-                      <td className="p-4 text-nowrap">{applicant.course}</td>
-                      <td className="p-4">{applicant.level}</td>
-                      <td className="p-4 text-nowrap">{applicant.state}</td>
-                      <td className="p-4 text-nowrap">
-                        {new Date(applicant.appliedAt).toDateString()}
-                      </td>
-                      <td className="p-4">
-                        <span
-                          className={`px-3 py-1 text-nowrap rounded-md text-sm ${
-                            applicant.status === "Admitted"
-                              ? "bg-green-100 text-[#78A55A]"
-                              : applicant.status === "Pending"
-                              ? "bg-yellow-100 text-[#F29D38]"
-                              : applicant.status === "Declined"
-                              ? "bg-red-100 text-[#E02B20]"
-                              : "bg-gray-100 text-[#525252]"
-                          }`}
-                        >
-                          {applicant.status}
-                        </span>
-                      </td>
-                      <td className='p-4'>
-                        <Dialog
-                          open={isOpen}
-                          onOpenChange={() => setIsOpen(open => !open)}>
-                          <DialogTrigger
-                            className='cursor-pointer'
-                            asChild>
-                            <button className='hover:underline cursor-pointer'>Update</button>
-
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Edit Applicant Profile</DialogTitle>
-                            </DialogHeader>
-
-                            <form onSubmit={e => handleSubmit(e, applicant._id)}>
-                              <div className='space-y-6 mt-5'>
-                                <label
-                                  htmlFor='level'
-                                  className='mb-10'>
-                                  Level
-                                </label>
-
-                                <select
-                                  name="level"
-                                  id="level"
-                                  value={formData.level}
-                                  onChange={handleChange}
-                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
-                                  disabled={isPending}>
-                                  <option value=''>Select Level</option>
-
-                                  {levelOptions.map((level, index) => (
-                                    <option key={index} value={level}>
-                                      {level}
-                                    </option>
-                                  ))}
-                                </select>
-
-                                <label htmlFor="status">Status</label>
-                                <select
-                                  name="status"
-                                  id="status"
-                                  value={formData.status}
-                                  onChange={handleChange}
-                                  className='w-full p-2 border mt-2 border-[#C4C4C4] rounded-md'
-                                  disabled={isPending}>
-                                  <option value=''>Select Status</option>
-
-                                  {statusOptions.map((status, index) => (
-                                    <option key={index} value={status}>
-                                      {status}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-
-                              <div className="mt-10 flex justify-end gap-4">
-                                <button
-                                  className=" bg-green-600 py-2 px-4 text-white rounded-lg cursor-pointer"
-                                  disabled={isPending}
-                                >
-                                  {isPending
-                                    ? "Updating..."
-                                    : "Update Applicant"}
-                                </button>
-                                <DialogClose asChild>
-                                  <button
-                                    className="bg-black text-white py-2 px-4 rounded-lg cursor-pointer"
-                                    type="button"
-                                  >
-                                    Cancel
-                                  </button>
-                                </DialogClose>
-                              </div>
-                            </form>
-                          </DialogContent>
-                        </Dialog>
-                      </td>
-                    </tr>
+                {filteredEnrollment.length > 0 ? (
+                  filteredEnrollment.map((enrollment) => (
+                    <ApplicantTr key={enrollment._id} enrollment={enrollment} />
                   ))
                 ) : (
                   <tr className="border-t border-[#C4C4C4]">
                     <td colSpan={7}>
-                      <div className='text-center font-bold py-24'>
-                        No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
-                        {status !== 'all' && (
-                          <span className='text-red-500'>
-                            {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
+                      <div className="text-center font-bold py-24">
+                        No results found for{" "}
+                        {searchTerm && (
+                          <span className="text-red-500">
+                            &#34;{searchTerm}&#34;
                           </span>
                         )}
-
+                        {status !== "all" && (
+                          <span className="text-red-500">
+                            {searchTerm ? " and " : ""}status &#34;{status}&#34;
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -392,9 +200,8 @@ export const CohortPreview = ({ cohort }: { cohort: CohortType }) => {
         </section>
       ) : (
         <EmptyState
-          title='No applicants found in this cohort'
-          message='Check back later'
-
+          title="No applicants found in this cohort"
+          message="Check back later"
         />
       )}
     </div>

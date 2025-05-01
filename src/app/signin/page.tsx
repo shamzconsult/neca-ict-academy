@@ -8,6 +8,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Swal from "sweetalert2";
 import Link from "next/link";
+import { Logo } from "@/components/atom/Logo";
 
 export default function SignIn() {
   const [inputEmail, setInputEmail] = useState("");
@@ -53,12 +54,10 @@ export default function SignIn() {
 
   return (
     <section className="bg-gradient-to-b from-gray-100 to-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-12 md:pt-40 md:pb-20">
-        <div className="max-w-3xl mx-auto text-center text-2xl pb-12 md:pb-20 font-bold">
-          <h1 className="">Welcome back admin.</h1>
-          <h2 className="text-[#E02B20] mt-1">
-            Sign in to add and edit content.
-          </h2>
+      <div className="space-y-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-12 md:pt-40 md:pb-20">
+        <div className="flex flex-col items-center gap-10">
+          <Logo />
+          <h1 className="text-3xl">Welcome back!</h1>
         </div>
 
         <div className="max-w-sm mx-auto">

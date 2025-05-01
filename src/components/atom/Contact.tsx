@@ -22,8 +22,6 @@ const Contact = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log("Form submitted:", formData);
   };
 
   const handleChange = (

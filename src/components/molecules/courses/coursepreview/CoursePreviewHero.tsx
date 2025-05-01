@@ -22,7 +22,7 @@ export const CoursePreviewHero = ({
             <EnrollBtn />
           </div>
         </div>
-        <div className="bg-white p-3 flex justify-center items-center rounded-xl ">
+        <div className="bg-white p-3 flex justify-center items-center rounded-xl">
           <img
             src={coverImage}
             alt="hero-image"
@@ -36,8 +36,8 @@ export const CoursePreviewHero = ({
           Build Your Future in <span className="mx-1">{title}</span>
         </h1>
         <p className="md:text-[20px] text-center px-4 lg:px-0">
-          This <span className="mx-1">{title}</span> course is designed to
-          provide you with a solid foundation and a broad understanding of core
+          This<span className="mx-1">{title}</span>course is designed to provide
+          you with a solid foundation and a broad understanding of core
           concepts. You&#8217;ll explore fundamental principles, essential
           tools, and best practices through immersive projects. Whether
           you&#8217;re new to the subject or aiming to refine your expertise,

@@ -9,6 +9,16 @@ import { MdDashboard } from "react-icons/md";
 import { AdminLogo } from "./AdminLogo";
 import { LogoutModal } from "./LogoutModal";
 import { FaBook } from "react-icons/fa";
+import {
+  Book,
+  BookA,
+  BookOpen,
+  ChartPieIcon,
+  SquareLibrary,
+  UserCog,
+  UserCog2,
+  Users2,
+} from "lucide-react";
 
 export const Sidebar = () => {
   const pathname = usePathname();
@@ -68,7 +78,7 @@ export const Sidebar = () => {
                   : " hover:text-[#27156F]"
               }`}
             >
-              <MdDashboard size={20} className="mr-3" />
+              <ChartPieIcon size={20} className="mr-3" />
               Dashboard
             </Link>
 
@@ -81,7 +91,7 @@ export const Sidebar = () => {
                   : " hover:text-[#27156F]"
               }`}
             >
-              <FiUsers size={20} className="mr-3" />
+              <SquareLibrary size={20} className="mr-3" />
               Cohorts
             </Link>
             <Link
@@ -93,8 +103,20 @@ export const Sidebar = () => {
                   : " hover:text-[#27156F]"
               }`}
             >
-              <FaBook size={20} className="mr-3" />
+              <BookOpen size={20} className="mr-3" />
               Courses
+            </Link>
+            <Link
+              href="#"
+              onClick={() => setIsOpen(false)}
+              className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
+                isActive("/admin/applicants")
+                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
+                  : " hover:text-[#27156F]"
+              }`}
+            >
+              <UserCog size={20} className="mr-3" />
+              Applicants
             </Link>
           </nav>
         </div>

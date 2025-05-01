@@ -1,19 +1,44 @@
-type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
+import { ApplicationLevel, ApplicationStatus, Gender } from "@/const";
+
+type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
 
 export type CourseOutline = {
   header: string;
   lists: string[];
 };
 
+export type EnrollmentType = {
+  _id: string;
+  course: CourseType;
+  applicant: ApplicantDetail;
+  cohort: CohortType;
+  level: ApplicationLevel;
+  status: ApplicationStatus;
+  createdAt: string;
+  cv: {
+    url: string;
+    public_id: string;
+  };
+};
+
+export type EnrollmentsType = EnrollmentType[];
+
 export type ApplicantDetail = {
   _id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   course: string;
   level: number;
   state: string;
-  appliedAt: string;
   status: Status;
+  createdAt: string;
+  phoneNumber: string;
+  gender: Gender;
+  profilePicture: {
+    url: string;
+    public_id: string;
+  };
 };
 
 export type CohortType = {
@@ -24,10 +49,10 @@ export type CohortType = {
   slug: string;
   name: string;
   active: boolean;
-  applicants: ApplicantDetail[];
-  admitted: string;
-  graduated: string;
-  declined: string;
+  admitted: number;
+  graduated: number;
+  declined: number;
+  applicantCount: number;
   startDate: string;
   endDate: string;
 };
@@ -59,6 +84,7 @@ export type Courses = {
 };
 
 export type CourseType = {
+  _id: string;
   courseOutlines: CourseOutline[];
   duration: string;
   skillLevel: string;

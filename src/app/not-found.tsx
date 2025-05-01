@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="flex flex-col items-center justify-center h-screen text-center">
       <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
       <p className="mb-6 ">
-        Sorry, the neca-ict-academy page you are looking for does not exist.
+        Sorry, the Neca Ict Academy page you are looking for does not exist.
       </p>
       <Link
         href="/"
