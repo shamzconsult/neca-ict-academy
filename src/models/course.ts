@@ -12,11 +12,7 @@ const generateSlug = (title: string): string => {
 };
 
 const CourseSchema = new Schema({
-  // programId: {
-  //     type: Schema.Types.ObjectId,
-  //     ref: "Program",
-  //     required: true
-  // },
+ 
   title: {
     type: String,
     required: true,
@@ -38,26 +34,6 @@ const CourseSchema = new Schema({
   duration: {
     type: String
   },
-  // lesson: {
-  //   count: {
-  //     type: String,
-  //     required: true
-  //   },
-  //   description: {
-  //     type: String,
-  //     trim: true
-  //   }
-  // },
-  // duration: {
-  //   count: {
-  //     type: String,
-  //     required: true
-  //   },
-  //   description: {
-  //     type: String,
-  //     trim: true
-  //   }
-  // },
   skillLevel: {
     type: String,
     enum: ALLOWED_LEVEL,
@@ -68,15 +44,7 @@ const CourseSchema = new Schema({
     required: true,
     trim: true
   },
-  // isCertified: {
-  //     type: Boolean,
-  //     required: true
-  // },
-  // mode: {
-  //     type: String,
-  //     enum: ALLOWED_MODE,
-  //     required: true
-  // },
+  
   rating: {
     type: String,
     default: "1"

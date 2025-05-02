@@ -1,8 +1,8 @@
 import connectViaMongoose from "@/lib/db";
-import Enrollment from "@/models/applicant";
+import { Enrollment } from "@/models/enrollment";
 import { NextResponse } from "next/server";
 
-const GET = async (req: Request) => {
+export const GET = async (req: Request) => {
   try {
     await connectViaMongoose();
     const url = new URL(req.url);
@@ -34,4 +34,4 @@ const GET = async (req: Request) => {
   }
 };
 
-export { GET };
+
