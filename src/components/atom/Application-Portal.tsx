@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import Link from "next/link";
 import { CheckStatusModal } from "./CheckStatusModal";
@@ -9,7 +9,14 @@ import { ApplicationReview } from "./ApplicationReview";
 import SuccessModal from "./SuccessPage";
 import { FileUploader } from "@/components/atom/FileUploader";
 import { MdArrowDropDown, MdImage, MdDescription } from "react-icons/md";
-import { genderOptions, levelOptionsMap, statusOptionsMap } from "@/const";
+import {
+  genderOptions,
+  levelOptionsMap,
+  states,
+  statusOptionsMap,
+} from "@/const";
+import { CourseType } from "@/types";
+import { useSearchParams } from "next/navigation";
 
 interface FormData {
   firstName: string;
@@ -29,7 +36,16 @@ type ApplicationFormProps = {
   name: string;
 }[];
 
-const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
+const ApplicationPortal = ({
+  cohorts,
+  courses,
+}: {
+  cohorts: ApplicationFormProps;
+  courses: CourseType[];
+}) => {
+  const searchParams = useSearchParams();
+  const course = searchParams.get("course");
+
   const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState<FormData>({
     firstName: "",
@@ -51,6 +67,15 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (course && typeof course === "string") {
+      setFormData((prevData) => ({
+        ...prevData,
+        course,
+      }));
+    }
+  }, [course]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -343,11 +368,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none"
                       >
                         <option value="">Select your state</option>
-                        <option value="Abuja">Abuja</option>
-                        <option value="Kwara state">Kwara state</option>
-                        <option value="Lagos State">Lagos State</option>
-                        <option value="Niger State">Niger State</option>
-                        <option value="Oyo State">Oyo State</option>
+                        {states.map((state) => (
+                          <option key={state} value={state}>
+                            {state}
+                          </option>
+                        ))}
                       </select>
                       <MdArrowDropDown
                         size={24}
@@ -432,10 +457,17 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       disabled={isPending}
                       className="w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none"
                     >
-                      <option value="">Select a course</option>
-                      <option value="680f7121b5d76b35a1218afe">
-                        Software Dev
+                      <option value="">
+                        {!courses || courses.length === 0
+                          ? "No courses available"
+                          : "Select a course"}
                       </option>
+                      {courses.length > 0 &&
+                        courses.map((course) => (
+                          <option key={course._id} value={course._id}>
+                            {course.title}
+                          </option>
+                        ))}
                     </select>
                     <MdArrowDropDown
                       size={24}
@@ -470,7 +502,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer"
+                  className={`w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer ${isPending ? "opacity-75" : ""}`}
                 >
                   {isPending ? "Submitting..." : "Submit Application"}
                 </button>

@@ -109,7 +109,7 @@ export const ApplicantTr = ({ enrollment }: Props) => {
       <td className="p-4 text-nowrap">
         {new Date(applicant.createdAt).toDateString()}
       </td>
-      <td className="p-4 text-nowrap">{course.title}</td>
+      <td className="p-4 text-nowrap">{course?.title}</td>
       <td className="p-4 capitalize">{level}</td>
       <td className="p-4">
         <span
@@ -117,10 +117,10 @@ export const ApplicantTr = ({ enrollment }: Props) => {
             applicant.status === "Admitted"
               ? "bg-green-100 text-[#78A55A]"
               : applicant.status === "Pending"
-              ? "bg-yellow-100 text-[#F29D38]"
-              : applicant.status === "Declined"
-              ? "bg-red-100 text-[#E02B20]"
-              : "bg-gray-100 text-[#525252]"
+                ? "bg-yellow-100 text-[#F29D38]"
+                : applicant.status === "Declined"
+                  ? "bg-red-100 text-[#E02B20]"
+                  : "bg-gray-100 text-[#525252]"
           }`}
         >
           {status}

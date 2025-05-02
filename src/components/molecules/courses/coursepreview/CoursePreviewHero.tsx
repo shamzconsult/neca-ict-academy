@@ -5,7 +5,7 @@ import { CourseType } from "@/types";
 import React from "react";
 
 export const CoursePreviewHero = ({
-  courseData: { title, coverImage },
+  courseData: { _id, title, coverImage },
 }: {
   courseData: CourseType;
 }) => {
@@ -19,7 +19,7 @@ export const CoursePreviewHero = ({
             creating real-world solutions from concept to completion.
           </p>
           <div className="mt-4">
-            <EnrollBtn />
+            <EnrollBtn courseId={_id} />
           </div>
         </div>
         <div className="bg-white p-3 flex justify-center items-center rounded-xl">

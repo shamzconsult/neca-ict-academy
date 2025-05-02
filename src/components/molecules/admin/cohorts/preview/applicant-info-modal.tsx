@@ -56,7 +56,7 @@ export const ApplicantInfoModal = ({
                   <strong>Gender:</strong> {applicant.gender}
                 </div>
                 <div className="mb-2">
-                  <strong>Course:</strong> {course.title}
+                  <strong>Course:</strong> {course?.title}
                 </div>
                 <div className="mb-2">
                   <strong>Level:</strong> {level}
