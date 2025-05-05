@@ -175,10 +175,13 @@ export const AddNewCourse = ({
       }
 
       const responseData = await res.json();
+      const newSlug = responseData.newSlug || courseToEdit.slug;
+      const updatedCourse = responseData.updatedCourse || responseData;
+
       setCourseList((prev) =>
         prev.map((course) =>
           course.slug === courseToEdit.slug
-            ? responseData.updatedCourse
+            ? { ...updatedCourse, slug: newSlug } 
             : course
         )
       );

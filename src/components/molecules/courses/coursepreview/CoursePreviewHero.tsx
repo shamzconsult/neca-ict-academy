@@ -10,7 +10,7 @@ export const CoursePreviewHero = ({
   courseData: CourseType;
 }) => {
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4">
       <section className="flex flex-col lg:justify-between w-full items-center lg:flex-row gap-8 pt-44 px-4 lg:px-0">
         <div className="flex flex-col gap-6 justify-center text-center lg:text-left max-w-2xl lg:max-w-1/2">
           <Heading>{`Learn ${title} & build real-world applications.`}</Heading>
