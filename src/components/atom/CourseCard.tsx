@@ -1,16 +1,17 @@
 'use client';
 
-import { CourseType } from '@/types';
-import Image from 'next/image';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { BsPlayBtn } from 'react-icons/bs';
-import { FiBarChart } from 'react-icons/fi';
-import { MdAccessTime } from 'react-icons/md';
-import Swal from 'sweetalert2';
-import { CourseOutline } from '../molecules/admin/courses/ManageCourses';
-import EmptyState from './EmptyState';
+import { CourseType } from "@/types";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BsPlayBtn } from "react-icons/bs";
+import { FiBarChart } from "react-icons/fi";
+import { MdAccessTime } from "react-icons/md";
+import Swal from "sweetalert2";
+import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
+import EmptyState from "./EmptyState";
+
 
 export const CourseCard = ({
   courses,
@@ -38,6 +39,10 @@ export const CourseCard = ({
   const isCoursesPath = pathname === '/courses';
   const admin = pathname === '/admin/courses';
   const CardWrapper = admin ? 'div' : Link;
+
+  useEffect(() => {
+    setCoursesData(courses);
+  }, [courses]);
 
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
