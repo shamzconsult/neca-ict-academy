@@ -29,7 +29,7 @@ export type ApplicantDetail = {
   lastName: string;
   email: string;
   course: string;
-  level: number;
+  level: string;
   state: string;
   status: Status;
   createdAt: string;
