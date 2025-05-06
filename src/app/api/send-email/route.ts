@@ -23,7 +23,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Email sending error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to send email' },
+      { error: error instanceof Error ? error.message : 'Failed to send email!' },
       { status: 500 }
     );
   }
