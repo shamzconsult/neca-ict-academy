@@ -90,5 +90,3 @@ export const adminCohortTableHead = [
   'Start Date',
   'End Date',
 ];
-
-export const ApplicantTable = [];
