@@ -227,7 +227,7 @@ const ApplicationPortal = ({
               <div className="relative aspect-[4/3] w-full flex items-center justify-center">
                 <div className="absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0" />
                 <img
-                  src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Online_education_and_virtual_learning_g0fzok.png"
+                  src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746617511/Online_education_and_virtual_learning_g0fzok_tcay9v.png"
                   alt="Online Education Image"
                   className="object-contain relative z-10"
                 />
