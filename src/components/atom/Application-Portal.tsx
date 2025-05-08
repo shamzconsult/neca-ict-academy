@@ -426,7 +426,7 @@ const ApplicationPortal = ({
                     >
                       <option value="">
                         {!cohorts || cohorts.length === 0
-                          ? "No cohorts available"
+                          ? "No cohorts in session"
                           : "Select a cohort"}
                       </option>
 
