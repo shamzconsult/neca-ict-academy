@@ -103,7 +103,6 @@ CourseSchema.pre('save', async function(next) {
   }
 });
 
-// Add a text index for search functionality
 CourseSchema.index({ 
   title: 'text', 
   description: 'text',
