@@ -20,7 +20,7 @@ export const CourseHeroSection = () => {
       <section className="w-full flex justify-center md:max-w-1/2">
         <div className=" w-full h-[400px] relative md:h-[405px] md:w-[502px] md:mb-4 ">
           <Image
-            src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745059683/neca_web_7_makhcu.jpg"
+            src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746616527/neca_web_7_makhcu_ievmym.png"
             alt="hero-image"
             fill
             className="rounded-4xl object-cover border-4 border-white"

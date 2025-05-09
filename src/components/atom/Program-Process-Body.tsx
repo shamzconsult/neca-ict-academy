@@ -38,7 +38,7 @@ const ProgramProcessBody = () => {
             <div className="w-full lg:w-1/2">
               <Image
                 className="w-[400px] h-auto transition-shadow duration-300"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_467975184_q7cv5l.png"
+                src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746617030/_467975184_q7cv5l_j0eebk.png"
                 alt="Course Image"
                 width={400}
                 height={400}
@@ -70,7 +70,7 @@ const ProgramProcessBody = () => {
             <div className="w-full lg:w-1/2">
               <Image
                 className="w-[400px] h-auto"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_358334872_vrvcwo.png"
+                src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746616765/_358334872_vrvcwo_mb3qvo.png"
                 alt="Course Image"
                 width={400}
                 height={400}
@@ -100,7 +100,7 @@ const ProgramProcessBody = () => {
             <div className="w-full lg:w-1/2">
               <Image
                 className="w-[400px] h-auto"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/v1741092794/_359620712_f6wddm.png"
+                src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746616766/_359620712_f6wddm_cks0wq.png"
                 alt="Course Image"
                 width={400}
                 height={400}
@@ -131,7 +131,7 @@ const ProgramProcessBody = () => {
             <div className="w-full lg:w-1/2">
               <Image
                 className="w-[400px] h-[300px] shadow-xl rounded bg-white"
-                src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1745055739/NECA_Web_14_jfmm5f.jpg"
+                src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746616768/NECA_Web_14_jfmm5f_c91udl.png"
                 alt="Course Image"
                 width={400}
                 height={400}

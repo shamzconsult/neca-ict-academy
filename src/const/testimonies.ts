@@ -3,7 +3,7 @@ export const testimonials = [
     name: "Emeka O.",
     role: "Developer",
     image:
-      "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741328499/Tope_Awotona_nks8fc.png",
+      "https://res.cloudinary.com/dtryuudiy/image/upload/v1746616332/images_13_nueo8r_fqpdbh.png",
     rating: 4,
     title: "I owe it all to Neca",
     review:
@@ -13,7 +13,7 @@ export const testimonials = [
     name: "Fatima A",
     role: "Lead Designer",
     image:
-      "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741328498/photo-1508002366005-75a695ee2d17_x1qmzh.png",
+      "https://res.cloudinary.com/dtryuudiy/image/upload/v1746616333/photo-1508002366005-75a695ee2d17_x1qmzh_trmqcl.png",
     rating: 5,
     title: "It was a very good experience",
     review:
@@ -23,7 +23,7 @@ export const testimonials = [
     name: "Tunde",
     role: "Lead Designer",
     image:
-      "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741328498/images_13_nueo8r.png",
+      "https://res.cloudinary.com/dtryuudiy/image/upload/v1746616332/Tope_Awotona_nks8fc_w5e3kd.png",
     rating: 4,
     title: "I highly recommend Neca",
     review:
