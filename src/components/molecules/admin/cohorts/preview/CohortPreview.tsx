@@ -1,70 +1,104 @@
 'use client';
 
-import React, { useState } from 'react';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import EmptyState from '@/components/atom/EmptyState';
-import { EnrollmentsType } from '@/types';
+import React, { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useDebounce } from '../../../../../../hooks/useDebounce';
+
 import { FaSearch } from 'react-icons/fa';
+import { Loader } from 'lucide-react';
 import { MdOutlineArrowCircleDown } from 'react-icons/md';
 
-import { statusOptions } from '@/const';
-import { ApplicantTr } from './applicant-tr';
+import { pdfDownload } from '@/utils/pdf-download';
+
 import { Table, TableBody, TableHead, TableRow } from '@/components/atom/Table/Table';
+import EmptyState from '@/components/atom/EmptyState';
+import { ApplicantTr } from './applicant-tr';
+import { Pagination } from '@/components/atom/Pagination';
+import { statusOptions } from '@/const';
+
+import { EnrollmentsType } from '@/types';
+
+const LIMIT = 8;
 
 export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [status, setStatus] = useState('all');
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(false);
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedStatus = e.target.value;
-    setStatus(selectedStatus);
-  };
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') ?? '');
+  const [totalPages, setTotalPages] = useState(1);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [status, setStatus] = useState(searchParams.get('status') ?? 'all');
+
+  const [filteredEnrollments, setFilteredEnrollments] = useState<EnrollmentsType>(enrollments);
 
   const cohort = enrollments[0]?.cohort;
-  let filteredEnrollment = enrollments || [];
+  const createQueryString = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      console.log(Object.entries(updates));
+      console.log('params', params, updates);
+      Object.entries(updates).forEach(([name, value]) => {
+        if (value) {
+          params.set(name, value);
+        } else {
+          params.delete(name);
+        }
+      });
+      return params.toString();
+    },
+    [searchParams]
+  );
 
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const queryParams = {
+          search: debouncedSearchTerm,
+          status: status !== 'all' ? status : '',
+          page: String(page),
+          limit: String(LIMIT),
+        };
 
-    doc.setFontSize(16);
-    doc.text(`${cohort.name} - Applicants List`, 14, 15);
-    doc.setFontSize(12);
+        const queryString = createQueryString(queryParams);
+        router.push(`${pathname}?${queryString}`, { scroll: false });
 
-    const tableData = filteredEnrollment.map(({ level, course, applicant, createdAt }) => [
-      `${applicant.firstName} ${applicant.lastName}\n${applicant.email}`,
-      applicant.state,
-      course.title,
-      level,
-      status,
-      new Date(createdAt).toDateString(),
-    ]);
+        const res = await fetch(`/api/cohort-applicants/?${queryString}`);
+        const data = await res.json();
 
-    autoTable(doc, {
-      head: [['Applicants', 'Location', 'Course', 'Level', 'Status', 'Date']],
-      body: tableData,
-      startY: 25,
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [33, 33, 33],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-      },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 25 },
-        4: { cellWidth: 35 },
-        5: { cellWidth: 25 },
-      },
-    });
+        setFilteredEnrollments(data.data);
+        setTotalPages(data.pagination.totalPages);
 
-    doc.save(`${cohort.name}-applicants.pdf`);
+        setLoading(false);
+
+        if (page > data.pagination.totalPages && data.pagination.totalPages > 0) {
+          setPage(data.pagination.totalPages);
+        }
+      } catch (error) {
+        console.error('Error fetching applicants:', error);
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [debouncedSearchTerm, status, page, pathname, router, createQueryString]);
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setStatus(value);
+    setPage(1);
+  };
+
+  const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setPage(1);
   };
 
   if (!cohort) {
@@ -80,23 +114,6 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
     );
   }
 
-  if (searchTerm) {
-    filteredEnrollment = filteredEnrollment.filter(({ applicant }) => {
-      return (
-        applicant.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.status?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }
-
-  if (status !== 'all') {
-    filteredEnrollment = filteredEnrollment.filter(({ applicant }) => applicant.status === status);
-  }
-
   return (
     <div className='p-6'>
       <h1 className='md:text-[20px] font-semibold mb-6 p-3 bg-white w-full'>{cohort.name}</h1>
@@ -110,7 +127,7 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
                 type='text'
                 placeholder='Search...'
                 value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
+                onChange={handleSearchTerm}
                 className='pl-10 pr-4 py-2 border w-full border-[#C4C4C4] rounded-md focus:outline-none focus:ring-none focus:border-gray-400'
               />
             </div>
@@ -119,10 +136,11 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
               <select
                 value={status}
                 onChange={handleStatusChange}
-                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'>
+                className='flex items-center px-2 py-2 border capitalize text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'>
                 <option value='all'>All Status</option>
                 {statusOptions.map((status, index) => (
                   <option
+                    className='capitalize'
                     value={status}
                     key={index}>
                     {status}
@@ -132,50 +150,61 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
 
               <button
                 className='flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md'
-                onClick={handleDownloadPDF}>
+                onClick={() => pdfDownload(cohort.name, filteredEnrollments)}>
                 <MdOutlineArrowCircleDown />
                 Download Data
               </button>
             </div>
           </div>
-          <div className='overflow-x-auto'>
-            <Table className='w-full table-auto bg-white'>
-              <TableHead>
-                <tr>
-                  {['Applicants', 'Location', 'Date', 'Course', 'Level', 'Status', 'Action'].map(header => (
-                    <th
-                      key={header}
-                      className='p-4 border-t border-[#C4C4C4] text-left font-medium'>
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </TableHead>
-              <TableBody>
-                {filteredEnrollment.length > 0 ? (
-                  filteredEnrollment.map(enrollment => (
-                    <ApplicantTr
-                      key={enrollment._id}
-                      enrollment={enrollment}
-                    />
-                  ))
-                ) : (
-                  <TableRow className='border-t border-[#C4C4C4]'>
-                    <td colSpan={7}>
-                      <div className='text-center font-bold py-24'>
-                        No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
-                        {status !== 'all' && (
-                          <span className='text-red-500'>
-                            {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          {loading ? (
+            <div>
+              <Loader className='absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] animate-spin text-red-700 size-8' />
+            </div>
+          ) : (
+            <div className='overflow-x-auto'>
+              <Table className='w-full table-auto bg-white'>
+                <TableHead>
+                  <tr>
+                    {['Applicants', 'Location', 'Date', 'Course', 'Level', 'Status', 'Action'].map(header => (
+                      <th
+                        key={header}
+                        className='p-4 border-t border-[#C4C4C4] text-left font-medium'>
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </TableHead>
+                <TableBody>
+                  {filteredEnrollments.length > 0 ? (
+                    filteredEnrollments.map(enrollment => (
+                      <ApplicantTr
+                        key={enrollment._id}
+                        enrollment={enrollment}
+                      />
+                    ))
+                  ) : (
+                    <TableRow className='border-t border-[#C4C4C4]'>
+                      <td colSpan={7}>
+                        <div className='text-center font-bold py-24'>
+                          No results found for {searchTerm && <span className='text-red-500'>&#34;{searchTerm}&#34;</span>}
+                          {status !== 'all' && (
+                            <span className='text-red-500'>
+                              {searchTerm ? ' and ' : ''}status &#34;{status}&#34;
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>
+          )}
         </section>
       ) : (
         <EmptyState

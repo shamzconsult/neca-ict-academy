@@ -1,49 +1,95 @@
 'use client';
 
-import { useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { useDebounce } from '../../../../../../hooks/useDebounce';
 
-import { levelOptions, statusOptions } from '@/const';
-import { ApplicantDetail } from '@/types';
-import ApplicantTable from '@/components/atom/Table/ApplicantTable';
+import { Loader } from 'lucide-react';
 import { FaSearch } from 'react-icons/fa';
 
-const ApplicantPreviewForm = ({ tableData }: { tableData: ApplicantDetail[] }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [status, setStatus] = useState('all');
-  const [level, setLevel] = useState('all');
+import { levelOptions, statusOptions } from '@/const';
+import { EnrollmentType } from '@/types';
+import ApplicantTable from '@/components/atom/Table/ApplicantTable';
+
+import { Pagination } from '@/components/atom/Pagination';
+
+const LIMIT = 8;
+
+const ApplicantPreviewForm = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+
+  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') ?? '');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [status, setStatus] = useState(searchParams.get('status') ?? 'all');
+  const [level, setLevel] = useState(searchParams.get('level') ?? 'all');
+
+  const [filteredApplicants, setFilteredApplicants] = useState<EnrollmentType[]>([]);
+
+  const createQueryString = useCallback(
+    (updates: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      Object.entries(updates).forEach(([name, value]) => {
+        if (value) {
+          params.set(name, value);
+          console.log('here', params.toString());
+        } else params.delete(name);
+      });
+
+      return params.toString();
+    },
+    [searchParams]
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const queryParams = {
+          search: debouncedSearchTerm,
+          status: status !== 'all' ? status : '',
+          level: level !== 'all' ? level : '',
+          page: String(page),
+          limit: String(LIMIT),
+        };
+
+        const queryString = createQueryString(queryParams);
+        router.push(`${pathname}?${queryString}`, { scroll: false });
+        const res = await fetch(`/api/cohort-applicants/?${queryString}`);
+        const data = await res.json();
+        setFilteredApplicants(data.data);
+        setTotalPages(data.pagination.totalPages);
+        setIsLoading(false);
+
+        if (page > data.pagination.totalPages && data.pagination.totalPages > 0) {
+          setPage(data.pagination.totalPages);
+        }
+      } catch (error) {
+        console.error('Error fetching applicants:', error);
+        setIsLoading(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [debouncedSearchTerm, status, level, page, pathname, router, createQueryString]);
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedStatus = e.target.value;
-    setStatus(selectedStatus);
+    const { value } = e.target;
+    setStatus(value);
+    setPage(1);
   };
 
   const handleLevelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedLevel = e.target.value;
-    setLevel(selectedLevel);
+    const { value } = e.target;
+    setLevel(value);
+    setPage(1);
   };
-
-  let filteredApplicants = tableData;
-
-  if (searchTerm) {
-    filteredApplicants = filteredApplicants.filter(applicant => {
-      return (
-        applicant.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.status?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }
-
-  if (status !== 'all') {
-    filteredApplicants = filteredApplicants.filter(applicant => applicant.status === status);
-  }
-
-  if (level !== 'all') {
-    filteredApplicants = filteredApplicants.filter(applicant => applicant.level === level);
-  }
 
   return (
     <section>
@@ -96,12 +142,23 @@ const ApplicantPreviewForm = ({ tableData }: { tableData: ApplicantDetail[] }) =
               </select>
             </div>
           </div>
-          <ApplicantTable
-            tableData={filteredApplicants}
-            status={status}
-            level={level}
-            searchTerm={searchTerm}
-          />
+          {isLoading ? (
+            <Loader className='absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] animate-spin text-red-700 size-8' />
+          ) : (
+            <>
+              <ApplicantTable
+                tableData={filteredApplicants}
+                status={status}
+                level={level}
+                searchTerm={searchTerm}
+              />
+              <Pagination
+                currentPage={page}
+                onPageChange={setPage}
+                totalPages={totalPages}
+              />
+            </>
+          )}
         </div>
       </div>
     </section>

@@ -1,15 +1,16 @@
 import { applicantTableHead } from '@/const';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './Table';
-import { ApplicantDetail } from '@/types';
+import { EnrollmentType } from '@/types';
 
 type ApplicantTableProps = {
-  tableData: ApplicantDetail[];
+  tableData: EnrollmentType[];
   status: string;
   level: string;
   searchTerm: string;
 };
 
 const ApplicantTable = ({ tableData, status, level, searchTerm }: ApplicantTableProps) => {
+  console.log('tableData::', tableData);
   return (
     <Table>
       <TableHead>
@@ -37,11 +38,11 @@ const ApplicantTable = ({ tableData, status, level, searchTerm }: ApplicantTable
                 {applicant.status && (
                   <span
                     className={`px-3 py-1 text-nowrap rounded-md text-sm capitalize ${
-                      applicant.status === 'Admitted'
+                      applicant.status.toLowerCase() === 'Admitted'
                         ? 'bg-green-100 text-[#78A55A]'
                         : applicant.status === 'Pending'
                           ? 'bg-yellow-100 text-[#F29D38]'
-                          : applicant.status === 'Declined'
+                          : applicant.status.toLowerCase() === 'declined'
                             ? 'bg-red-100 text-[#E02B20]'
                             : 'bg-gray-100 text-[#525252]'
                     }`}>
