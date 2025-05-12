@@ -26,6 +26,7 @@ const POST = async (req: Request) => {
       applicationEndDate,
       active,
     } = await req.json();
+    
 
     if (
       !name ||
@@ -38,6 +39,17 @@ const POST = async (req: Request) => {
         { message: "All fields are required" },
         { status: 400 }
       );
+    }
+
+    // To check for existing cohort
+    if (active) {
+      const activeCohort = await Cohort.findOne({ active: true });
+      if (activeCohort) {
+        return NextResponse.json(
+          { message: "Another cohort is already active. Deactivate it first." },
+          { status: 400 }
+        );
+      }
     }
 
     const newCohort = await Cohort.create({

@@ -1,5 +1,5 @@
 import React from "react";
-import { FiX } from "react-icons/fi"; // Import the close icon
+import { FiX } from "react-icons/fi";
 
 interface CheckStatusModalProps {
   email: string;
@@ -7,6 +7,7 @@ interface CheckStatusModalProps {
   onCheckStatus: () => void;
   emailError: string;
   onClose: () => void; // Add onClose prop
+  isPending: boolean;
 }
 
 export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
@@ -14,12 +15,12 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
   setEmail,
   onCheckStatus,
   emailError,
-  onClose, // Destructure onClose
+  onClose,
+  isPending,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/30 flex justify-center items-center z-[999]">
       <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px] relative">
-      
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
@@ -27,7 +28,7 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
         >
           <FiX className="w-5 h-5" />
         </button>
-        
+
         <h2 className="text-[17px] text-[#27156F] font-bold mb-4">
           Check your application status.
         </h2>
@@ -51,7 +52,7 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
             onClick={onCheckStatus}
             className="w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#C0241A] transition-colors cursor-pointer"
           >
-            Check Status
+            {isPending ? "Checking..." : "Check Status"}
           </button>
         </div>
       </div>

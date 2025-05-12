@@ -4,11 +4,11 @@ import { CourseType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
-import Swal from "sweetalert2";
+import { toast } from "sonner";
 import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 import EmptyState from "./EmptyState";
 
@@ -42,17 +42,7 @@ export const CourseCard = ({
   const handleDelete = async (slug: string, event: React.MouseEvent) => {
     event.stopPropagation();
 
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#E02B20",
-      cancelButtonColor: "#000000",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (!result.isConfirmed) return;
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
 
     try {
       const res = await fetch(`/api/course/${slug}`, {
@@ -61,7 +51,7 @@ export const CourseCard = ({
 
       if (!res.ok) {
         console.error("Failed to delete course");
-        Swal.fire("Error", "Failed to delete the course.", "error");
+        toast.error("Failed to delete the course.");
         return;
       }
 
@@ -69,25 +59,10 @@ export const CourseCard = ({
         prevCourse.filter((course) => course.slug !== slug)
       );
 
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Course deleted Successfully",
-        theme: "dark",
-      });
+      toast.success("Course deleted successfully");
     } catch (error) {
       console.error("Error deleting course: ", error);
-      Swal.fire("Error", "Something went wrong.", "error");
+      toast.error("Something went wrong.");
     }
   };
 
@@ -141,16 +116,16 @@ export const CourseCard = ({
                   src={course.coverImage}
                   alt={course.title}
                   fill
-                  className="rounded-md object-cover"
+                  className='rounded-md object-cover'
                 />
               </div>
 
-              <h3 className="text-lg font-bold text-[#27156F] mt-4">
+              <h3 className='text-lg font-bold text-[#27156F] mt-4'>
                 {course.title}
               </h3>
               <div>
                 {(isCoursesPath || admin) && (
-                  <p className="font-bold mt-2 text-sm">About The Course</p>
+                  <p className='font-bold mt-2 text-sm'>About The Course</p>
                 )}
                 <p
                   className={`mt-1 ${
@@ -161,36 +136,36 @@ export const CourseCard = ({
                 </p>
                 <div>
                   {(isCoursesPath || admin) && (
-                    <div className="text-sm mt-3 ">
-                      <h3 className="font-bold mb-2 text-sm">Course Details</h3>
-                      <div className="grid grid-cols-3 gap-3 text-xs">
-                        <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                          <p className="font-semibold">Lesson</p>
-                          <div className="flex gap-2  items-center ">
+                    <div className='text-sm mt-3 '>
+                      <h3 className='font-bold mb-2 text-sm'>Course Details</h3>
+                      <div className='grid grid-cols-3 gap-3 text-xs'>
+                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
+                          <p className='font-semibold'>Lesson</p>
+                          <div className='flex gap-2  items-center '>
                             <span>
                               <BsPlayBtn />
                             </span>
-                            <span className="text-nowrap">{course.lesson}</span>
+                            <span className='text-nowrap'>{course.lesson}</span>
                           </div>
                         </div>
-                        <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                          <p className="font-semibold">Duration</p>
-                          <div className="flex gap-2 items-center ">
+                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
+                          <p className='font-semibold'>Duration</p>
+                          <div className='flex gap-2 items-center '>
                             <span>
                               <MdAccessTime />
                             </span>
-                            <span className="text-nowrap">
+                            <span className='text-nowrap'>
                               {course.duration}
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg">
-                          <p className="font-semibold">Skill Level</p>
-                          <div className="flex  gap-2 items-center ">
+                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
+                          <p className='font-semibold'>Skill Level</p>
+                          <div className='flex  gap-2 items-center '>
                             <span>
                               <FiBarChart />
                             </span>
-                            <span className="text-nowrap">
+                            <span className='text-nowrap'>
                               {course.skillLevel}
                             </span>
                           </div>
@@ -201,37 +176,37 @@ export const CourseCard = ({
                 </div>
               </div>
 
-              <div className="mt-5">
+              <div className='mt-5'>
                 {(isCoursesPath || admin) && (
                   <p>
-                    <span className="font-bold">{course.rating}</span>⭐{" "}
+                    <span className='font-bold'>{course.rating}</span>⭐{" "}
                     <span>({course.review})</span>
                   </p>
                 )}
               </div>
-              <div className="flex flex-col lg:flex-row justify-between lg:items-end mt-3">
+              <div className='flex flex-col lg:flex-row justify-between lg:items-end mt-3'>
                 {(isCoursesPath || admin) && (
-                  <div className="flex divide-x divide-[#525252] space-x-2  text-xs">
-                    <span className="px-1">{course.skillLevel}</span>
-                    <span className="px-1">Certificate</span>
-                    <span className="px-1">Physical</span>
+                  <div className='flex divide-x divide-[#525252] space-x-2  text-xs'>
+                    <span className='px-1'>{course.skillLevel}</span>
+                    <span className='px-1'>Certificate</span>
+                    <span className='px-1'>Physical</span>
                   </div>
                 )}
-                <p className="text-[#E02B20] mt-3 hover:underline-offset-4 hover:underline">
+                <p className='text-[#E02B20] mt-3 hover:underline-offset-4 hover:underline'>
                   Learn More →
                 </p>
               </div>
               {admin && (
-                <div className="mt-5 flex justify-between ">
+                <div className='mt-5 flex justify-between '>
                   <button
                     onClick={() => handleEdit(course)}
-                    className="bg-green-600 hover:bg-green-500 duration-300 cursor-pointer text-white rounded-md py-1.5 px-4 w-24"
+                    className='bg-green-600 hover:bg-green-500 duration-300 cursor-pointer text-white rounded-md py-1.5 px-4 w-24'
                   >
                     Edit
                   </button>
                   <button
                     onClick={(event) => handleDelete(course.slug, event)}
-                    className="rounded-md cursor-pointer  bg-[#E02B20] hover:bg-[#e02a20ce] duration-300  text-white py-1.5 px-4 w-24"
+                    className='rounded-md cursor-pointer  bg-[#E02B20] hover:bg-[#e02a20ce] duration-300  text-white py-1.5 px-4 w-24'
                   >
                     Delete
                   </button>
@@ -242,8 +217,8 @@ export const CourseCard = ({
         </div>
       ) : (
         <EmptyState
-          title=" No Course Uploaded yet"
-          message="Check back later"
+          title=' No Course Uploaded yet'
+          message='Check back later'
         />
       )}
     </div>

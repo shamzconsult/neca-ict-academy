@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
+import ReactQueryProvider from "@/components/ReactQueryProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -18,12 +20,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang='en'>
       <body className={poppins.className}>
-       
-         {children}
-        
-        </body>
+        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <Toaster position='top-center' />
+      </body>
     </html>
   );
 }

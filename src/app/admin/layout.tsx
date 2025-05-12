@@ -1,6 +1,5 @@
 "use client";
 
-import { AdminLogo } from "@/components/atom/AdminLogo";
 import { Sidebar } from "@/components/atom/Sidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -35,26 +34,26 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
     }
   }, [router, pathname, status, session]);
 
-  if (authenticated === null) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E02B20]"></div>
-      </div>
-    );
-  }
+  // if (authenticated === null) {
+  //   return (
+  //     <div className='flex items-center justify-center h-screen'>
+  //       <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E02B20]'></div>
+  //     </div>
+  //   );
+  // }
 
   if (PUBLIC_ADMIN_ROUTES.includes(pathname)) {
     return <>{children}</>;
   }
 
   return (
-    <div className="flex flex-col lg:flex-row bg-[#FAFAFA] h-screen overflow-y-auto">
+    <div className='flex flex-col lg:flex-row bg-gray-50 min-h-screen'>
       <Sidebar />
-      <div className="w-full flex-1 h-screen overflow-y-auto">
-        <div className="hidden md:flex justify-end items-end w-full mt-1 mb-5">
+      <div className='w-full flex-1 overflow-y-auto lg:ml-[280px]'>
+        {/* <div className='hidden md:flex justify-end items-center w-full p-4 bg-white shadow-sm'>
           <AdminLogo />
-        </div>
-        <main className="mt-3">{children}</main>
+        </div> */}
+        <main className='p-6'>{children}</main>
       </div>
     </div>
   );

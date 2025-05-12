@@ -1,157 +1,287 @@
 "use client";
 
-import React, { useState } from "react";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import EmptyState from "@/components/atom/EmptyState";
-import { EnrollmentsType } from "@/types";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import {
+  notFound,
+  usePathname,
+  useRouter,
+  useSearchParams,
+  useParams,
+} from "next/navigation";
+import { useDebounce } from "../../../../../../hooks/useDebounce";
+import { useQuery } from "@tanstack/react-query";
+
 import { FaSearch } from "react-icons/fa";
 import { MdOutlineArrowCircleDown } from "react-icons/md";
 
-import { statusOptions } from "@/const";
+import { pdfDownload } from "@/utils/pdf-download";
+
+import { Table, TableBody, TableHead } from "@/components/atom/Table/Table";
+import EmptyState from "@/components/atom/EmptyState";
 import { ApplicantTr } from "./applicant-tr";
+import { Pagination } from "@/components/atom/Pagination";
+import { statusOptions } from "@/const";
 
-export const CohortPreview = ({
-  enrollments,
+import { EnrollmentsType } from "@/types";
+
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+
+const LIMIT = 8;
+
+const TableSkeleton = ({
+  rows = 8,
+  columns = 7,
 }: {
-  enrollments: EnrollmentsType;
-}) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [status, setStatus] = useState("all");
+  rows?: number;
+  columns?: number;
+}) => (
+  <div className='overflow-x-auto'>
+    <table className='w-full table-auto bg-white rounded-b-lg'>
+      <thead>
+        <tr>
+          {Array.from({ length: columns }).map((_, idx) => (
+            <th key={idx} className='p-4 border-gray-200 bg-gray-50'>
+              <div className='h-4 w-24 bg-gray-200 rounded animate-pulse' />
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: rows }).map((_, rowIdx) => (
+          <tr key={rowIdx}>
+            {Array.from({ length: columns }).map((_, colIdx) => (
+              <td key={colIdx} className='p-4 border-t border-gray-100'>
+                <div className='h-4 w-full bg-gray-100 rounded animate-pulse' />
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedStatus = e.target.value;
-    setStatus(selectedStatus);
+const StatsSkeleton = () => (
+  <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6'>
+    {Array.from({ length: 5 }).map((_, i) => (
+      <div
+        key={i}
+        className='p-4 bg-gray-100 rounded shadow animate-pulse h-20'
+      />
+    ))}
+  </div>
+);
+
+interface ApiResponse {
+  success: boolean;
+  cohort: {
+    name: string;
+    slug: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+  };
+  data: EnrollmentsType;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export const CohortPreview = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const slug = params?.slug as string;
+
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") ?? ""
+  );
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const [status, setStatus] = useState(searchParams.get("status") ?? "all");
+
+  // Build query string for API
+  const queryParams = {
+    search: debouncedSearchTerm,
+    status: status !== "all" ? status : "",
+    page: String(page),
+    limit: String(LIMIT),
+  };
+  const queryString = Object.entries(queryParams)
+    .filter((entry) => entry[1])
+    .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
+    .join("&");
+
+  // React Query fetch
+  const { data, isLoading } = useQuery<ApiResponse, Error>({
+    queryKey: ["cohort-applicants", slug, debouncedSearchTerm, status, page],
+    queryFn: async () => {
+      if (!slug) throw new Error("No slug provided");
+      const res = await fetch(`/api/cohort/${slug}/applicants?${queryString}`);
+      if (!res.ok) throw new Error("Network response was not ok");
+      return res.json();
+    },
+    enabled: !!slug,
+  });
+
+  // Fetch stats for this cohort
+  const { data: statsData, isLoading: statsLoading } = useQuery<
+    { stats: Record<string, number> },
+    Error
+  >({
+    queryKey: ["cohort-applicants-stats", slug],
+    queryFn: async () => {
+      if (!slug)
+        return {
+          stats: {
+            total: 0,
+            admitted: 0,
+            pending: 0,
+            declined: 0,
+            graduated: 0,
+          },
+        };
+      const res = await fetch(`/api/cohort/${slug}/applicants/stats`);
+      if (!res.ok) throw new Error("Failed to fetch stats");
+      return res.json();
+    },
+    enabled: !!slug,
+  });
+
+  // Update router for deep-linking
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearchTerm) params.set("search", debouncedSearchTerm);
+    if (status && status !== "all") params.set("status", status);
+    if (page > 1) params.set("page", String(page));
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [debouncedSearchTerm, status, page, pathname, router]);
+
+  const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setPage(1);
   };
 
-  const cohort = enrollments[0]?.cohort;
-  let filteredEnrollment = enrollments || [];
-
-  const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-
-    doc.setFontSize(16);
-    doc.text(`${cohort.name} - Applicants List`, 14, 15);
-    doc.setFontSize(12);
-
-    const tableData = filteredEnrollment.map(
-      ({ level, course, applicant, createdAt }) => [
-        `${applicant.firstName} ${applicant.lastName}\n${applicant.email}`,
-        applicant.state,
-        course.title,
-        level,
-        status,
-        new Date(createdAt).toDateString(),
-      ]
-    );
-
-    autoTable(doc, {
-      head: [["Applicants", "Location", "Course", "Level", "Status", "Date"]],
-      body: tableData,
-      startY: 25,
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [33, 33, 33],
-        textColor: [255, 255, 255],
-        fontStyle: "bold",
-      },
-      columnStyles: {
-        0: { cellWidth: 50 },
-        1: { cellWidth: 30 },
-        2: { cellWidth: 25 },
-        3: { cellWidth: 25 },
-        4: { cellWidth: 35 },
-        5: { cellWidth: 25 },
-      },
-    });
-
-    doc.save(`${cohort.name}-applicants.pdf`);
-  };
-
-  if (!cohort) {
-    return (
-      <div className=" h-screen mt2 flex flex-col justify-center items-center">
-        <h1 className="text-center font-bold  ">Cohort not found</h1>
-        <Link
-          className="text-sm text-slate-400 hover:underline cursor-pointer"
-          href="/admin/cohorts"
-        >
-          Click here to check other Cohort
-        </Link>
-      </div>
-    );
+  if (!isLoading && (!data || !slug)) {
+    notFound();
   }
 
-  if (searchTerm) {
-    filteredEnrollment = filteredEnrollment.filter(({ applicant }) => {
-      return (
-        applicant.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.state?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        applicant.status?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    });
-  }
+  const cohortName = data?.cohort?.name;
+  const filteredEnrollments = data?.data || [];
+  const totalPages = data?.pagination?.totalPages || 1;
 
-  if (status !== "all") {
-    filteredEnrollment = filteredEnrollment.filter(
-      ({ applicant }) => applicant.status === status
-    );
-  }
+  const showSkeleton = isLoading;
+  const showTable = !isLoading && filteredEnrollments.length > 0;
+  const showEmptyState = !isLoading && filteredEnrollments.length === 0;
 
   return (
-    <div className="p-6">
-      <h1 className="md:text-[20px] font-semibold mb-6 p-3 bg-white w-full">
-        {cohort.name}
-      </h1>
-      {enrollments && enrollments.length > 0 ? (
-        <section className="border border-[#C4C4C4] w-full">
-          <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full">
-            <div className="relative w-full md:w-[70%]">
-              <FaSearch className="absolute left-3 top-3 " />
-
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border w-full border-[#C4C4C4] rounded-md focus:outline-none focus:ring-none focus:border-gray-400"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <select
-                value={status}
-                onChange={handleStatusChange}
-                className="flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md"
-              >
-                <option value="all">All Status</option>
-                {statusOptions.map((status, index) => (
-                  <option value={status} key={index}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                className="flex items-center gap-2 px-4 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md"
-                onClick={handleDownloadPDF}
-              >
-                <MdOutlineArrowCircleDown />
-                Download Data
-              </button>
+    <div className='p-6'>
+      <div className='sticky top-0 z-10 bg-gray-50 pb-4 mb-4'>
+        <h1 className='text-2xl font-bold text-gray-800 mb-2 p-4 bg-white rounded-lg shadow-sm border border-gray-200'>
+          {isLoading ? (
+            <div className='h-8 w-64 bg-gray-100 rounded animate-pulse' />
+          ) : (
+            cohortName
+          )}
+        </h1>
+      </div>
+      {/* Stats Bar */}
+      {statsLoading ? (
+        <StatsSkeleton />
+      ) : statsData && statsData.stats ? (
+        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6'>
+          <div className='p-4 bg-white rounded shadow border text-center'>
+            <div className='text-xs text-gray-500 mb-1'>Total</div>
+            <div className='text-2xl font-bold text-gray-800'>
+              {statsData.stats.total}
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto bg-white">
-              <thead>
-                <tr>
+          <div className='p-4 bg-white rounded shadow border text-center'>
+            <div className='text-xs text-gray-500 mb-1'>Admitted</div>
+            <div className='text-2xl font-bold text-green-600'>
+              {statsData.stats.admitted}
+            </div>
+          </div>
+          <div className='p-4 bg-white rounded shadow border text-center'>
+            <div className='text-xs text-gray-500 mb-1'>Pending</div>
+            <div className='text-2xl font-bold text-yellow-500'>
+              {statsData.stats.pending}
+            </div>
+          </div>
+          <div className='p-4 bg-white rounded shadow border text-center'>
+            <div className='text-xs text-gray-500 mb-1'>Declined</div>
+            <div className='text-2xl font-bold text-red-500'>
+              {statsData.stats.declined}
+            </div>
+          </div>
+          <div className='p-4 bg-white rounded shadow border text-center'>
+            <div className='text-xs text-gray-500 mb-1'>Graduated</div>
+            <div className='text-2xl font-bold text-blue-600'>
+              {statsData.stats.graduated}
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <section className='border border-gray-200 rounded-lg bg-white shadow-sm w-full'>
+        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50 rounded-t-lg'>
+          <div className='relative w-full md:w-[70%]'>
+            <FaSearch className='absolute left-3 top-3 text-gray-400' />
+            <input
+              type='text'
+              placeholder='Search applicants...'
+              value={searchTerm}
+              onChange={handleSearchTerm}
+              className='pl-10 pr-4 py-2 border w-full border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white'
+            />
+          </div>
+          <div className='flex gap-2'>
+            <Select
+              value={status}
+              onValueChange={(value) => {
+                setStatus(value);
+                setPage(1);
+              }}
+              disabled={isLoading}
+            >
+              <SelectTrigger className='min-w-[120px]'>
+                <SelectValue placeholder='All Status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Status</SelectItem>
+                {statusOptions.map((status, index) => (
+                  <SelectItem value={status} key={index} className='capitalize'>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              className='border text-nowrap border-gray-200 cursor-pointer rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+              onClick={() => pdfDownload(cohortName || "", filteredEnrollments)}
+              disabled={isLoading || filteredEnrollments.length === 0}
+            >
+              <MdOutlineArrowCircleDown />
+              Download Data
+            </Button>
+          </div>
+        </div>
+        {showTable && (
+          <div className='overflow-x-auto'>
+            <Table className='w-full table-auto bg-white rounded-lg overflow-hidden'>
+              <TableHead>
+                <tr className='border-b border-gray-200 bg-gray-50'>
                   {[
                     "Applicants",
                     "Location",
@@ -163,47 +293,50 @@ export const CohortPreview = ({
                   ].map((header) => (
                     <th
                       key={header}
-                      className="p-4 border-t border-[#C4C4C4] text-left font-medium"
+                      className='p-4 text-left font-semibold text-gray-700'
                     >
                       {header}
                     </th>
                   ))}
                 </tr>
-              </thead>
-              <tbody>
-                {filteredEnrollment.length > 0 ? (
-                  filteredEnrollment.map((enrollment) => (
+              </TableHead>
+              <TableBody>
+                {filteredEnrollments.length > 0 &&
+                  filteredEnrollments.map((enrollment) => (
                     <ApplicantTr key={enrollment._id} enrollment={enrollment} />
-                  ))
-                ) : (
-                  <tr className="border-t border-[#C4C4C4]">
-                    <td colSpan={7}>
-                      <div className="text-center font-bold py-24">
-                        No results found for{" "}
-                        {searchTerm && (
-                          <span className="text-red-500">
-                            &#34;{searchTerm}&#34;
-                          </span>
-                        )}
-                        {status !== "all" && (
-                          <span className="text-red-500">
-                            {searchTerm ? " and " : ""}status &#34;{status}&#34;
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  ))}
+              </TableBody>
+            </Table>
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            )}
           </div>
-        </section>
-      ) : (
-        <EmptyState
-          title="No applicants found in this cohort"
-          message="Check back later"
-        />
-      )}
+        )}
+        {showSkeleton && <TableSkeleton />}
+        {showEmptyState && (
+          <EmptyState
+            title={
+              searchTerm && status !== "all"
+                ? "No record found"
+                : `No applicants yet in "${cohortName}"`
+            }
+            message={
+              searchTerm && status !== "all"
+                ? `No applicants match the search "${searchTerm}" and status "${status}"`
+                : searchTerm
+                  ? `No applicants match the search "${searchTerm}"`
+                  : status !== "all"
+                    ? `No applicants with status "${status}"`
+                    : "Applicants will appear here when they register for this cohort"
+            }
+            size='lg'
+          />
+        )}
+      </section>
     </div>
   );
 };

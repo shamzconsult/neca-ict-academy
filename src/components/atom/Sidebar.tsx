@@ -17,105 +17,105 @@ export const Sidebar = () => {
   const isActive = (path: string) => pathname === path;
 
   return (
-    <div className="relative">
-      <div className="flex justify-between items-center">
+    <div className='relative'>
+      <div className='flex justify-between items-center p-4 bg-white shadow-sm'>
         <button
-          className="lg:hidden  focus:outline-none"
+          className='lg:hidden focus:outline-none'
           onClick={() => setIsOpen(true)}
         >
           <FiMenu size={24} />
         </button>
 
-        <div className="py-1 flex md:hidden">
+        <div className='py-1 flex md:hidden'>
           <AdminLogo />
         </div>
       </div>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 bg-opacity-50 z-40"
+          className='fixed inset-0 bg-black/60 bg-opacity-50 z-40'
           onClick={() => setIsOpen(false)}
         ></div>
       )}
 
       <div
-        className={`fixed lg:sticky top-0 left-0 w-[280px] h-screen bg-white flex flex-col justify-between border-r border-[#C4C4C4] transition-transform duration-300 z-50 ${
+        className={`fixed top-0 left-0 w-[280px] h-screen bg-white flex flex-col justify-between border-r border-gray-200 transition-transform duration-300 z-50 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0`}
       >
         <div>
           <button
-            className="lg:hidden p-4 flex justify-end w-full"
+            className='lg:hidden p-4 flex justify-end w-full'
             onClick={() => setIsOpen(false)}
           >
             <FiX size={24} />
           </button>
-          <div className="w-[150px] h-[60px] lg:w-[222px] lg:h-[66px] relative m-4">
+          <div className='w-[150px] h-[60px] lg:w-[222px] lg:h-[66px] relative m-4'>
             <Image
-              src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1744035920/logo_qrd6my.png"
-              alt="Neca-logo"
+              src='https://res.cloudinary.com/dcgghkk7q/image/upload/v1744035920/logo_qrd6my.png'
+              alt='Neca-logo'
               fill
             />
           </div>
 
-          <nav className="mt-10">
+          <nav className='mt-10'>
             <Link
-              href="/admin/dashboard"
+              href='/admin/dashboard'
               onClick={() => setIsOpen(false)}
               className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/dashboard")
-                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
-                  : " hover:text-[#27156F]"
+                  ? "text-blue-600 border-b-2 w-fit border-blue-600"
+                  : " hover:text-blue-600"
               }`}
             >
-              <ChartPieIcon size={20} className="mr-3" />
+              <ChartPieIcon size={20} className='mr-3' />
               Dashboard
             </Link>
 
             <Link
-              href="/admin/cohorts"
+              href='/admin/cohorts'
               onClick={() => setIsOpen(false)}
               className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/cohorts")
-                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
-                  : " hover:text-[#27156F]"
+                  ? "text-blue-600 border-b-2 w-fit border-blue-600"
+                  : " hover:text-blue-600"
               }`}
             >
-              <SquareLibrary size={20} className="mr-3" />
+              <SquareLibrary size={20} className='mr-3' />
               Cohorts
             </Link>
             <Link
-              href="/admin/courses"
+              href='/admin/courses'
               onClick={() => setIsOpen(false)}
               className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/courses")
-                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
-                  : " hover:text-[#27156F]"
+                  ? "text-blue-600 border-b-2 w-fit border-blue-600"
+                  : " hover:text-blue-600"
               }`}
             >
-              <BookOpen size={20} className="mr-3" />
+              <BookOpen size={20} className='mr-3' />
               Courses
             </Link>
             <Link
-              href="#"
+              href='/admin/applicants'
               onClick={() => setIsOpen(false)}
               className={`flex items-center px-3 py-3 text-sm font-medium mx-1 ${
                 isActive("/admin/applicants")
-                  ? "text-[#27156F] border-b-2 w-fit border-[#27156F]"
-                  : " hover:text-[#27156F]"
+                  ? "text-blue-600 border-b-2 w-fit border-blue-600"
+                  : " hover:text-blue-600"
               }`}
             >
-              <UserCog size={20} className="mr-3" />
+              <UserCog size={20} className='mr-3' />
               Applicants
             </Link>
           </nav>
         </div>
 
-        <div className="mb-6">
+        <div className='mb-6'>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center px-6 py-3 text-sm text-[#E02B20] hover:text-red-800 w-full cursor-pointer"
+            className='flex items-center px-6 py-3 text-sm text-red-600 hover:text-red-800 w-full cursor-pointer'
           >
-            <FiLogOut size={20} className="mr-3" />
+            <FiLogOut size={20} className='mr-3' />
             Logout
           </button>
         </div>

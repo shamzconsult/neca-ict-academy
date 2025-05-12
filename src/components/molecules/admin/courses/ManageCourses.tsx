@@ -9,6 +9,7 @@ import { HiOutlinePlusCircle } from "react-icons/hi";
 export type CourseOutline = {
   header: string;
   lists: string[];
+  currentInput?: string;
 };
 
 export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
@@ -38,12 +39,12 @@ export const ManageCourses = ({ courses }: { courses: CourseType[] }) => {
     setShowModal(!showModal);
   };
   return (
-    <div className="px-4 space-y-8 w-full pb-10">
-      <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4">
-        <h1 className="md:text-[20px] font-medium">Course Overview</h1>
+    <div className='px-4 space-y-8 w-full pb-10'>
+      <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4'>
+        <h1 className='md:text-[20px] font-medium'>Course Overview</h1>
         <button
           onClick={toggleModal}
-          className="bg-[#E02B20] text-nowrap flex items-center gap-1 text-white px-6 py-2.5 rounded-md cursor-pointer"
+          className='bg-[#E02B20] text-nowrap flex items-center gap-1 text-white px-6 py-2.5 rounded-md cursor-pointer max-md:self-start'
         >
           <HiOutlinePlusCircle /> Add New Course
         </button>

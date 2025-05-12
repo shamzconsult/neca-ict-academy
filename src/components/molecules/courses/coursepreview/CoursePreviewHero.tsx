@@ -5,12 +5,12 @@ import { CourseType } from "@/types";
 import React from "react";
 
 export const CoursePreviewHero = ({
-  courseData: { title, coverImage },
+  courseData: { _id, title, coverImage },
 }: {
   courseData: CourseType;
 }) => {
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto px-4">
       <section className="flex flex-col lg:justify-between w-full items-center lg:flex-row gap-8 pt-44 px-4 lg:px-0">
         <div className="flex flex-col gap-6 justify-center text-center lg:text-left max-w-2xl lg:max-w-1/2">
           <Heading>{`Learn ${title} & build real-world applications.`}</Heading>
@@ -19,14 +19,14 @@ export const CoursePreviewHero = ({
             creating real-world solutions from concept to completion.
           </p>
           <div className="mt-4">
-            <EnrollBtn />
+            <EnrollBtn courseId={_id} />
           </div>
         </div>
         <div className="bg-white p-3 flex justify-center items-center rounded-xl">
           <img
             src={coverImage}
             alt="hero-image"
-            className="rounded-xl h-[300px] md:h-[400px] md:w-[582px]"
+            className="rounded-xl h-[300px] md:h-[400px] md:w-[582px] object-cover"
           />
         </div>
       </section>

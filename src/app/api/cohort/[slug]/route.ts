@@ -55,6 +55,23 @@ export const PUT = async (req: Request) => {
     const applicationEndDate = formData.get("applicationEndDate") as string;
     const active = formData.get("active") === "true";
 
+    if (active) {
+      const activeCohort = await Cohort.findOne({ 
+        active: true, 
+        slug: { $ne: slug }
+      });
+      
+      if (activeCohort) {
+        return NextResponse.json(
+          { 
+            message: `Cannot activate this cohort. ${activeCohort.name} is already active.`,
+            activeCohort
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     if (
       !name ||
       !startDate ||

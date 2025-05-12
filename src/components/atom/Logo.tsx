@@ -7,7 +7,7 @@ export const Logo = () => (
   <Link href="/" className="text-xl font-medium">
     <div className="w-[200px]  h-[50px] lg:w-[220px] lg:h-[73px] relative ">
       <Image
-        src="https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png"
+        src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746617205/WhatsApp_Image_2025-03-20_at_22_t7myt8.png"
         alt="Neca-logo"
         fill
       />
