@@ -146,6 +146,7 @@ const ApplicationPortal = ({ cohorts, courses }: { cohorts: ApplicationFormProps
     if (emailRegex.test(email)) {
       startTransition(async () => {
         try {
+          setShowReview(false);
           const res = await fetch(`/api/applicant/status/${email}`);
           if (res.status === 404) {
             setStatusError('No application found for this email.');
@@ -166,7 +167,6 @@ const ApplicationPortal = ({ cohorts, courses }: { cohorts: ApplicationFormProps
           setStatusError('An unexpected error occurred. Please try again.');
           setApplicantStatus(null);
           console.error('error:', error);
-          setShowReview(true);
         }
       });
       setEmail('');
