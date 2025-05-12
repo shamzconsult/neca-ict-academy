@@ -1,12 +1,11 @@
-import connectViaMongoose from "@/lib/db";
-import { Applicant } from "@/models/applicant";
-import { Enrollment } from "@/models/enrollment";
-import mongoose, { Types } from "mongoose";
-import { FilterQuery } from "mongoose";
-import { NextResponse } from "next/server";
-import Course from "@/models/course";
-import Cohort from "@/models/cohort";
-
+import connectViaMongoose from '@/lib/db';
+import { Applicant } from '@/models/applicant';
+import { Enrollment } from '@/models/enrollment';
+import mongoose, { Types } from 'mongoose';
+import { FilterQuery } from 'mongoose';
+import { NextResponse } from 'next/server';
+import Course from '@/models/course';
+import Cohort from '@/models/cohort';
 
 interface IApplicant {
   _id: Types.ObjectId;
@@ -38,7 +37,6 @@ interface ICohort {
   endDate: Date;
 }
 
-
 interface IEnrollment {
   _id: Types.ObjectId;
   applicant: Types.ObjectId | IApplicant;
@@ -53,7 +51,6 @@ interface IEnrollment {
   createdAt: Date;
   updatedAt: Date;
 }
-
 
 interface IApplicantQuery extends FilterQuery<IApplicant> {
   $or?: Array<{
@@ -90,13 +87,13 @@ export async function GET(request: Request) {
   try {
     await connectViaMongoose();
 
-     if (!mongoose.models.Course) {
-      mongoose.model("Course", Course.schema);
+    if (!mongoose.models.Course) {
+      mongoose.model('Course', Course.schema);
     }
     if (!mongoose.models.Cohort) {
-      mongoose.model("Cohort", Cohort.schema);
+      mongoose.model('Cohort', Cohort.schema);
     }
-    
+
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -114,7 +111,7 @@ export async function GET(request: Request) {
         { firstName: { $regex: searchQuery, $options: 'i' } },
         { lastName: { $regex: searchQuery, $options: 'i' } },
         { email: { $regex: searchQuery, $options: 'i' } },
-        { phoneNumber: { $regex: searchQuery, $options: 'i' } }
+        { phoneNumber: { $regex: searchQuery, $options: 'i' } },
       ];
     }
 
@@ -125,28 +122,24 @@ export async function GET(request: Request) {
       .limit(limit)
       .lean<IApplicant[]>();
 
-
     const applicantIds = applicants.map(app => app._id);
-    
-    
-    const enrollmentQuery: IEnrollmentQuery = { 
-      applicant: { $in: applicantIds } 
+
+    const enrollmentQuery: IEnrollmentQuery = {
+      applicant: { $in: applicantIds },
     };
     if (statusFilter) enrollmentQuery.status = statusFilter;
     if (cohortFilter) enrollmentQuery.cohort = new Types.ObjectId(cohortFilter);
     if (levelFilter) enrollmentQuery.level = levelFilter;
 
     const enrollments = await Enrollment.find(enrollmentQuery)
-    .populate<{ course: ICourse }>('course', 'title')
+      .populate<{ course: ICourse }>('course', 'title')
       .populate<{ cohort: ICohort }>('cohort', 'name')
       .sort({ createdAt: -1 })
       .lean<IEnrollment[]>();
 
     const enrichedApplicants: IApplicantResponse[] = applicants.map(applicant => {
       const applicantEnrollments = enrollments.filter(enr => {
-        const enrollmentApplicantId = enr.applicant instanceof Types.ObjectId 
-          ? enr.applicant 
-          : enr.applicant._id;
+        const enrollmentApplicantId = enr.applicant instanceof Types.ObjectId ? enr.applicant : enr.applicant._id;
         return enrollmentApplicantId.equals(applicant._id);
       });
 
@@ -156,13 +149,9 @@ export async function GET(request: Request) {
         ...applicant,
         status: latestEnrollment?.status || 'Not enrolled',
         level: latestEnrollment?.level || 'Not enrolled',
-         course: latestEnrollment?.course && 'title' in latestEnrollment.course 
-          ? latestEnrollment.course.title 
-          : 'No course',
-        cohort: latestEnrollment?.cohort && 'name' in latestEnrollment.cohort
-          ? latestEnrollment.cohort.name
-          : 'No cohort',
-        enrollmentId: latestEnrollment?._id
+        course: latestEnrollment?.course && 'title' in latestEnrollment.course ? latestEnrollment.course.title : 'No course',
+        cohort: latestEnrollment?.cohort && 'name' in latestEnrollment.cohort ? latestEnrollment.cohort.name : 'No cohort',
+        enrollmentId: latestEnrollment?._id,
       };
     });
 
@@ -174,8 +163,8 @@ export async function GET(request: Request) {
       filteredApplicants = filteredApplicants.filter(app => app.level.toLowerCase() === levelFilter.toLowerCase());
     }
     if (cohortFilter) {
-      filteredApplicants = filteredApplicants.filter(app => 
-        app.cohort === cohortFilter || app.cohort === new Types.ObjectId(cohortFilter).toString()
+      filteredApplicants = filteredApplicants.filter(
+        app => app.cohort === cohortFilter || app.cohort === new Types.ObjectId(cohortFilter).toString()
       );
     }
     // if (levelFilter) {
@@ -189,18 +178,18 @@ export async function GET(request: Request) {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit)
-      }
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-  console.error('Error fetching applicants:', error);
-  return NextResponse.json(
-    { 
-      success: false, 
-      message: "Error fetching applicants",
-      error: error instanceof Error ? error.message : String(error)
-    },
-    { status: 500 }
-  );
-}
+    console.error('Error fetching applicants:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Error fetching applicants',
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
 }

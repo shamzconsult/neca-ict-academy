@@ -9,12 +9,22 @@ export type CourseOutline = {
 
 export type EnrollmentType = {
   _id: string;
-  course: CourseType;
+  course: string;
+  firstName: string;
+  lastName: string;
   applicant: ApplicantDetail;
   cohort: CohortType;
   level: ApplicationLevel;
+  email: string;
   status: ApplicationStatus;
   createdAt: string;
+  phoneNumber: string;
+  gender: Gender;
+  state: string;
+  profilePicture: {
+    url: string;
+    public_id: string;
+  };
   cv: {
     url: string;
     public_id: string;
