@@ -217,13 +217,9 @@ export const CourseCard = ({
                     <span className="px-1">Physical</span>
                   </div>
                 )}
-                <Link
-                  href={`/courses/${course.slug}`}
-                  target="_blank"
-                  className="text-[#E02B20]  mt-3 inline-flex items-center hover:underline-offset-4 hover:underline"
-                >
-                  Learn More <span className="ml-2">→</span>
-                </Link>
+                <p className="text-[#E02B20] mt-3 hover:underline-offset-4 hover:underline">
+                  Learn More →
+                </p>
               </div>
               {admin && (
                 <div className="mt-5 flex justify-between ">
