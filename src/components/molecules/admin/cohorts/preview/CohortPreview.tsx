@@ -39,8 +39,6 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
   const createQueryString = useCallback(
     (updates: Record<string, string>) => {
       const params = new URLSearchParams(searchParams.toString());
-      console.log(Object.entries(updates));
-      console.log('params', params, updates);
       Object.entries(updates).forEach(([name, value]) => {
         if (value) {
           params.set(name, value);
@@ -72,6 +70,7 @@ export const CohortPreview = ({ enrollments }: { enrollments: EnrollmentsType })
 
         setFilteredEnrollments(data.data);
         setTotalPages(data.pagination.totalPages);
+        console.log('data:', data.data);
 
         setLoading(false);
 

@@ -37,7 +37,6 @@ const ApplicantPreviewForm = () => {
       Object.entries(updates).forEach(([name, value]) => {
         if (value) {
           params.set(name, value);
-          console.log('here', params.toString());
         } else params.delete(name);
       });
 
