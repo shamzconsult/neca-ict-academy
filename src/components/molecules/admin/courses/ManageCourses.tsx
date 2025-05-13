@@ -17,8 +17,11 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useDebounce } from "@/hooks/useDebounce";
-import { ExternalLink, X } from "lucide-react";
+import { ExternalLink, PanelLeft, X } from "lucide-react";
 import Link from "next/link";
+import { Separator } from "@/components/ui/separator";
+import { useSidebar } from "@/app/admin/layout";
+import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 export type CourseOutline = {
   header: string;
@@ -112,22 +115,24 @@ export const ManageCourses = () => {
     refetchOnMount: "always",
   });
 
+  const { sidebarCollapsed, toggleSidebar } = useSidebar();
+
   const toggleModal = () => {
     setShowModal(!showModal);
   };
 
   return (
     <>
-      <div className='bg-white min-h-[95dvh] shadow-lg rounded-xl p-6'>
-        <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center mb-10'>
-          <h1 className='text-2xl font-bold text-gray-800'>Course Overview</h1>
-          <div className='flex gap-3'>
+      <AdminSectionHeader
+        title='Course Overview'
+        cta={
+          <>
             <Button
               onClick={toggleModal}
               className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
             >
               <HiOutlinePlusCircle /> Add New Course
-            </Button>{" "}
+            </Button>
             <Button
               variant='outline'
               asChild
@@ -138,71 +143,71 @@ export const ManageCourses = () => {
                 Go to Courses Page
               </Link>
             </Button>
-          </div>
+          </>
+        }
+      />
+      {/* Filter & Sort Controls */}
+      <div className='flex gap-4 mb-6'>
+        <div className='relative w-full'>
+          <Input
+            placeholder='Search course title...'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className='pr-8'
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
+            >
+              <X className='h-4 w-4' />
+            </button>
+          )}
         </div>
-        {/* Filter & Sort Controls */}
-        <div className='flex gap-4 mb-6'>
-          <div className='relative w-full'>
-            <Input
-              placeholder='Search course title...'
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className='pr-8'
-            />
-            {search && (
-              <button
-                onClick={() => setSearch("")}
-                className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
-              >
-                <X className='h-4 w-4' />
-              </button>
-            )}
-          </div>
-          <div className='flex justify-between gap-4'>
-            <Select value={skillLevel} onValueChange={setSkillLevel}>
-              <SelectTrigger className='w-40'>
-                <SelectValue placeholder='Skill Level' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All</SelectItem>
-                <SelectItem value='Beginner'>Beginner</SelectItem>
-                <SelectItem value='Intermediate'>Intermediate</SelectItem>
-                <SelectItem value='Advanced'>Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={order} onValueChange={setOrder}>
-              <SelectTrigger className='w-40'>
-                <SelectValue placeholder='Order' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='desc'>Newest First</SelectItem>
-                <SelectItem value='asc'>Oldest First</SelectItem>
-              </SelectContent>
-            </Select>
-            {/* Date range picker: two DatePickers for start and end */}
-            <DatePicker
-              value={dateRange.start}
-              onChange={(date) => setDateRange((r) => ({ ...r, start: date }))}
-              placeholder='Start Date'
-              className='w-40'
-            />
-            <DatePicker
-              value={dateRange.end}
-              onChange={(date) => setDateRange((r) => ({ ...r, end: date }))}
-              placeholder='End Date'
-              className='w-40'
-            />
-          </div>
+        <div className='flex justify-between gap-4'>
+          <Select value={skillLevel} onValueChange={setSkillLevel}>
+            <SelectTrigger className='w-40'>
+              <SelectValue placeholder='Skill Level' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All</SelectItem>
+              <SelectItem value='Beginner'>Beginner</SelectItem>
+              <SelectItem value='Intermediate'>Intermediate</SelectItem>
+              <SelectItem value='Advanced'>Advanced</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={order} onValueChange={setOrder}>
+            <SelectTrigger className='w-40'>
+              <SelectValue placeholder='Order' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='desc'>Newest First</SelectItem>
+              <SelectItem value='asc'>Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
+          {/* Date range picker: two DatePickers for start and end */}
+          <DatePicker
+            value={dateRange.start}
+            onChange={(date) => setDateRange((r) => ({ ...r, start: date }))}
+            placeholder='Start Date'
+            className='w-40'
+          />
+          <DatePicker
+            value={dateRange.end}
+            onChange={(date) => setDateRange((r) => ({ ...r, end: date }))}
+            placeholder='End Date'
+            className='w-40'
+          />
         </div>
-        <hr className='border-gray-200 mb-4' />
-        <CourseCard
-          courses={courses}
-          setShowModal={setShowModal}
-          setCourseToEdit={setCourseToEdit}
-          setFormData={setFormData}
-          loading={isLoading}
-        />
       </div>
+      <hr className='border-gray-200 mb-4' />
+      <CourseCard
+        courses={courses}
+        setShowModal={setShowModal}
+        setCourseToEdit={setCourseToEdit}
+        setFormData={setFormData}
+        loading={isLoading}
+      />
       {showModal && (
         <AddNewCourse
           open={showModal}

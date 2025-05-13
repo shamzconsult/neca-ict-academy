@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 const LIMIT = 8;
 
@@ -188,15 +189,13 @@ export const CohortPreview = () => {
 
   return (
     <>
-      <div className='sticky top-0 z-10 bg-gray-50'>
-        <h1 className='text-2xl font-bold text-gray-800 mb-2 p-4 bg-white rounded-lg shadow-sm border border-gray-200'>
-          {isLoading ? (
+      <AdminSectionHeader
+        title={
+          cohortName || (
             <div className='h-8 w-64 bg-gray-100 rounded animate-pulse' />
-          ) : (
-            cohortName
-          )}
-        </h1>
-      </div>
+          )
+        }
+      />
       {/* Stats Bar */}
       {statsLoading ? (
         <StatsSkeleton />

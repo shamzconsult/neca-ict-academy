@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
@@ -93,10 +94,10 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   };
   return (
     <>
-      <div className='bg-white shadow-lg rounded-xl p-6'>
-        <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center mb-4'>
-          <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
-          <div className='flex gap-3'>
+      <AdminSectionHeader
+        title='Cohort Overview'
+        cta={
+          <>
             <Button
               onClick={checkAllCohortStatus}
               className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
@@ -114,29 +115,29 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
                 Go to Enroll Portal
               </Link>
             </Button>
-          </div>
-        </div>
-        <hr className='border-gray-200 mb-4' />
-        {cohortsData?.length > 0 ? (
-          <div className='overflow-x-auto border border-[#C4C4C4] rounded-lg'>
-            <CohortTable
-              tableHead={cohortTableHead}
-              handleDelete={handleDelete}
-              handleEdit={handleEdit}
-              handleRowClick={handleRowClick}
-              tableData={cohortsData}
-              action={true}
-              isEditToggle={isEditToggle}
-              handleEditToggle={handleEditToggle}
-            />
-          </div>
-        ) : (
-          <EmptyState
-            title='No Cohort Created yet'
-            message='Click on the create Cohort button to start'
+          </>
+        }
+      />
+      <hr className='border-gray-200 mb-4' />
+      {cohortsData?.length > 0 ? (
+        <div className='overflow-x-auto border border-[#C4C4C4] rounded-lg'>
+          <CohortTable
+            tableHead={cohortTableHead}
+            handleDelete={handleDelete}
+            handleEdit={handleEdit}
+            handleRowClick={handleRowClick}
+            tableData={cohortsData}
+            action={true}
+            isEditToggle={isEditToggle}
+            handleEditToggle={handleEditToggle}
           />
-        )}
-      </div>
+        </div>
+      ) : (
+        <EmptyState
+          title='No Cohort Created yet'
+          message='Click on the create Cohort button to start'
+        />
+      )}
       {showModal && (
         <CohortForm
           toggleModal={toggleModal}

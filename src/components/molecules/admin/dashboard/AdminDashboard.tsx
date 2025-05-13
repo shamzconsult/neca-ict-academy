@@ -10,9 +10,9 @@ import Link from "next/link";
 import EmptyState from "@/components/atom/EmptyState";
 import CohortTable from "@/components/atom/Table/CohortTable";
 import { adminCohortTableHead } from "@/const";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
+import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 interface DashboardStat {
   name: string;
@@ -78,29 +78,30 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   };
 
   return (
-    <div className='p-6 bg-gray-50 min-h-screen'>
-      {/* Header with title and create button */}
-      <header className='flex justify-between items-center mb-8'>
-        <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
-        <div className='flex gap-3'>
-          <Button
-            onClick={checkAllCohortStatus}
-            className='flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors'
-          >
-            <HiOutlinePlusCircle /> Create Cohort
-          </Button>
-          <Button
-            variant='outline'
-            asChild
-            className='flex items-center gap-2 transition-colors'
-          >
-            <Link href='/enroll' target='_blank'>
-              <ExternalLink />
-              Go to Enroll Portal
-            </Link>
-          </Button>
-        </div>
-      </header>
+    <>
+      <AdminSectionHeader
+        title='Overview'
+        cta={
+          <>
+            <Button
+              onClick={checkAllCohortStatus}
+              className='flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors'
+            >
+              <HiOutlinePlusCircle /> Create Cohort
+            </Button>
+            <Button
+              variant='outline'
+              asChild
+              className='flex items-center gap-2 transition-colors'
+            >
+              <Link href='/enroll' target='_blank'>
+                <ExternalLink />
+                Go to Enroll Portal
+              </Link>
+            </Button>
+          </>
+        }
+      />
 
       {/* Stats cards */}
       {isLoading ? (
@@ -153,6 +154,6 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
           cohortsData={localCohorts}
         />
       )}
-    </div>
+    </>
   );
 };

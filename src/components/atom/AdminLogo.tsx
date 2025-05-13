@@ -1,16 +1,12 @@
 "use client";
 
-import Image from "next/image";
+import { NECA_ICT_ACADEMY_LOGO } from "@/const";
 import React from "react";
 
 export const AdminLogo = () => {
   return (
-    <div className="w-[150px] h-[60px] lg:w-[222px] lg:h-[66px] relative m-4">
-      <Image
-        src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1744035920/logo_qrd6my.png"
-        alt="Neca-logo"
-        fill
-      />
+    <div className='relative m-4'>
+      <img src={NECA_ICT_ACADEMY_LOGO} alt='Neca ict academy logo' />
     </div>
   );
 };
