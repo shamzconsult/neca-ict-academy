@@ -1,3 +1,5 @@
+import { ApplicationLevel, ApplicationStatus, Gender } from '@/const';
+
 type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
 
 export type CourseOutline = {
@@ -5,14 +7,48 @@ export type CourseOutline = {
   lists: string[];
 };
 
-export type ApplicantDetail = {
-  applicantName: string;
-  applicantEmail: string;
+export type EnrollmentType = {
+  _id: string;
   course: string;
-  level: number;
-  location: string;
-  date: string;
+  firstName: string;
+  lastName: string;
+  applicant: ApplicantDetail;
+  cohort: CohortType;
+  level: ApplicationLevel;
+  email: string;
+  status: ApplicationStatus;
+  createdAt: string;
+  phoneNumber: string;
+  gender: Gender;
+  state: string;
+  profilePicture: {
+    url: string;
+    public_id: string;
+  };
+  cv: {
+    url: string;
+    public_id: string;
+  };
+};
+
+export type EnrollmentsType = EnrollmentType[];
+
+export type ApplicantDetail = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  course: string;
+  level: string;
+  state: string;
   status: Status;
+  createdAt: string;
+  phoneNumber: string;
+  gender: Gender;
+  profilePicture: {
+    url: string;
+    public_id: string;
+  };
 };
 
 export type CohortType = {
@@ -22,13 +58,13 @@ export type CohortType = {
   _id: number;
   slug: string;
   name: string;
-  applicants: string;
-  admitted: string;
-  graduated: string;
-  declined: string;
+  active: boolean;
+  admitted: number;
+  graduated: number;
+  declined: number;
+  applicantCount: number;
   startDate: string;
   endDate: string;
-  applicantDetails: ApplicantDetail[];
 };
 
 export type CohortsProps = {
@@ -58,6 +94,7 @@ export type Courses = {
 };
 
 export type CourseType = {
+  _id: string;
   courseOutlines: CourseOutline[];
   duration: string;
   skillLevel: string;

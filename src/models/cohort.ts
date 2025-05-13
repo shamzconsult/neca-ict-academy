@@ -1,11 +1,11 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 
 const generateSlug = (text: string): string => {
   return text
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 };
 
 const CohortSchema = new Schema(
@@ -39,30 +39,22 @@ const CohortSchema = new Schema(
       type: Boolean,
       default: true,
     },
-    applicants: [
-      {
-        _id: { type: Schema.Types.ObjectId, ref: 'Enrollment' },
-        fullName: String,
-        email: String,
-        course: String,
-        status: String,
-      },
-    ],
   },
   {
     timestamps: true,
   }
 );
 
-// Updated pre-save 
-CohortSchema.pre('save', async function (next) {
-  if (!this.isModified('name') && this.slug) return next();
+// Updated pre-save
+CohortSchema.pre("save", async function (next) {
+  if (!this.isModified("name") && this.slug) return next();
 
   try {
     let slug = generateSlug(this.name);
     let count = 1;
 
-    const model = mongoose.models.Cohort || mongoose.model('Cohort', CohortSchema);
+    const model =
+      mongoose.models.Cohort || mongoose.model("Cohort", CohortSchema);
 
     while (true) {
       const existing = await model.findOne({
@@ -82,10 +74,10 @@ CohortSchema.pre('save', async function (next) {
     if (err instanceof Error) {
       next(err);
     } else {
-      next(new Error('An unknown error occurred while generating slug'));
+      next(new Error("An unknown error occurred while generating slug"));
     }
   }
 });
 
-const Cohort = mongoose.models.Cohort || mongoose.model('Cohort', CohortSchema);
+const Cohort = mongoose.models.Cohort || mongoose.model("Cohort", CohortSchema);
 export default Cohort;

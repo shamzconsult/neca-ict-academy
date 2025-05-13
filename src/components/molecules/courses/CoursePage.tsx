@@ -9,7 +9,7 @@ import { CourseType } from "@/types";
 
 export const CoursePage = ({ courses }: { courses: CourseType[] }) => {
   return (
-    <div>
+    <div className="bg-[#FBFBFB]">
       <Navbar />
       <CourseHeroSection />
       <CoursesCards courses={courses} />

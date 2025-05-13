@@ -4,11 +4,7 @@ import React from "react";
 
 const page = async () => {
   const courses = await getAllCourses();
-  return (
-    <div>
-      <CoursePage courses={courses} />
-    </div>
-  );
+  return <CoursePage courses={courses} />;
 };
 
 export default page;
