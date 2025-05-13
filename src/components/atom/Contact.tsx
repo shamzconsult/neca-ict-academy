@@ -29,7 +29,7 @@ const Contact = () => {
     const body = encodeURIComponent(
       `Name: ${name}\nEmail: ${email}\nPhone Number: ${phoneNumber}\nHow did you find us?: ${source}\n\nPlease provide more context here:`
     );
-    const mailto = `mailto:neca@neca.org.ng?subject=${subject}&body=${body}`;
+    const mailto = `mailto:contact@necaictacademy.org?subject=${subject}&body=${body}`;
     if (mailtoRef.current) {
       mailtoRef.current.href = mailto;
       mailtoRef.current.click();
@@ -166,7 +166,7 @@ const Contact = () => {
                   <li>
                     You can{" "}
                     <a
-                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=neca@neca.org.ng&su=Contact%20Request%20from%20Website&body=${encodeURIComponent(
+                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=contact@necaictacademy.org&su=Contact%20Request%20from%20Website&body=${encodeURIComponent(
                         `Name: ${formData.name}\nEmail: ${formData.email}\nPhone Number: ${formData.phoneNumber}\nHow did you find us?: ${formData.source}\n\nPlease provide more context here:`
                       )}`}
                       target='_blank'
@@ -180,10 +180,10 @@ const Contact = () => {
                   <li>
                     Or, email us directly at{" "}
                     <a
-                      href='mailto:neca@neca.org.ng'
+                      href='mailto:contact@necaictacademy.org'
                       className='underline text-blue-700'
                     >
-                      neca@neca.org.ng
+                      contact@necaictacademy.org
                     </a>
                   </li>
                 </ul>
@@ -205,7 +205,7 @@ const Contact = () => {
                 {
                   icon: "https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1741092792/Frame_833_czmxeu.png",
                   title: "EMAIL",
-                  value: "neca@neca.org.ng",
+                  value: "contact@necaictacademy.org",
                 },
               ].map((item, index) => (
                 <div key={index} className='flex items-center gap-4'>
