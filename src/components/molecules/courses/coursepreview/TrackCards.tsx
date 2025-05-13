@@ -14,9 +14,9 @@ export const TrackCards = ({
         <div className='text-center lg:text-left'>
           <SubHeading>{title}</SubHeading>
           <p className='md:text-2xl mt-4'>
-            Join the <span className='mx-1'>{title}</span> to gain in-depth
-            knowledge, from conceptualizing and designing solutions to hands-on
-            implementation, evaluation, and final delivery.
+            Join the <span>{title}</span> to gain in-depth knowledge, from
+            conceptualizing and designing solutions to hands-on implementation,
+            evaluation, and final delivery.
           </p>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16'>

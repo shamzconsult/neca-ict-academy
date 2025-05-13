@@ -9,6 +9,7 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { Logo } from "@/components/atom/Logo";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 export default function SignIn() {
   const [inputEmail, setInputEmail] = useState("");
@@ -85,7 +86,7 @@ export default function SignIn() {
                   onClick={togglePasswordVisibility}
                   className='absolute inset-y-0 right-0 pr-3 flex items-center'
                 >
-                  {passwordVisible ? "🙈" : "👁️"}
+                  {passwordVisible ? <FiEyeOff /> : <FiEye />}
                 </button>
               </div>
             </div>
