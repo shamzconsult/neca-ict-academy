@@ -27,9 +27,9 @@ export const Navbar = () => {
   }
 
   return (
-    <nav className="bg-white font-medium w-full fixed top-0 z-50 text-[#27156F]  px-4 shadow-md text-sm">
-      <div className="max-w-6xl mx-auto flex items-center justify-between h-[80px] lg:h-[106px]">
-        <div className="flex items-center w-full lg:w-auto">
+    <nav className='bg-white font-medium w-full fixed top-0 z-50 text-[#27156F]  px-4 shadow-md text-sm'>
+      <div className='max-w-6xl mx-auto flex items-center justify-between h-[80px] lg:h-[106px]'>
+        <div className='flex items-center w-full lg:w-auto'>
           <div onClick={handleLinkClick}>
             <Logo />
           </div>
@@ -37,12 +37,12 @@ export const Navbar = () => {
           <button
             onClick={() => setIsOpen(!isOpen)}
             aria-expanded={isOpen}
-            className="lg:hidden text-[24px] focus:outline-none ml-auto"
+            className='lg:hidden text-[24px] focus:outline-none ml-auto'
           >
             {isOpen ? (
-              <AiOutlineClose className="text-[#E02B20]" />
+              <AiOutlineClose className='text-[#E02B20]' />
             ) : (
-              <VscMenu className="" />
+              <VscMenu className='' />
             )}
           </button>
         </div>
@@ -68,11 +68,11 @@ export const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <div className="lg:hidden w-fit  text-center px-2">
+          <div className='lg:hidden w-fit mt-5 text-center px-2'>
             <EnrollBtn />
           </div>
         </div>
-        <div className="hidden lg:flex w-fit  text-center">
+        <div className='hidden lg:flex w-fit  text-center'>
           <EnrollBtn />
         </div>
       </div>
