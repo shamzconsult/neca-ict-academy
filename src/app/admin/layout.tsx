@@ -20,8 +20,14 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    if (status === "loading") {
+      setAuthenticated(null);
+      return;
+    }
+
     if (status === "unauthenticated") {
-      router.push("/" + encodeURIComponent(pathname));
+      setAuthenticated(false);
+      router.push("/signin");
     } else if (status === "authenticated") {
       if (
         session?.user?.role === "Admin" ||
@@ -29,21 +35,26 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
       ) {
         setAuthenticated(true);
       } else {
+        setAuthenticated(false);
         router.push("/unauthorized");
       }
     }
   }, [router, pathname, status, session]);
 
-  // if (authenticated === null) {
-  //   return (
-  //     <div className='flex items-center justify-center h-screen'>
-  //       <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E02B20]'></div>
-  //     </div>
-  //   );
-  // }
-
   if (PUBLIC_ADMIN_ROUTES.includes(pathname)) {
     return <>{children}</>;
+  }
+
+  if (authenticated === null) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E02B20]'></div>
+      </div>
+    );
+  }
+
+  if (authenticated === false) {
+    return null;
   }
 
   return (
