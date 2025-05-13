@@ -57,7 +57,7 @@ export const Navbar = () => {
         <div
           className={`${
             isOpen
-              ? "flex flex-col justify-start items-start gap-5 px-2 h-screen lg:h-auto py-6 "
+              ? "flex flex-col justify-start items-start gap-9 px-2 h-screen py-6 "
               : "hidden"
           } lg:flex lg:flex-row lg:items-center absolute lg:static top-16 left-0 w-full bg-white lg:w-auto lg:bg-transparent py-4 md:py-0`}
         >

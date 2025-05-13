@@ -3,6 +3,7 @@ import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Enrollment } from "@/models/enrollment";
+import { revalidatePath } from "next/cache";
 
 export const POST = async (req: Request) => {
   try {
@@ -76,9 +77,15 @@ export const POST = async (req: Request) => {
       skillLevel,
       type,
       hasCertificate,
-      coverImage: url,
       courseOutlines,
+      coverImage: url,
     });
+
+    // Revalidate only the specific paths that need to be updated
+    revalidatePath("/");
+    revalidatePath("/courses");
+    revalidatePath("/courses/[slug]", "page");
+    revalidatePath("/enroll", "page");
 
     return NextResponse.json(
       { message: "Course created successfully!", newCourse },

@@ -17,7 +17,7 @@ import {
 } from "@/const";
 import { CourseType } from "@/types";
 import { useSearchParams } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, Form } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
 interface FormData {
@@ -172,7 +172,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailRegex.test(email)) {
       checkStatusMutation.mutate(email);
-      setEmail("");
+      // setEmail("");
       setEmailError("");
     } else {
       setEmailError("Please enter a valid email address.");
@@ -494,9 +494,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
                       >
                         <option value=''>
-                          {!cohortCourses || cohortCourses.length === 0
-                            ? "No courses available"
-                            : "Select a course"}
+                          {!selectedCohort
+                            ? "Select a cohort first..."
+                            : !cohortCourses || cohortCourses.length === 0
+                              ? "No courses available"
+                              : "Select a course"}
                         </option>
                         {cohortCourses.length > 0 &&
                           cohortCourses.map((course) => (
@@ -532,6 +534,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           placeholder='Upload your CV'
                           onFileChange={field.onChange}
                           currentFile={field.value}
+                          maxSize={307200}
                         />
                       )}
                     />
@@ -549,6 +552,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           placeholder='Upload your image'
                           onFileChange={field.onChange}
                           currentFile={field.value}
+                          maxSize={307200}
                         />
                       )}
                     />

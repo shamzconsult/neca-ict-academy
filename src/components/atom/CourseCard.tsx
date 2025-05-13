@@ -205,12 +205,12 @@ export const CourseCard = ({
                 />
               </div>
 
-              <h3 className='text-lg font-bold text-[#27156F] mt-4'>
+              <h3 className='text-lg font-medium text-[#27156F] mt-4'>
                 {course.title}
               </h3>
               <div>
                 {(isCoursesPath || admin) && (
-                  <p className='mt-2 text-sm font-semibold'>About The Course</p>
+                  <p className='mt-2 text-sm'>About The Course</p>
                 )}
                 <p
                   className={`mt-1 ${
@@ -222,10 +222,10 @@ export const CourseCard = ({
                 <div>
                   {(isCoursesPath || admin) && (
                     <div className='text-sm mt-3'>
-                      <h3 className='font-bold mb-2 text-sm'>Course Details</h3>
+                      <h3 className='mb-2 text-sm'>Course Details</h3>
                       <div className='grid grid-cols-3 gap-3 text-xs'>
                         <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-semibold'>Lesson</p>
+                          <p className='font-medium'>Lesson</p>
                           <div className='flex gap-2 items-center'>
                             <span>
                               <BsPlayBtn />
@@ -234,7 +234,7 @@ export const CourseCard = ({
                           </div>
                         </div>
                         <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-semibold'>Duration</p>
+                          <p className='font-medium'>Duration</p>
                           <div className='flex gap-2 items-center '>
                             <span>
                               <MdAccessTime />
@@ -245,7 +245,7 @@ export const CourseCard = ({
                           </div>
                         </div>
                         <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-semibold'>Skill Level</p>
+                          <p className='font-medium'>Skill Level</p>
                           <div className='flex  gap-2 items-center '>
                             <span>
                               <FiBarChart />

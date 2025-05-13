@@ -3,6 +3,7 @@ import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { generateSlug } from "@/utils/slugify";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export const GET = async (req: Request) => {
   try {
@@ -116,11 +117,29 @@ export const PUT = async (req: Request) => {
       updateData.coverImage = imageUrl;
     }
 
-    const updatedCourse = await Course.findOneAndUpdate(
-      { slug: oldSlug },
-      updateData,
+    const updatedCourse = await Course.findByIdAndUpdate(
+      existingCourse._id,
+      {
+        title,
+        description,
+        lesson,
+        duration,
+        rating,
+        review,
+        skillLevel,
+        hasCertificate,
+        type,
+        courseOutlines: updateData.courseOutlines,
+        ...(updateData.coverImage && { coverImage: updateData.coverImage }),
+      },
       { new: true }
     );
+
+    // Revalidate only the specific paths that need to be updated
+    revalidatePath("/");
+    revalidatePath("/courses");
+    revalidatePath(`/courses/${oldSlug}`, "page");
+    revalidatePath("/enroll", "page");
 
     return NextResponse.json({
       message: "Course updated",
