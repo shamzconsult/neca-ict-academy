@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navbar } from "@/components/atom/Navbar";
 import { Footer } from "@/components/atom/Footer";
 import PhotoAlbum from "react-photo-album";
@@ -65,6 +65,20 @@ const IMAGES = [
 export default function PhotoAlbumPage() {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [images, setImages] = useState(IMAGES);
+  const backgroundImages = [
+    "https://cdn.hashnode.com/res/hashnode/image/upload/v1747116422583/899aad12-5c86-4d93-815a-30d3f7f39993.webp",
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80",
+    // Add more image URLs as needed
+  ];
+  const [bgIndex, setBgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setBgIndex((prev) => (prev + 1) % backgroundImages.length);
+    }, 5000); // Change image every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   // Example infinite scroll: load more images (replace with your real fetch)
   const loadMorePhotos = () => {
@@ -80,17 +94,17 @@ export default function PhotoAlbumPage() {
         <section className='w-full flex items-center lg:h-[500px] py-12 mb-10 border-b border-[#E02B20]/10 relative overflow-hidden'>
           {/* Hero Background Image */}
           <div
-            className='absolute inset-0 z-0 opacity-30'
+            className='absolute inset-0 z-0 opacity-30 transition-all duration-1000'
             style={{
-              backgroundImage:
-                "url('https://cdn.hashnode.com/res/hashnode/image/upload/v1747116422583/899aad12-5c86-4d93-815a-30d3f7f39993.webp')",
+              backgroundImage: `url('${backgroundImages[bgIndex]}')`,
               backgroundSize: "cover",
               backgroundPosition: "top",
+              transition: "background-image 1s ease-in-out",
             }}
           />
           <div className='absolute inset-0 z-10 bg-[#27156F] opacity-40' />
           <div className='max-w-6xl mx-auto px-4 text-center relative z-10'>
-            <h1 className='text-4xl md:text-[5rem] font-extrabold text-[#27156F] mb-3 tracking-tight drop-shadow'>
+            <h1 className='text-4xl md:text-[3rem] text-[#27156F] mb-3 tracking-tight drop-shadow'>
               Photo Album
             </h1>
             {/* <p className='text-lg text-[#27156F]/80 max-w-2xl mx-auto'>

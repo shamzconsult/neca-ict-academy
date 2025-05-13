@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import connectViaMongoose from "@/lib/db";
 import { Applicant } from "@/models/applicant";
 import { Enrollment } from "@/models/enrollment";
+import Course from "@/models/course";
+import Cohort from "@/models/cohort";
 
 export async function GET(request: Request) {
   try {
@@ -39,8 +41,8 @@ export async function GET(request: Request) {
     const enrollments = await Enrollment.find({
       applicant: { $in: applicants.map((a) => a._id) },
     })
-      .populate("cohort", "name")
-      .populate("course", "title");
+      .populate("cohort", "name", Cohort)
+      .populate("course", "title", Course);
 
     // Group enrollments by applicant
     const applicantEnrollments = enrollments.reduce(

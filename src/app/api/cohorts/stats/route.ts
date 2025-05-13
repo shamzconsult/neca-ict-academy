@@ -14,7 +14,7 @@ export async function GET() {
       cohorts.map(async (cohort: any) => {
         // Get all enrollments for this cohort
         const enrollments = await Enrollment.find({ cohort: cohort._id })
-          .populate("applicant", "gender")
+          .populate("applicant", "gender", Applicant)
           .lean();
 
         // Count total and gender breakdown
