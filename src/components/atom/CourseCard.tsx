@@ -174,12 +174,12 @@ export const CourseCard = ({
                 </p>
                 <div>
                   {(isCoursesPath || admin) && (
-                    <div className='text-sm mt-3 '>
+                    <div className='text-sm mt-3'>
                       <h3 className='font-bold mb-2 text-sm'>Course Details</h3>
                       <div className='grid grid-cols-3 gap-3 text-xs'>
                         <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
                           <p className='font-semibold'>Lesson</p>
-                          <div className='flex gap-2  items-center'>
+                          <div className='flex gap-2 items-center'>
                             <span>
                               <BsPlayBtn />
                             </span>

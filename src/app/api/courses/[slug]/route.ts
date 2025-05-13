@@ -65,7 +65,7 @@ export const PUT = async (req: Request) => {
 
         const newSlug = title !== existingCourse.title ? generateSlug(title) : oldSlug;
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const updateData: any = {
             title,
             description,

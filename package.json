@@ -44,6 +44,7 @@
     "leaflet": "^1.9.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.503.0",
+    "masonic": "^4.1.0",
     "mongoose": "^8.12.1",
     "next": "15.2.0",
     "next-auth": "^4.24.11",
@@ -57,13 +58,18 @@
     "react-hook-form": "^7.56.3",
     "react-icons": "^5.5.0",
     "react-leaflet": "^5.0.0",
+    "react-photo-album": "^3.1.0",
     "react-slick": "^0.30.3",
     "recharts": "^2.15.3",
     "resend": "^4.4.1",
     "shadcn-ui": "^0.9.5",
     "slick-carousel": "^1.8.1",
+    "slideshow": "link:yet-another-react-lightbox/plugins/slideshow",
     "sonner": "^2.0.3",
-    "tailwind-merge": "^3.2.0"
+    "tailwind-merge": "^3.2.0",
+    "thumbnails": "link:yet-another-react-lightbox/plugins/thumbnails",
+    "yet-another-react-lightbox": "^3.23.1",
+    "zoom": "link:yet-another-react-lightbox/plugins/zoom"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

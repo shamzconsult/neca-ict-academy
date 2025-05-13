@@ -6,11 +6,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<Record<string, unknown>> }
 ) {
   try {
     await connectViaMongoose();
-    const { slug } = params;
+    const { slug } = await params;
     // Find cohort by slug
     const cohort = await Cohort.findOne({ slug });
     if (!cohort) {

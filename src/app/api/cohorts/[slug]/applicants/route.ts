@@ -9,11 +9,11 @@ import { Parser } from "json2csv";
 
 export async function GET(
   request: Request,
-  context: { params: { slug: string } }
+  { params }: { params: Promise<Record<string, unknown>> }
 ) {
   try {
     await connectViaMongoose();
-    const { slug } = await context.params;
+    const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");

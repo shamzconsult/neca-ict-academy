@@ -15,7 +15,9 @@ const AD_IMAGES = [
 ];
 
 const STORAGE_KEY = "neca_advert_overlay_dismissed";
+const EXPIRATION_KEY = "neca_advert_overlay_expiration";
 const SWITCH_INTERVAL = 5000; // 5 seconds between switches
+const EXPIRATION_HOURS = 24; // Advert will expire after 24 hours
 
 export const AdvertOverlay: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -24,11 +26,26 @@ export const AdvertOverlay: React.FC = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    // Only show if not dismissed before
-    if (typeof window !== "undefined") {
-      const dismissed = localStorage.getItem(STORAGE_KEY);
-      if (!dismissed) setOpen(true);
+    if (typeof window === "undefined") return;
+
+    // Check if advert has expired
+    const expirationTime = localStorage.getItem(EXPIRATION_KEY);
+    const now = new Date().getTime();
+
+    if (expirationTime) {
+      // If we have an expiration time, check if we're past it
+      if (now > parseInt(expirationTime)) {
+        return;
+      }
+    } else {
+      // If no expiration time is set, set it to 24 hours from now
+      const newExpirationTime = now + EXPIRATION_HOURS * 60 * 60 * 1000;
+      localStorage.setItem(EXPIRATION_KEY, newExpirationTime.toString());
     }
+
+    // Only show if not dismissed before
+    const dismissed = localStorage.getItem(STORAGE_KEY);
+    if (!dismissed) setOpen(true);
   }, []);
 
   useEffect(() => {

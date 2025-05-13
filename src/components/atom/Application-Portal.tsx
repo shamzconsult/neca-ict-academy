@@ -188,24 +188,19 @@ const ApplicationPortal = ({
           priority
         />
       </div>
-      <div className='hidden lg:block absolute top-[90%] right-0 w-[20%] h-[20%] z-[5] transform'>
-        <Image
-          src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742300250/Background-Pattern_cukkck.png'
+      <div className='hidden lg:block absolute bottom-0 right-0 w-[366px] h-[366px] z-[5]'>
+        <img
+          src='https://cdn.hashnode.com/res/hashnode/image/upload/v1747112476016/86e16667-5b96-461a-845f-0f6e896b0fb5.png'
           alt='Background Right'
-          layout='fill'
-          objectFit='cover'
-          className='opacity-41'
+          className='opacity-[20%]'
         />
       </div>
       <div className='h-screen overflow-hidden'>
         {/* Fixed Header */}
         <header className='fixed top-0 left-0 right-0 bg-white'>
-          <div className='max-w-[1550px] mx-auto px-4 py-4'>
+          <div className='py-4 px-[8%]'>
             <div className='flex flex-col gap-5 md:flex-row justify-between items-center'>
-              <Link
-                href='/'
-                className='w-36 lg:w-48 relative lg:left-[100px] 2xl:left-0'
-              >
+              <Link href='/' className='w-36 lg:w-48 relative'>
                 <Image
                   src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png'
                   alt='NECA ICT ACADEMY Logo'
@@ -283,24 +278,22 @@ const ApplicationPortal = ({
               </div>
             </div>
 
-            <div className='w-full lg:w-1/2 lg:ml-[50%] bg-white overflow-y-auto h-full pt-5'>
+            <div className='relative z-50 w-full lg:w-1/2 lg:ml-[50%] overflow-y-auto h-full pt-5'>
               <div className='max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left'>
                 <SubHeading>NECA ICT Academy Application Portal</SubHeading>
                 <h2 className='text-2xl font-semibold text-[#27156F] mb-4 mt-6'>
                   Register Now!
                 </h2>
                 <p className='text-gray-600 text-xl mb-7'>
-                  To apply for our training programs or opportunities, please
-                  fill out the form below with accurate information. Ensure all
-                  required fields are completed to avoid delays in processing{" "}
-                  <br /> your application.
+                  Please fill out the form below with accurate and current
+                  information to begin your application.
                 </p>
 
                 <form
                   onSubmit={handleSubmit((data: FormData) =>
                     submitMutation.mutate(data)
                   )}
-                  className='space-y-6'
+                  className='space-y-6 bg-white'
                 >
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div className='md:col-span-2'>

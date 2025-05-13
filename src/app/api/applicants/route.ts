@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     const skip = (page - 1) * limit;
 
     // Build the base query
-    let query: any = {};
+    const query: any = {};
     if (search) {
       query.$or = [
         { firstName: { $regex: search, $options: "i" } },
@@ -69,7 +69,7 @@ export async function GET(request: Request) {
       filteredApplicants = applicants.filter((applicant) => {
         const enrollments =
           applicantEnrollments[applicant._id.toString()] || [];
-        return enrollments.some((e) => e.status === status);
+        return enrollments.some((e: any) => e.status === status);
       });
     }
 
@@ -78,7 +78,7 @@ export async function GET(request: Request) {
       filteredApplicants = filteredApplicants.filter((applicant) => {
         const enrollments =
           applicantEnrollments[applicant._id.toString()] || [];
-        return enrollments.some((e) => e.level === level);
+        return enrollments.some((e: any) => e.level === level);
       });
     }
 
