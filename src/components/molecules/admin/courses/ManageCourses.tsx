@@ -64,6 +64,8 @@ export const ManageCourses = () => {
     review: string;
     skillLevel: string;
     courseOutlines: CourseOutline[];
+    hasCertificate: boolean;
+    type: string;
   }>({
     title: "",
     description: "",
@@ -73,6 +75,8 @@ export const ManageCourses = () => {
     review: "",
     skillLevel: "",
     courseOutlines: [],
+    hasCertificate: false,
+    type: "",
   });
 
   // Filter/sort state

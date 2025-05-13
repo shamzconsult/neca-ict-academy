@@ -12,9 +12,15 @@ import { toast } from "sonner";
 import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 import EmptyState from "./EmptyState";
 import { cn } from "@/lib/utils";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, ExternalLink, MoreVertical } from "lucide-react";
 import { Button } from "../ui/button";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 
 // Skeleton card component
 const SkeletonCard = () => (
@@ -56,11 +62,13 @@ export const CourseCard = ({
     review: string;
     skillLevel: string;
     courseOutlines: CourseOutline[];
+    hasCertificate: boolean;
+    type: string;
   }) => void;
   loading?: boolean;
 }) => {
   const pathname = usePathname();
-  const isCoursesPath = pathname === "/courses";
+  const isCoursesPath = pathname === "/courses" || pathname === "/";
   const admin = pathname === "/admin/courses";
   const CardWrapper = admin ? "div" : Link;
   const queryClient = useQueryClient();
@@ -102,6 +110,8 @@ export const CourseCard = ({
         review: course.review,
         skillLevel: course.skillLevel,
         courseOutlines: course.courseOutlines,
+        hasCertificate: course.hasCertificate,
+        type: course.type,
       });
       setShowModal(true);
     }
@@ -142,6 +152,43 @@ export const CourseCard = ({
                 (isCoursesPath || admin ? " hover:cursor-pointer" : "")
               }
             >
+              {admin && (
+                <div className='mb-4 flex justify-between items-center'>
+                  <span className='text-xs text-gray-500'>
+                    Enrolled: {course.totalEnrolled ?? 0}
+                  </span>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='icon'
+                        className='h-8 w-8 p-0'
+                      >
+                        <MoreVertical className='w-5 h-5' />
+                        <span className='sr-only'>Open menu</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align='start'>
+                      <DropdownMenuItem asChild>
+                        <Link
+                          href={`/courses/${course.slug}`}
+                          target='_blank'
+                          className='flex items-center gap-2'
+                          aria-label='Open course'
+                        >
+                          <ExternalLink className='w-4 h-4' /> Open
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => handleEdit(course)}
+                        className='flex items-center gap-2'
+                      >
+                        <Pencil className='w-4 h-4' /> Update
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              )}
               <div
                 className={
                   "relative w-full min-w-0 " +
@@ -163,7 +210,7 @@ export const CourseCard = ({
               </h3>
               <div>
                 {(isCoursesPath || admin) && (
-                  <p className='font-bold mt-2 text-sm'>About The Course</p>
+                  <p className='mt-2 text-sm font-semibold'>About The Course</p>
                 )}
                 <p
                   className={`mt-1 ${
@@ -223,34 +270,33 @@ export const CourseCard = ({
                 )}
               </div> */}
               <div className='flex flex-col lg:flex-row justify-between lg:items-end mt-3'>
-                {(isCoursesPath || admin) && (
-                  <div className='flex divide-x divide-[#525252] space-x-2  text-xs'>
-                    <span className='px-1'>{course.skillLevel}</span>
-                    <span className='px-1'>Certificate</span>
-                    <span className='px-1'>Physical</span>
+                {/* {(isCoursesPath || admin) && ( */}
+                <div className='flex items-center gap-2 text-xs'>
+                  {course.hasCertificate && (
+                    <div className='px-1 bg-gray-100 text-gray-700 rounded font-semibold'>
+                      Certificate
+                    </div>
+                  )}
+                  <div className='px-1 bg-gray-100 text-gray-700 rounded font-semibold'>
+                    {course.type}
                   </div>
-                )}
-                <p className='text-[#E02B20] mt-3 hover:underline-offset-4 hover:underline'>
-                  Learn More →
-                </p>
-              </div>
-              {admin && (
-                <div className='mt-5 flex justify-between'>
-                  <Button
-                    variant='secondary'
-                    size='sm'
-                    onClick={() => handleEdit(course)}
-                    className='inline-flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-500 hover:text-blue-600 duration-300'
-                    aria-label='Update cohort'
-                  >
-                    <Pencil className='w-4 h-4' />
-                    Update
-                  </Button>
-                  {/* <button onClick={(event) => handleDelete(course.slug, event)}>
-                    <Trash2 className='w-4 h-4 text-red-500 hover:text-red-600 duration-300' />
-                  </button> */}
                 </div>
-              )}
+                {/* )} */}
+
+                {admin ? (
+                  <Link
+                    href={`/courses/${course.slug}`}
+                    target='_blank'
+                    className='text-[#E02B20] text-sm mt-3 hover:underline-offset-4 hover:underline'
+                  >
+                    Learn More →
+                  </Link>
+                ) : (
+                  <p className='text-[#E02B20] text-sm mt-3 hover:underline-offset-4 hover:underline'>
+                    Learn More →
+                  </p>
+                )}
+              </div>
             </CardWrapper>
           ))}
         </div>

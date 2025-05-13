@@ -1,6 +1,6 @@
-import { ApplicationLevel, ApplicationStatus, Gender } from '@/const';
+import { ApplicationLevel, ApplicationStatus, Gender } from "@/const";
 
-type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
+type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
 
 export type CourseOutline = {
   header: string;
@@ -100,11 +100,12 @@ export type CourseType = {
   skillLevel: string;
   rating: string;
   review: string;
-  mode: string;
   lesson: string;
   description: string;
   slug: string;
   title: string;
   coverImage: string;
-  courses: Courses[];
+  hasCertificate: boolean;
+  type: "Physical" | "Virtual" | "Hybrid";
+  totalEnrolled?: number;
 };
