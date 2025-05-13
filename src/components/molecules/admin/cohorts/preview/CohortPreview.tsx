@@ -128,7 +128,7 @@ export const CohortPreview = () => {
     queryKey: ["cohort-applicants", slug, debouncedSearchTerm, status, page],
     queryFn: async () => {
       if (!slug) throw new Error("No slug provided");
-      const res = await fetch(`/api/cohort/${slug}/applicants?${queryString}`);
+      const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
       if (!res.ok) throw new Error("Network response was not ok");
       return res.json();
     },
@@ -152,7 +152,7 @@ export const CohortPreview = () => {
             graduated: 0,
           },
         };
-      const res = await fetch(`/api/cohort/${slug}/applicants/stats`);
+      const res = await fetch(`/api/cohorts/${slug}/applicants/stats`);
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
@@ -187,8 +187,8 @@ export const CohortPreview = () => {
   const showEmptyState = !isLoading && filteredEnrollments.length === 0;
 
   return (
-    <div className='p-6'>
-      <div className='sticky top-0 z-10 bg-gray-50 pb-4 mb-4'>
+    <>
+      <div className='sticky top-0 z-10 bg-gray-50'>
         <h1 className='text-2xl font-bold text-gray-800 mb-2 p-4 bg-white rounded-lg shadow-sm border border-gray-200'>
           {isLoading ? (
             <div className='h-8 w-64 bg-gray-100 rounded animate-pulse' />
@@ -269,7 +269,16 @@ export const CohortPreview = () => {
             </Select>
             <Button
               className='border text-nowrap border-gray-200 cursor-pointer rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
-              onClick={() => pdfDownload(cohortName || "", filteredEnrollments)}
+              onClick={() => {
+                const params = new URLSearchParams();
+                if (searchTerm) params.set("search", searchTerm);
+                if (status && status !== "all") params.set("status", status);
+                params.set("download", "1");
+                window.open(
+                  `/api/cohorts/${slug}/applicants?${params.toString()}`,
+                  "_blank"
+                );
+              }}
               disabled={isLoading || filteredEnrollments.length === 0}
             >
               <MdOutlineArrowCircleDown />
@@ -319,6 +328,7 @@ export const CohortPreview = () => {
         {showSkeleton && <TableSkeleton />}
         {showEmptyState && (
           <EmptyState
+            className='min-h-[500px]'
             title={
               searchTerm && status !== "all"
                 ? "No record found"
@@ -337,6 +347,6 @@ export const CohortPreview = () => {
           />
         )}
       </section>
-    </div>
+    </>
   );
 };

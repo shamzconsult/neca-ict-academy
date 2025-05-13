@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
@@ -56,7 +57,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
 
     if (window.confirm("Are you sure you want to delete this cohort?")) {
       try {
-        const res = await fetch(`/api/cohort/${slug}`, {
+        const res = await fetch(`/api/cohorts/${slug}`, {
           method: "DELETE",
         });
 
@@ -93,35 +94,38 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     }
   };
   return (
-    <div className='px-4 space-y-8 w-full pb-10'>
-      <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4'>
-        <h1 className='md:text-[20px] font-medium'>Dashboard Overview</h1>
-        <button
-          onClick={checkAllCohortStatus}
-          className='bg-[#E02B20] text-nowrap flex items-center gap-1 text-white px-6 py-2.5 rounded-md cursor-pointer'
-        >
-          <HiOutlinePlusCircle /> Create Cohort
-        </button>
-      </div>
-      {cohortsData?.length > 0 ? (
-        <div className='overflow-x-auto border border-[#C4C4C4]'>
-          <CohortTable
-            tableHead={cohortTableHead}
-            handleDelete={handleDelete}
-            handleEdit={handleEdit}
-            handleRowClick={handleRowClick}
-            tableData={cohortsData}
-            action={true}
-            isEditToggle={isEditToggle}
-            handleEditToggle={handleEditToggle}
-          />
+    <>
+      <div className='bg-white shadow-lg rounded-xl p-6'>
+        <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center mb-4'>
+          <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
+          <Button
+            onClick={checkAllCohortStatus}
+            className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+          >
+            <HiOutlinePlusCircle /> Create Cohort
+          </Button>
         </div>
-      ) : (
-        <EmptyState
-          title='No Cohort Created yet'
-          message='Click on the create Cohort button to start'
-        />
-      )}
+        <hr className='border-gray-200 mb-4' />
+        {cohortsData?.length > 0 ? (
+          <div className='overflow-x-auto border border-[#C4C4C4] rounded-lg'>
+            <CohortTable
+              tableHead={cohortTableHead}
+              handleDelete={handleDelete}
+              handleEdit={handleEdit}
+              handleRowClick={handleRowClick}
+              tableData={cohortsData}
+              action={true}
+              isEditToggle={isEditToggle}
+              handleEditToggle={handleEditToggle}
+            />
+          </div>
+        ) : (
+          <EmptyState
+            title='No Cohort Created yet'
+            message='Click on the create Cohort button to start'
+          />
+        )}
+      </div>
       {showModal && (
         <CohortForm
           toggleModal={toggleModal}
@@ -131,6 +135,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
           setCohortToEdit={setCohortToEdit}
         />
       )}
-    </div>
+    </>
   );
 };

@@ -23,10 +23,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type AddNewCourseProps = {
   toggleModal: () => void;
-  setCourseList: React.Dispatch<React.SetStateAction<CourseType[]>>;
   courseToEdit: CourseType | null;
   setCourseToEdit: (course: CourseType | null) => void;
   formData: {
@@ -56,7 +57,6 @@ type AddNewCourseProps = {
 
 export const AddNewCourse = ({
   toggleModal,
-  setCourseList,
   courseToEdit,
   setCourseToEdit,
   formData,
@@ -66,6 +66,78 @@ export const AddNewCourse = ({
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  const addCourseMutation = useMutation({
+    mutationFn: async (formDataToSend: FormData) => {
+      const res = await fetch("/api/courses", {
+        method: "POST",
+        body: formDataToSend,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      toast.success("Course Created Successfully 🎉");
+      setFormData({
+        title: "",
+        description: "",
+        lesson: "",
+        duration: "",
+        rating: "",
+        review: "",
+        skillLevel: "",
+        courseOutlines: [],
+      });
+      setFile(null);
+      toggleModal();
+    },
+    onError: () => {
+      toast.error("Failed to create course");
+    },
+    onMutate: () => setLoading(true),
+    onSettled: () => setLoading(false),
+  });
+
+  const updateCourseMutation = useMutation({
+    mutationFn: async ({
+      slug,
+      formDataToSend,
+    }: {
+      slug: string;
+      formDataToSend: FormData;
+    }) => {
+      const res = await fetch(`/api/courses/${slug}`, {
+        method: "PUT",
+        body: formDataToSend,
+      });
+      if (!res.ok) throw new Error(await res.text());
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["courses"] });
+      toast.success("Course Updated Successfully 🎉");
+      setCourseToEdit(null);
+      setFormData({
+        title: "",
+        description: "",
+        lesson: "",
+        duration: "",
+        rating: "",
+        review: "",
+        skillLevel: "",
+        courseOutlines: [],
+      });
+      setFile(null);
+      toggleModal();
+    },
+    onError: () => {
+      toast.error("Failed to update course");
+    },
+    onMutate: () => setLoading(true),
+    onSettled: () => setLoading(false),
+  });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -78,7 +150,7 @@ export const AddNewCourse = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) {
-      console.error("No file selected");
+      toast.error("No file selected");
       return;
     }
     setLoading(true);
@@ -95,48 +167,12 @@ export const AddNewCourse = ({
       "courseOutlines",
       JSON.stringify(formData.courseOutlines)
     );
-
-    try {
-      const res = await fetch("/api/course", {
-        method: "POST",
-        body: formDataToSend,
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error creating course:", errorText);
-        return;
-      }
-
-      const responseData = await res.json();
-      setCourseList((prevOffers) => [...prevOffers, responseData.newCourse]);
-
-      toast.success("Course Created Successfully 🎉");
-
-      setFormData({
-        title: "",
-        description: "",
-        lesson: "",
-        duration: "",
-        rating: "",
-        review: "",
-        skillLevel: "",
-        courseOutlines: [],
-      });
-      setFile(null);
-      toggleModal();
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Failed to create course");
-    } finally {
-      setLoading(false);
-    }
+    addCourseMutation.mutate(formDataToSend);
   };
 
   const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!courseToEdit) return;
-
     setLoading(true);
     const formDataToSend = new FormData();
     formDataToSend.append("title", formData.title);
@@ -150,56 +186,10 @@ export const AddNewCourse = ({
       "courseOutlines",
       JSON.stringify(formData.courseOutlines)
     );
-
     if (file) {
       formDataToSend.append("coverImage", file);
     }
-
-    try {
-      const res = await fetch(`/api/course/${courseToEdit.slug}`, {
-        method: "PUT",
-        body: formDataToSend,
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Error updating course:", errorText);
-        return;
-      }
-
-      const responseData = await res.json();
-      const newSlug = responseData.newSlug || courseToEdit.slug;
-      const updatedCourse = responseData.updatedCourse || responseData;
-
-      setCourseList((prev) =>
-        prev.map((course) =>
-          course.slug === courseToEdit.slug
-            ? { ...updatedCourse, slug: newSlug }
-            : course
-        )
-      );
-
-      toast.success("Course Updated Successfully 🎉");
-
-      setCourseToEdit(null);
-      setFormData({
-        title: "",
-        description: "",
-        lesson: "",
-        duration: "",
-        rating: "",
-        review: "",
-        skillLevel: "",
-        courseOutlines: [],
-      });
-      setFile(null);
-      toggleModal();
-    } catch (error) {
-      console.error("Error updating course:", error);
-      toast.error("Failed to update course");
-    } finally {
-      setLoading(false);
-    }
+    updateCourseMutation.mutate({ slug: courseToEdit.slug, formDataToSend });
   };
 
   return (
@@ -223,8 +213,8 @@ export const AddNewCourse = ({
         }
       }}
     >
-      <DialogContent className='max-h-[90vh] overflow-y-auto'>
-        <DialogHeader>
+      <DialogContent className='max-h-[90vh] lg:max-w-xl px-0'>
+        <DialogHeader className='px-6'>
           <DialogTitle>
             {courseToEdit ? "Edit Course" : "Add New Course"}
           </DialogTitle>
@@ -234,257 +224,273 @@ export const AddNewCourse = ({
           onSubmit={courseToEdit ? handleUpdate : handleSubmit}
           className='space-y-4'
         >
-          <div className='space-y-1'>
-            <Label>Course Title</Label>
-            <Input
-              type='text'
-              name='title'
-              value={formData.title}
-              onChange={handleChange}
-              placeholder='Software Engineering'
-              required
-            />
-          </div>
-
-          <div className='space-y-1'>
-            <Label>Description</Label>
-            <Textarea
-              name='description'
-              value={formData.description}
-              onChange={handleChange}
-              rows={8}
-              placeholder='Write a brief description here...'
-              required
-            />
-          </div>
-
-          <div className='space-y-1 cursor-pointer'>
-            <Label>Upload Cover Image</Label>
-            <div className='relative'>
-              {(file || courseToEdit?.coverImage) && (
-                <div className='mb-4 relative'>
-                  <img
-                    src={
-                      file
-                        ? URL.createObjectURL(file)
-                        : courseToEdit?.coverImage
-                    }
-                    alt='Cover preview'
-                    className='w-full h-48 object-cover rounded-lg'
-                  />
-                  <button
-                    type='button'
-                    onClick={() => {
-                      setFile(null);
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = "";
-                      }
-                    }}
-                    className='absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors'
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      className='h-5 w-5'
-                      viewBox='0 0 20 20'
-                      fill='currentColor'
-                    >
-                      <path
-                        fillRule='evenodd'
-                        d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                        clipRule='evenodd'
-                      />
-                    </svg>
-                  </button>
-                </div>
-              )}
-              <div className='flex items-center gap-3'>
-                <Input
-                  type='file'
-                  accept='image/*'
-                  className='cursor-pointer'
-                  ref={fileInputRef}
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className='flex flex-col md:flex-row gap-4'>
-            <div className='flex-1 space-y-1'>
-              <Label>Lesson</Label>
-              <Input
-                type='text'
-                name='lesson'
-                value={formData.lesson}
-                onChange={handleChange}
-                placeholder='140'
-                required
-              />
-            </div>
-            <div className='flex-1 space-y-1'>
-              <Label>Duration</Label>
-              <Input
-                type='text'
-                name='duration'
-                value={formData.duration}
-                onChange={handleChange}
-                placeholder='8 weeks'
-                required
-              />
-            </div>
-          </div>
-
-          {/* <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 space-y-1">
-            <Label>Rating</Label>
-            <Input
-              type="text"
-              name="rating"
-              value={formData.rating}
-              onChange={handleChange}
-              placeholder="4.0"
-              required
-            />
-          </div>
-          <div className="flex-1 space-y-1">
-            <Label>Review</Label>
-            <Input
-              type="text"
-              name="review"
-              value={formData.review}
-              onChange={handleChange}
-              placeholder="48 reviews"
-              required
-            />
-          </div>
-        </div> */}
-
-          <div className='space-y-1 w-full'>
-            <Label>Skill Level</Label>
-            <Select
-              value={formData.skillLevel}
-              onValueChange={(value) => {
-                setFormData({ ...formData, skillLevel: value });
-              }}
-            >
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='Select skill level' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='Beginner'>Beginner</SelectItem>
-                <SelectItem value='Intermediate'>Intermediate</SelectItem>
-                <SelectItem value='Advanced'>Advanced</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className='space-y-2'>
-            <Label>Course Outline</Label>
-            {formData.courseOutlines.map((outline, index) => (
-              <div key={index} className='border p-3 rounded-md space-y-2'>
-                <div className='flex justify-end'>
-                  <Button
-                    type='button'
-                    variant='ghost'
-                    className='cursor-pointer text-[#e02a20ce] hover:text-[#e02a20ce]'
-                    size='sm'
-                    onClick={() => {
-                      const newOutlines = formData.courseOutlines.filter(
-                        (_, i) => i !== index
-                      );
-                      setFormData({ ...formData, courseOutlines: newOutlines });
-                    }}
-                  >
-                    Remove
-                  </Button>
-                </div>
+          <ScrollArea className='h-[calc(90vh-450px)] px-6'>
+            <div className='space-y-4'>
+              <div className='space-y-1'>
+                <Label>Course Title</Label>
                 <Input
                   type='text'
-                  placeholder='Outline Header'
-                  value={outline.header}
-                  onChange={(e) => {
-                    const newOutlines = [...formData.courseOutlines];
-                    newOutlines[index].header = e.target.value;
-                    setFormData({ ...formData, courseOutlines: newOutlines });
-                  }}
+                  name='title'
+                  value={formData.title}
+                  onChange={handleChange}
+                  placeholder='Software Engineering'
+                  required
                 />
-                <div className='space-y-2'>
-                  <div className='flex flex-wrap gap-2 mb-2'>
-                    {outline.lists.map((item, itemIndex) => (
-                      <div
-                        key={itemIndex}
-                        className='bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2'
+              </div>
+
+              <div className='space-y-1'>
+                <Label>Description</Label>
+                <Textarea
+                  name='description'
+                  value={formData.description}
+                  onChange={handleChange}
+                  rows={8}
+                  placeholder='Write a brief description here...'
+                  required
+                />
+              </div>
+
+              <div className='space-y-1 cursor-pointer'>
+                <Label>Upload Cover Image</Label>
+                <div className='relative'>
+                  {(file || courseToEdit?.coverImage) && (
+                    <div className='mb-4 relative'>
+                      <img
+                        src={
+                          file
+                            ? URL.createObjectURL(file)
+                            : courseToEdit?.coverImage
+                        }
+                        alt='Cover preview'
+                        className='w-full h-48 object-cover rounded-lg'
+                      />
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setFile(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                        className='absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors'
                       >
-                        <span>{item}</span>
-                        <button
-                          type='button'
-                          className='text-red-500 hover:text-red-700'
-                          onClick={() => {
-                            const newOutlines = [...formData.courseOutlines];
-                            newOutlines[index].lists = newOutlines[
-                              index
-                            ].lists.filter((_, i) => i !== itemIndex);
-                            setFormData({
-                              ...formData,
-                              courseOutlines: newOutlines,
-                            });
-                          }}
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          className='h-5 w-5'
+                          viewBox='0 0 20 20'
+                          fill='currentColor'
                         >
-                          ×
-                        </button>
-                      </div>
-                    ))}
+                          <path
+                            fillRule='evenodd'
+                            d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                            clipRule='evenodd'
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  <div className='flex items-center gap-3'>
+                    <Input
+                      type='file'
+                      accept='image/*'
+                      className='cursor-pointer'
+                      ref={fileInputRef}
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    />
                   </div>
+                </div>
+              </div>
+
+              <div className='flex flex-col md:flex-row gap-4'>
+                <div className='flex-1 space-y-1'>
+                  <Label>Lesson</Label>
+                  <Input
+                    type='number'
+                    name='lesson'
+                    value={formData.lesson}
+                    onChange={handleChange}
+                    placeholder='140'
+                    required
+                  />
+                </div>
+                <div className='flex-1 space-y-1'>
+                  <Label>Duration</Label>
                   <Input
                     type='text'
-                    placeholder='Type and press comma or enter to add items'
-                    value={outline.currentInput || ""}
-                    onChange={(e) => {
-                      const newOutlines = [...formData.courseOutlines];
-                      newOutlines[index].currentInput = e.target.value;
-                      setFormData({ ...formData, courseOutlines: newOutlines });
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "," || e.key === "Enter") {
-                        e.preventDefault();
+                    name='duration'
+                    value={formData.duration}
+                    onChange={handleChange}
+                    placeholder='8 weeks'
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 space-y-1">
+                <Label>Rating</Label>
+                <Input
+                  type="text"
+                  name="rating"
+                  value={formData.rating}
+                  onChange={handleChange}
+                  placeholder="4.0"
+                  required
+                />
+              </div>
+              <div className="flex-1 space-y-1">
+                <Label>Review</Label>
+                <Input
+                  type="text"
+                  name="review"
+                  value={formData.review}
+                  onChange={handleChange}
+                  placeholder="48 reviews"
+                  required
+                />
+              </div>
+            </div> */}
+
+              <div className='space-y-1 w-full'>
+                <Label>Skill Level</Label>
+                <Select
+                  value={formData.skillLevel}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, skillLevel: value });
+                  }}
+                >
+                  <SelectTrigger className='w-full'>
+                    <SelectValue placeholder='Select skill level' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='Beginner'>Beginner</SelectItem>
+                    <SelectItem value='Intermediate'>Intermediate</SelectItem>
+                    <SelectItem value='Advanced'>Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className='space-y-2'>
+                <Label>Course Outline</Label>
+                {formData.courseOutlines.map((outline, index) => (
+                  <div key={index} className='border p-3 rounded-md space-y-2'>
+                    <Input
+                      type='text'
+                      placeholder='Outline Header'
+                      value={outline.header}
+                      onChange={(e) => {
                         const newOutlines = [...formData.courseOutlines];
-                        const value = newOutlines[index].currentInput?.trim();
-                        if (value) {
-                          newOutlines[index].lists = [
-                            ...newOutlines[index].lists,
-                            value,
-                          ];
-                          newOutlines[index].currentInput = "";
+                        newOutlines[index].header = e.target.value;
+                        setFormData({
+                          ...formData,
+                          courseOutlines: newOutlines,
+                        });
+                      }}
+                    />
+                    <div className='space-y-2'>
+                      <div className='flex flex-wrap gap-2 mb-2'>
+                        {outline.lists.map((item, itemIndex) => (
+                          <div
+                            key={itemIndex}
+                            className='bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2'
+                          >
+                            <span>{item}</span>
+                            <button
+                              type='button'
+                              className='text-red-500 hover:text-red-700'
+                              onClick={() => {
+                                const newOutlines = [
+                                  ...formData.courseOutlines,
+                                ];
+                                newOutlines[index].lists = newOutlines[
+                                  index
+                                ].lists.filter((_, i) => i !== itemIndex);
+                                setFormData({
+                                  ...formData,
+                                  courseOutlines: newOutlines,
+                                });
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <Input
+                        type='text'
+                        placeholder='Type and press comma or enter to add items'
+                        value={outline.currentInput || ""}
+                        onChange={(e) => {
+                          const newOutlines = [...formData.courseOutlines];
+                          newOutlines[index].currentInput = e.target.value;
                           setFormData({
                             ...formData,
                             courseOutlines: newOutlines,
                           });
-                        }
-                      }
-                    }}
-                  />
-                </div>
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "," || e.key === "Enter") {
+                            e.preventDefault();
+                            const newOutlines = [...formData.courseOutlines];
+                            const value =
+                              newOutlines[index].currentInput?.trim();
+                            if (value) {
+                              newOutlines[index].lists = [
+                                ...newOutlines[index].lists,
+                                value,
+                              ];
+                              newOutlines[index].currentInput = "";
+                              setFormData({
+                                ...formData,
+                                courseOutlines: newOutlines,
+                              });
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className='flex justify-end'>
+                      <Button
+                        type='button'
+                        variant='ghost'
+                        className='cursor-pointer text-[#e02a20ce] hover:text-[#e02a20ce]'
+                        size='sm'
+                        onClick={() => {
+                          const newOutlines = formData.courseOutlines.filter(
+                            (_, i) => i !== index
+                          );
+                          setFormData({
+                            ...formData,
+                            courseOutlines: newOutlines,
+                          });
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <Button
+                  type='button'
+                  variant='outline'
+                  className='cursor-pointer'
+                  onClick={() =>
+                    setFormData({
+                      ...formData,
+                      courseOutlines: [
+                        ...formData.courseOutlines,
+                        { header: "", lists: [] },
+                      ],
+                    })
+                  }
+                >
+                  + Add Section
+                </Button>
               </div>
-            ))}
-            <Button
-              type='button'
-              variant='outline'
-              className='cursor-pointer'
-              onClick={() =>
-                setFormData({
-                  ...formData,
-                  courseOutlines: [
-                    ...formData.courseOutlines,
-                    { header: "", lists: [] },
-                  ],
-                })
-              }
-            >
-              + Add Section
-            </Button>
-          </div>
+            </div>
+          </ScrollArea>
 
-          <DialogFooter className='flex flex-col md:flex-row gap-2 mt-6'>
+          <DialogFooter className='flex flex-col md:flex-row gap-2 mt-6 px-6'>
             <Button
               type='submit'
               disabled={loading}

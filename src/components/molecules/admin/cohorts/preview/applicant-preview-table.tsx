@@ -56,7 +56,7 @@ const ApplicantPreviewForm = () => {
     ],
     queryFn: async () => {
       if (!slug) return { data: [], pagination: { totalPages: 1 } };
-      const res = await fetch(`/api/cohort/${slug}/applicants?${queryString}`);
+      const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
       if (!res.ok) throw new Error("Network response was not ok");
       return res.json();
     },

@@ -5,14 +5,15 @@ import Course from "@/models/course";
 import { Enrollment } from "@/models/enrollment";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+import { Parser } from "json2csv";
 
 export async function GET(
   request: Request,
-  { params }: { params: { slug: string } }
+  context: { params: { slug: string } }
 ) {
   try {
     await connectViaMongoose();
-    const { slug } = params;
+    const { slug } = await context.params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -21,6 +22,7 @@ export async function GET(
     const searchQuery = searchParams.get("search") || "";
     const statusFilter = searchParams.get("status") || "";
     const levelFilter = searchParams.get("level") || "";
+    const isDownload = searchParams.get("download") === "1";
 
     // Find cohort by slug
     const cohort = await Cohort.findOne({ slug });
@@ -56,6 +58,49 @@ export async function GET(
       ];
     }
 
+    // If download, fetch all matching applicants (no pagination)
+    if (isDownload) {
+      const allApplicants = await Applicant.find(query)
+        .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
+        .lean();
+      // Enrich applicants with their latest enrollment (if any)
+      const enrichedApplicants = allApplicants.map((applicant) => {
+        const applicantEnrollments = enrollments.filter((enr) => {
+          const enrollmentApplicantId =
+            enr.applicant instanceof Types.ObjectId
+              ? enr.applicant
+              : enr.applicant._id;
+          return enrollmentApplicantId.equals(applicant._id);
+        });
+        const latestEnrollment = applicantEnrollments[0] || null;
+        return {
+          firstName: applicant.firstName,
+          lastName: applicant.lastName,
+          email: applicant.email,
+          phoneNumber: applicant.phoneNumber,
+          state: applicant.state,
+          cv: latestEnrollment?.cv || null,
+          status: latestEnrollment?.status || "Not enrolled",
+          level: latestEnrollment?.level || "Not enrolled",
+          course:
+            latestEnrollment?.course && "title" in latestEnrollment.course
+              ? latestEnrollment.course.title
+              : "No course",
+          cohort: cohort.name,
+          enrollmentId: latestEnrollment?._id,
+        };
+      });
+      // Convert to CSV
+      const parser = new Parser();
+      const csv = parser.parse(enrichedApplicants);
+      return new Response(csv, {
+        headers: {
+          "Content-Type": "text/csv",
+          "Content-Disposition": `attachment; filename=applicants-${slug}.csv`,
+        },
+      });
+    }
+
     // 3. Paginate applicants
     const total = await Applicant.countDocuments(query);
     const applicants = await Applicant.find(query)
@@ -73,9 +118,11 @@ export async function GET(
             : enr.applicant._id;
         return enrollmentApplicantId.equals(applicant._id);
       });
+
       const latestEnrollment = applicantEnrollments[0] || null;
       return {
         ...applicant,
+        cv: latestEnrollment?.cv || null,
         status: latestEnrollment?.status || "Not enrolled",
         level: latestEnrollment?.level || "Not enrolled",
         course:

@@ -64,7 +64,7 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
-    
+
       coverImage: url,
       courseOutlines,
     });
@@ -82,10 +82,40 @@ export const POST = async (req: Request) => {
   }
 };
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
   try {
     await connectViaMongoose();
-    const courses = await Course.find({});
+    const { searchParams } = new URL(req.url);
+
+    const search = searchParams.get("search") || "";
+    const skillLevel = searchParams.get("skillLevel");
+    const sort = searchParams.get("sort") || "createdAt";
+    const order = searchParams.get("order") === "asc" ? 1 : -1;
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+
+    const query: any = {};
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+        { "courseOutlines.header": { $regex: search, $options: "i" } },
+        { "courseOutlines.lists": { $regex: search, $options: "i" } },
+      ];
+    }
+    if (skillLevel) {
+      query.skillLevel = skillLevel;
+    }
+    if (startDate || endDate) {
+      query.createdAt = {};
+      if (startDate) query.createdAt.$gte = new Date(startDate);
+      if (endDate) query.createdAt.$lte = new Date(endDate);
+    }
+
+    const courses = await Course.find(query)
+      .sort({ [sort]: order })
+      .exec();
+
     return NextResponse.json(courses, { status: 200 });
   } catch (error) {
     return NextResponse.json(

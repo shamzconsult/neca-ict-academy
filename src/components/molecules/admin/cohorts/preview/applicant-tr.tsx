@@ -65,6 +65,10 @@ export const ApplicantTr = ({ enrollment }: Props) => {
         queryKey: ["cohort-applicants", slug],
         exact: false,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["cohort-applicants-stats", slug],
+        exact: false,
+      });
       toast.success("Applicant updated");
       setIsOpen(false);
     },
@@ -167,7 +171,7 @@ export const ApplicantTr = ({ enrollment }: Props) => {
             </DialogHeader>
 
             <form onSubmit={(e) => handleSubmit(e, _id)}>
-              <div className='space-y-6 mt-5'>
+              <div className='space-y-6'>
                 <div className='space-y-2'>
                   <label htmlFor='level' className='text-sm font-medium'>
                     Level
@@ -178,18 +182,11 @@ export const ApplicantTr = ({ enrollment }: Props) => {
                     disabled={isPending}
                   >
                     <SelectTrigger className='w-full'>
-                      <SelectValue
-                        placeholder='Select Level'
-                        className='capitalize'
-                      />
+                      <SelectValue placeholder='Select Level' />
                     </SelectTrigger>
                     <SelectContent>
                       {levelOptions.map((level, index) => (
-                        <SelectItem
-                          key={index}
-                          value={level}
-                          className='capitalize'
-                        >
+                        <SelectItem key={index} value={level}>
                           {level}
                         </SelectItem>
                       ))}

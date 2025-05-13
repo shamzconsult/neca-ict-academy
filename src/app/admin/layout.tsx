@@ -53,7 +53,7 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
         {/* <div className='hidden md:flex justify-end items-center w-full p-4 bg-white shadow-sm'>
           <AdminLogo />
         </div> */}
-        <main className='p-6'>{children}</main>
+        <main className='p-6 pl-0'>{children}</main>
       </div>
     </div>
   );

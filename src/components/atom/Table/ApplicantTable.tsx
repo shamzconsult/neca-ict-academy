@@ -35,7 +35,7 @@ const ApplicantTable = ({
       <TableBody>
         {tableData.length > 0 ? (
           tableData.map((applicant) => (
-            <TableRow key={applicant._id} className="hover:bg-slate-50">
+            <TableRow key={applicant._id} className='hover:bg-slate-50'>
               <TableCell>
                 {applicant.firstName} {applicant.lastName}
               </TableCell>
@@ -51,10 +51,10 @@ const ApplicantTable = ({
                       applicant.status.toLowerCase() === "Admitted"
                         ? "bg-green-100 text-[#78A55A]"
                         : applicant.status === "Pending"
-                        ? "bg-yellow-100 text-[#F29D38]"
-                        : applicant.status.toLowerCase() === "declined"
-                        ? "bg-red-100 text-[#E02B20]"
-                        : "bg-gray-100 text-[#525252]"
+                          ? "bg-yellow-100 text-[#F29D38]"
+                          : applicant.status.toLowerCase() === "declined"
+                            ? "bg-red-100 text-[#E02B20]"
+                            : "bg-gray-100 text-[#525252]"
                     }`}
                   >
                     {applicant.status}
@@ -65,8 +65,8 @@ const ApplicantTable = ({
           ))
         ) : (
           <TableRow>
-            <td colSpan={7} className="text-center text-red-500">
-              <div className="text-center font-bold py-24">
+            <td colSpan={7} className='text-center text-red-500'>
+              <div className='text-center font-bold py-24'>
                 No results founds
               </div>
             </td>

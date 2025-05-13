@@ -1,4 +1,12 @@
 import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface ApplicationReviewProps {
   onClose: () => void;
@@ -15,37 +23,39 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
   statusError,
 }) => {
   return (
-    <div className="fixed inset-0 bg-black/60 flex justify-center items-center">
-      <p>stat</p>
-      {statusError}
-      <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
+    <Dialog open={!!applicantStatus || !!statusError} onOpenChange={onClose}>
+      <DialogContent>
         {statusError ? (
-          <>
-            <p className="text-red-600 text-center pt-3 text-xl font-bold mb-6">
+          <DialogHeader>
+            <DialogTitle className='text-red-600 text-center pt-3 text-xl font-bold mb-6'>
               {statusError}
-            </p>
-          </>
+            </DialogTitle>
+          </DialogHeader>
         ) : applicantStatus ? (
           <>
             {applicantStatus.status === "pending" && (
               <>
-                <p className="text-[#27156F] text-center font-bold mb-6">
-                  Your Application is Under Review
-                </p>
-                <p className="text-sm text-center">
+                <DialogHeader>
+                  <DialogTitle className='text-[#27156F] text-center font-bold mb-6'>
+                    Your Application is Under Review
+                  </DialogTitle>
+                </DialogHeader>
+                <p className='text-sm text-center'>
                   Dear {applicantStatus.applicant.firstName}{" "}
                   {applicantStatus.applicant.lastName}, your application is
-                  currently under review. We’ll notify you once a decision has
+                  currently under review. We'll notify you once a decision has
                   been made.
                 </p>
               </>
             )}
             {applicantStatus.status === "interview" && (
               <>
-                <p className="text-[#27156F] text-center font-bold mb-6">
-                  You&apos;re scheduled for an Interview
-                </p>
-                <p className="text-sm text-center">
+                <DialogHeader>
+                  <DialogTitle className='text-[#27156F] text-center font-bold mb-6'>
+                    You&apos;re scheduled for an Interview
+                  </DialogTitle>
+                </DialogHeader>
+                <p className='text-sm text-center'>
                   Dear {applicantStatus.applicant.firstName}{" "}
                   {applicantStatus.applicant.lastName}, you&apos;ve been
                   scheduled for an interview, check your email box for more
@@ -55,10 +65,12 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
             )}
             {applicantStatus.status === "admitted" && (
               <>
-                <p className="text-green-600 text-center font-bold mb-6">
-                  🎉 Application Accepted
-                </p>
-                <p className="text-sm text-center">
+                <DialogHeader>
+                  <DialogTitle className='text-green-600 text-center font-bold mb-6'>
+                    🎉 Application Accepted
+                  </DialogTitle>
+                </DialogHeader>
+                <p className='text-sm text-center'>
                   Congratulations {applicantStatus.applicant.firstName}{" "}
                   {applicantStatus.applicant.lastName}! You have admitted to the
                   course.
@@ -67,30 +79,33 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
             )}
             {applicantStatus.status === "declined" && (
               <>
-                <p className="text-red-600 text-center font-bold mb-6">
-                  Application Rejected
-                </p>
-                <p className="text-sm text-center">
+                <DialogHeader>
+                  <DialogTitle className='text-red-600 text-center font-bold mb-6'>
+                    Application Not Successful
+                  </DialogTitle>
+                </DialogHeader>
+                <p className='text-sm text-center'>
                   Hi {applicantStatus.applicant.firstName}{" "}
-                  {applicantStatus.applicant.lastName}, we regret to inform you
-                  that your application has not been successful.
+                  {applicantStatus.applicant.lastName}, thank you for your
+                  interest in our program. While we are unable to offer you a
+                  spot this time, we encourage you to apply again in the future.
+                  We appreciate your effort and wish you the best in your
+                  learning journey!
                 </p>
               </>
             )}
           </>
         ) : (
-          <p className="text-center">Loading status...</p>
+          <p className='text-center'>Loading status...</p>
         )}
-
-        <div className="flex justify-center">
-          <button
-            onClick={onClose}
-            className="px-10 py-1.5 bg-[#E02B20] text-white rounded-md cursor-pointer mt-6"
-          >
-            Okay
-          </button>
-        </div>
-      </div>
-    </div>
+        <DialogFooter className='flex justify-center'>
+          <DialogClose asChild>
+            <button className='px-10 py-1.5 bg-[#E02B20] text-white rounded-md cursor-pointer mt-6'>
+              Okay
+            </button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

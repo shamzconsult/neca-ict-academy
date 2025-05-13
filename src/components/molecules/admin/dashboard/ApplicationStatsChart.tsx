@@ -1,154 +1,133 @@
-import React, { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+"use client";
+import React from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
-  Filler,
   Legend,
-  ChartOptions,
 } from "chart.js";
+import { Bar } from "react-chartjs-2";
 import { AlertTriangle, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
+  BarElement,
   Title,
   Tooltip,
-  Filler,
   Legend
 );
 
 interface CohortStats {
   name: string;
   slug: string;
-  applicantCount: number;
-  createdAt?: Date;
+  total: number;
+  male: number;
+  female: number;
 }
 
 interface ApplicationStatsChartProps {
   initialData?: CohortStats[];
 }
 
+const ChartSkeleton = () => (
+  <div className='w-full h-full flex flex-col gap-4 p-4'>
+    <div className='h-6 w-1/3 bg-gray-200 rounded animate-pulse' />
+    <div className='flex-1 flex items-end gap-2'>
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          className='flex-1 bg-gray-200 rounded-t animate-pulse'
+          style={{ height: `${Math.random() * 60 + 20}%` }}
+        />
+      ))}
+    </div>
+  </div>
+);
+
 export const ApplicationStatsChart = ({
   initialData,
 }: ApplicationStatsChartProps) => {
-  const [chartData, setChartData] = useState({
-    labels: initialData?.map((c) => c.name) || ["Loading..."],
+  const { data, error, isLoading } = useQuery<{
+    success: boolean;
+    data: CohortStats[];
+  }>({
+    queryKey: ["cohorts-stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/cohorts/stats");
+      if (!res.ok) throw new Error("Failed to fetch stats");
+      return res.json();
+    },
+    initialData: initialData ? { success: true, data: initialData } : undefined,
+  });
+
+  const chartData = {
+    labels: data?.data.map((d) => d.name) || [],
     datasets: [
       {
-        label: "Applicants",
-        fill: true,
-        backgroundColor: "#27156F",
-        borderColor: "#E02B20",
-        pointBackgroundColor: "#FFFFFF",
-        pointBorderColor: "#47AA49",
-        data: initialData?.map((c) => c.applicantCount) || [0],
+        label: "Male",
+        data: data?.data.map((d) => d.male) || [],
+        backgroundColor: "#3b82f6",
+        stack: "stack0",
+      },
+      {
+        label: "Female",
+        data: data?.data.map((d) => d.female) || [],
+        backgroundColor: "#ec4899",
+        stack: "stack0",
       },
     ],
-  });
-  const [error] = useState<string | null>(null);
+  };
 
-  useEffect(() => {
-    if (!initialData) {
-      const fetchData = async () => {
-        try {
-          const response = await fetch("/api/cohort/applicant-stat");
-          const result = await response.json();
-          if (result.success) {
-            setChartData({
-              labels: result.data.map((c: CohortStats) => c.name),
-              datasets: [
-                {
-                  ...chartData.datasets[0],
-                  data: result.data.map((c: CohortStats) => c.applicantCount),
-                },
-              ],
-            });
-          }
-        } catch (error) {
-          console.error("Error:", error);
-        }
-      };
-      fetchData();
-    }
-  }, [initialData]);
-
-  const options: ChartOptions<"line"> = {
+  const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: true,
-        position: "top",
-        labels: {
-          color: "#374151",
-          usePointStyle: true,
-          boxWidth: 10,
-          font: {
-            size: 12,
-            weight: "bold",
-          },
-        },
+        position: "top" as const,
       },
       tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        titleColor: "#fff",
-        bodyColor: "#fff",
         callbacks: {
-          label: (tooltipItem) => `${tooltipItem.raw} applicants`,
+          footer: (items: any[]) => {
+            const total = items.reduce((sum, item) => sum + item.raw, 0);
+            return `Total: ${total}`;
+          },
         },
       },
     },
     scales: {
       x: {
-        grid: { display: false },
-        ticks: {
-          color: "#6B7280",
+        stacked: true,
+        grid: {
+          display: false,
         },
       },
       y: {
-        grid: { color: "#E5E7EB" },
-        ticks: {
-          color: "#6B7280",
-        },
-        title: {
-          display: true,
-          text: "Number of Applicants",
-          color: "#374151",
-          font: {
-            size: 14,
-            weight: "bold",
-          },
+        stacked: true,
+        beginAtZero: true,
+        grid: {
+          color: "rgba(0, 0, 0, 0.1)",
         },
       },
     },
   };
 
   return (
-    <div className='w-full p-6 bg-white rounded-lg shadow-md border border-gray-200'>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-lg font-semibold text-gray-800'>
-          Application Stats
-        </h2>
-        <h2 className='text-sm text-gray-500'>By Cohort</h2>
-      </div>
-
+    <div className='w-full p-6 bg-white rounded-lg shadow-lg border border-gray-200'>
       <div className='relative h-64'>
         {error ? (
           <div className='flex flex-col items-center justify-center h-full gap-2 text-red-500'>
             <AlertTriangle className='w-8 h-8' />
             <p>Failed to load data</p>
-            <p className='text-sm text-gray-500'>{error}</p>
+            <p className='text-sm text-gray-500'>{error.message}</p>
           </div>
-        ) : chartData.labels.length > 0 ? (
-          <Line data={chartData} options={options} />
-        ) : (
+        ) : isLoading ? (
+          <ChartSkeleton />
+        ) : data?.data.length === 0 ? (
           <div className='flex flex-col items-center justify-center h-full gap-2 text-gray-500'>
             <Search className='w-8 h-8' />
             <p>No application data available</p>
@@ -156,6 +135,8 @@ export const ApplicationStatsChart = ({
               There are no cohorts with applicant data to display
             </p>
           </div>
+        ) : (
+          <Bar data={chartData} options={options} />
         )}
       </div>
     </div>

@@ -10,10 +10,12 @@ import { Footer } from "@/components/atom/Footer";
 import { Navbar } from "@/components/atom/Navbar";
 import { CourseType } from "@/types";
 import { HomeHeroSection } from "./HomeHerosection";
+import { AdvertOverlay } from "@/components/atom/AdvertOverlay";
 
 export const HomePage = ({ courses }: { courses: CourseType[] }) => {
   return (
-    <div className="">
+    <>
+      <AdvertOverlay />
       <Navbar />
       <HomeHeroSection />
       <MileStone />
@@ -23,6 +25,6 @@ export const HomePage = ({ courses }: { courses: CourseType[] }) => {
       <FeaturedCourses courses={courses} />
       <Testimonials />
       <Footer />
-    </div>
+    </>
   );
 };
