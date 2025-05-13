@@ -200,7 +200,16 @@ export default function PhotoAlbumPage() {
           />
           <div className='absolute inset-0 z-10 bg-[#27156F] opacity-20' />
           <div className='max-w-6xl mx-auto px-4 text-center relative z-10'>
-            <h1 className='text-4xl md:text-[3rem] shadow-2xl text-[#27156F] mb-3 tracking-tight drop-shadow'>
+            <h1
+              className='
+                text-4xl md:text-[3rem] font-extrabold text-[#27156F]
+                mb-3 tracking-tight drop-shadow-2xl shadow-black
+                bg-white/80 px-8 py-4 rounded-xl inline-block
+                border-2 border-[#27156F]/20
+                backdrop-blur-sm
+                mx-auto
+              '
+            >
               Gallery Photo Album
             </h1>
             <div className='flex justify-center mt-2'>
