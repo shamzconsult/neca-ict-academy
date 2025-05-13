@@ -34,7 +34,7 @@ export const Navbar = () => {
   }
 
   return (
-    <nav className='bg-white font-medium w-full fixed top-0 z-50 text-[#27156F]  px-4 shadow-md text-sm'>
+    <nav className='bg-white w-full fixed top-0 z-50 text-[#27156F]  px-4 shadow-md text-sm'>
       <div className='max-w-6xl mx-auto flex items-center justify-between h-[80px] lg:h-[106px]'>
         <div className='flex items-center w-full lg:w-auto'>
           <div onClick={handleLinkClick}>
@@ -57,15 +57,15 @@ export const Navbar = () => {
         <div
           className={`${
             isOpen
-              ? "flex flex-col justify-start items-start gap-9 px-2 h-screen py-6 "
+              ? "flex flex-col justify-start items-start gap-5 px-2 h-screen py-6 "
               : "hidden"
-          } lg:flex lg:flex-row lg:items-center absolute lg:static top-16 left-0 w-full bg-white lg:w-auto lg:bg-transparent py-4 md:py-0`}
+          } lg:flex lg:flex-row lg:gap-5 lg:items-center absolute lg:static top-16 left-0 w-full bg-white lg:w-auto lg:bg-transparent py-4 md:py-0`}
         >
           {mainNavLinks.map((link) => (
             <Link
               href={link.url}
               key={link.label}
-              className={`py-2 px-3 hover:text-[#E02B20] transition duration-150 ease-in-out font-medium text-nowrap ${
+              className={`py-2 px-3 hover:text-[#E02B20] transition duration-150 ease-in-out text-nowrap ${
                 pathname === link.url
                   ? "underline text-[#E02B20] underline-offset-8"
                   : ""
@@ -76,7 +76,7 @@ export const Navbar = () => {
             </Link>
           ))}
           <DropdownMenu>
-            <DropdownMenuTrigger className='flex items-center gap-1 py-2 px-3 hover:text-[#E02B20] transition duration-150 ease-in-out font-medium text-nowrap'>
+            <DropdownMenuTrigger className='flex items-center gap-1 py-2 px-3 hover:text-[#E02B20] transition duration-150 ease-in-out text-nowrap'>
               More <ChevronDown className='h-4 w-4' />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
