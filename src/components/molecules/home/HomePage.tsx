@@ -31,7 +31,7 @@ export const HomePage = ({ courses }: { courses: CourseType[] }) => {
       {/* Floating Video Preview Button */}
       <button
         onClick={() => setIsVideoOpen(true)}
-        className='fixed bottom-6 right-6 z-[9999] rounded-full shadow-lg bg-white border border-[#27156F] hover:scale-105 transition-transform overflow-hidden w-16 h-16 flex items-center justify-center group'
+        className='fixed bottom-6 right-6 z-[9999] rounded-md shadow-lg bg-white border border-[#27156F] hover:scale-105 transition-transform overflow-hidden w-16 h-16 flex items-center justify-center group'
         aria-label='Watch our video'
       >
         <img

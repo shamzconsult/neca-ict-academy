@@ -148,25 +148,29 @@ export const Footer = () => {
               <h3 className='font-semibold text-nowrap'>Follow Us:</h3>
               <div className='flex space-x-3 '>
                 <a
-                  href=''
+                  target='_blank'
+                  rel='noopener'
+                  href='https://x.com/necadotorg'
                   className='bg-white hover:bg-[#E02B20] duration-300 ease-in-out p-2 rounded-full'
                 >
                   <BsTwitterX className='text-sm text-[#27156F]  ' />
                 </a>
                 <a
-                  href=''
+                  href='https://www.facebook.com/Nigemployers'
                   className='bg-white hover:bg-[#E02B20] duration-300 ease-in-out p-2 rounded-full'
                 >
                   <FaFacebookF className='text-sm text-[#27156F]  ' />
                 </a>
                 <a
-                  href=''
+                  href='https://www.linkedin.com/showcase/neca-ict-academy'
+                  target='_blank'
+                  rel='noopener'
                   className='bg-white hover:bg-[#E02B20] duration-300 ease-in-out p-2 rounded-full'
                 >
                   <FaLinkedinIn className='text-sm  text-[#27156F] ' />
                 </a>
                 <a
-                  href=''
+                  href='https://www.instagram.com/necaictacademy'
                   className='bg-white hover:bg-[#E02B20] duration-300 ease-in-out p-2 rounded-full'
                 >
                   <FaInstagram className='text-sm  text-[#27156F] ' />
