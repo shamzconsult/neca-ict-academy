@@ -191,7 +191,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   return (
     <div className='relative min-h-screen bg-white overflow-hidden'>
       {/* Background Elements */}
-      <div className='fixed top-0 left-0 w-[8%] h-[73%] z-10 transform rotate-[-0.47deg] origin-top-left'>
+      <div className='fixed top-0 left-0 w-[8%] h-[73%] z-40 transform rotate-[-0.47deg] origin-top-left'>
         <Image
           src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png'
           alt='Background Left'
@@ -210,7 +210,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
       </div>
       <div className='h-screen overflow-hidden'>
         {/* Fixed Header */}
-        <header className='fixed top-0 left-0 right-0 bg-white'>
+        <header className='fixed top-0 left-0 right-0 bg-white z-30'>
           <div className='py-4 px-[8%]'>
             <div className='flex flex-col gap-5 md:flex-row justify-between items-center'>
               <Link href='/' className='w-36 lg:w-48 relative'>
@@ -291,7 +291,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
               </div>
             </div>
 
-            <div className='relative z-50 w-full lg:w-1/2 lg:ml-[50%] overflow-y-auto h-full pt-5'>
+            <div className='relative z-10 w-full lg:w-1/2 lg:ml-[50%] overflow-y-auto h-full pt-5'>
               <div className='max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left'>
                 <SubHeading>NECA ICT Academy Application Portal</SubHeading>
                 <h2 className='text-2xl font-semibold text-[#27156F] mb-4 mt-6'>

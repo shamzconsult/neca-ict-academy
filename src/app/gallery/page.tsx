@@ -13,7 +13,7 @@ import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 
 const IMAGES = [
   {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114948320/e69d2f68-72b3-4b68-a4bd-4d8ecac6887b.jpeg",
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139261/IMG_0285-min_1_11zon_tra6m7.jpg",
     title: `Photo #1`,
     date: `2024-06-01`,
     description: `A memorable moment from our activities.`,
@@ -60,16 +60,112 @@ const IMAGES = [
     width: 800,
     height: 600,
   },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139977/IMG-20250503-WA0160_1_bu5bhw.jpg",
+    title: `Photo #7`,
+    date: `2024-06-07`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114948320/e69d2f68-72b3-4b68-a4bd-4d8ecac6887b.jpeg",
+    title: `Photo #8`,
+    date: `2024-06-08`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137510/WhatsApp_Image_2025-05-08_at_1.22.46_PM_f9ari0.jpg",
+    title: `Photo #9`,
+    date: `2024-06-09`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137478/Lagos_Training_2_wkmgo5.jpg",
+    title: `Photo #10`,
+    date: `2024-06-10`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139260/IMG_0289_dkrtzx_e_improve-min_2_11zon_r6tulm.jpg",
+    title: `Photo #11`,
+    date: `2024-06-11`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137479/WhatsApp_Image_2025-05-08_at_1.22.47_PM_j9tabw.jpg",
+    title: `Photo #12`,
+    date: `2024-06-12`,
+    description: `UncleBigBay teaching AI and Vibe Coding at NECA ICT Academy`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139259/IMG_0569-min_3_11zon_owqran.jpg",
+    title: `Photo #13`,
+    date: `2024-06-13`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139257/IMG_0304-min_6_11zon_lgqtyq.jpg",
+    title: `Photo #14`,
+    date: `2024-06-14`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
+    title: `Photo #15`,
+    date: `2024-06-15`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139255/IMG_0280-min_5_11zon_lv2bwp.jpg",
+    title: `Photo #16`,
+    date: `2024-06-16`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0571-min_9_11zon_rghmsg.jpg",
+    title: `Photo #17`,
+    date: `2024-06-17`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
+
+  {
+    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0505-min_7_11zon_ucvokd.jpg",
+    title: `Photo #18`,
+    date: `2024-06-18`,
+    description: `A memorable moment from our activities.`,
+    width: 800,
+    height: 600,
+  },
 ];
 
 export default function PhotoAlbumPage() {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const [images, setImages] = useState(IMAGES);
   const backgroundImages = [
-    "https://cdn.hashnode.com/res/hashnode/image/upload/v1747116422583/899aad12-5c86-4d93-815a-30d3f7f39993.webp",
-    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=800&q=80",
-    // Add more image URLs as needed
+    "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140810/899aad12-5c86-4d93-815a-30d3f7f39993_cgix5e.webp",
+    "https://res.cloudinary.com/dtryuudiy/image/upload/v1747141648/image_jxqy5v.webp",
+    "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
   ];
   const [bgIndex, setBgIndex] = useState(0);
 
@@ -91,10 +187,10 @@ export default function PhotoAlbumPage() {
       <Navbar />
       <main className='flex-1 pt-16 lg:pt-[106px] pb-16'>
         {/* Hero Section */}
-        <section className='w-full flex items-center lg:h-[500px] py-12 mb-10 border-b border-[#E02B20]/10 relative overflow-hidden'>
+        <section className='w-full flex items-end h-[50vh] lg:h-[80vh] py-12 mb-10 border-b border-[#E02B20]/10 relative overflow-hidden'>
           {/* Hero Background Image */}
           <div
-            className='absolute inset-0 z-0 opacity-30 transition-all duration-1000'
+            className='absolute inset-0 z-0 opacity-45 transition-all duration-1000'
             style={{
               backgroundImage: `url('${backgroundImages[bgIndex]}')`,
               backgroundSize: "cover",
@@ -102,11 +198,26 @@ export default function PhotoAlbumPage() {
               transition: "background-image 1s ease-in-out",
             }}
           />
-          <div className='absolute inset-0 z-10 bg-[#27156F] opacity-40' />
+          <div className='absolute inset-0 z-10 bg-[#27156F] opacity-20' />
           <div className='max-w-6xl mx-auto px-4 text-center relative z-10'>
-            <h1 className='text-4xl md:text-[3rem] text-[#27156F] mb-3 tracking-tight drop-shadow'>
-              Photo Album
+            <h1 className='text-4xl md:text-[3rem] shadow-2xl text-[#27156F] mb-3 tracking-tight drop-shadow'>
+              Gallery Photo Album
             </h1>
+            <div className='flex justify-center mt-2'>
+              <svg
+                className='w-8 h-8 text-[#27156F] animate-bounce'
+                fill='none'
+                stroke='currentColor'
+                strokeWidth={2}
+                viewBox='0 0 24 24'
+              >
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  d='M19 9l-7 7-7-7'
+                />
+              </svg>
+            </div>
             {/* <p className='text-lg text-[#27156F]/80 max-w-2xl mx-auto'>
               A visual journey through our teaching, workshops, and community
               activities. Click any photo to view it larger.
@@ -130,7 +241,7 @@ export default function PhotoAlbumPage() {
                 >
                   <img
                     src={img.src}
-                    alt={img.title}
+                    alt={img.description}
                     className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-300'
                     style={{ aspectRatio: idx % 7 === 0 ? "2/2" : "1/1" }}
                   />
