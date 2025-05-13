@@ -86,10 +86,10 @@ export const Footer = () => {
             <h3 className='font-semibold mb-3'>Links</h3>
             <div className='text-sm flex flex-col space-y-2'>
               <Link
-                href='/photos'
+                href='/gallery'
                 className='hover:underline underline-offset-4 duration-150 text-nowrap'
               >
-                Photos
+                Gallery
               </Link>
               <Link
                 href='/enroll'

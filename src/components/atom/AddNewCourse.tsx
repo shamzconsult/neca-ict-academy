@@ -312,8 +312,8 @@ export const AddNewCourse = ({
                       ref={fileInputRef}
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null;
-                        if (file && file.size > 204800) {
-                          alert("File size must be less than 200KB.");
+                        if (file && file.size > 307200) {
+                          alert("File size must be less than 300KB.");
                           e.target.value = "";
                           setFile(null);
                           return;

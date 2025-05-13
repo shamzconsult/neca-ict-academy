@@ -4,10 +4,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import { VscMenu } from "react-icons/vsc";
-import { navLinks } from "@/const/links";
 import { Logo } from "./Logo";
 import { usePathname } from "next/navigation";
 import { EnrollBtn } from "./EnrollBtn";
+import { mainNavLinks, dropdownNavLinks } from "@/const/links";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,11 +57,11 @@ export const Navbar = () => {
         <div
           className={`${
             isOpen
-              ? "flex flex-col justify-start items-start gap-5 px-2 h-screen py-6 "
+              ? "flex flex-col justify-start items-start gap-5 px-2 h-screen lg:h-auto py-6 "
               : "hidden"
-          } lg:flex lg:flex-row lg:items-center lg:space-x-6 absolute lg:static top-16 left-0 w-full bg-white lg:w-auto lg:bg-transparent py-4 md:py-0`}
+          } lg:flex lg:flex-row lg:items-center absolute lg:static top-16 left-0 w-full bg-white lg:w-auto lg:bg-transparent py-4 md:py-0`}
         >
-          {navLinks.map((link) => (
+          {mainNavLinks.map((link) => (
             <Link
               href={link.url}
               key={link.label}
@@ -68,6 +75,26 @@ export const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger className='flex items-center gap-1 py-2 px-3 hover:text-[#E02B20] transition duration-150 ease-in-out font-medium text-nowrap'>
+              More <ChevronDown className='h-4 w-4' />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {dropdownNavLinks.map((link) => (
+                <DropdownMenuItem key={link.label} asChild>
+                  <Link
+                    href={link.url}
+                    className={`w-full ${
+                      pathname === link.url ? "text-[#E02B20]" : ""
+                    }`}
+                    onClick={handleLinkClick}
+                  >
+                    {link.label}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <div className='lg:hidden w-fit mt-5 text-center px-2'>
             <EnrollBtn />
           </div>
