@@ -11,11 +11,11 @@ import { CourseType } from "@/types";
 export const CoursePreview = ({ course }: { course: CourseType }) => {
   if (!course) {
     return (
-      <div className=" h-screen mt2 flex flex-col justify-center items-center">
-        <h1 className="text-center font-bold  ">Course not found</h1>
+      <div className=' h-screen mt2 flex flex-col justify-center items-center'>
+        <h1 className='text-center font-bold  '>Course not found</h1>
         <Link
-          className="text-sm text-slate-400 hover:underline cursor-pointer"
-          href="/courses"
+          className='text-sm text-slate-400 hover:underline cursor-pointer'
+          href='/courses'
         >
           Click here to check other courses
         </Link>
@@ -23,11 +23,11 @@ export const CoursePreview = ({ course }: { course: CourseType }) => {
     );
   }
   return (
-    <div className="bg-[#FBFBFB] ">
+    <div className='bg-[#FBFBFB]'>
       <Navbar />
       <CoursePreviewHero courseData={course} />
       <TrackCards courseData={course} />
-      <CourseDetails courseData={course} />
+      <CourseDetails course={course} />
       <JoinUs courseData={course} />
       <Footer />
     </div>

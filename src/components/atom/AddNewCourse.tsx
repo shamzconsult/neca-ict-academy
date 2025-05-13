@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type AddNewCourseProps = {
   toggleModal: () => void;
@@ -39,6 +40,8 @@ type AddNewCourseProps = {
     review: string;
     skillLevel: string;
     courseOutlines: CourseOutline[];
+    hasCertificate: boolean;
+    type: string;
   };
   setFormData: React.Dispatch<
     React.SetStateAction<{
@@ -50,6 +53,8 @@ type AddNewCourseProps = {
       review: string;
       skillLevel: string;
       courseOutlines: CourseOutline[];
+      hasCertificate: boolean;
+      type: string;
     }>
   >;
   open: boolean;
@@ -89,6 +94,8 @@ export const AddNewCourse = ({
         review: "",
         skillLevel: "",
         courseOutlines: [],
+        hasCertificate: false,
+        type: "",
       });
       setFile(null);
       toggleModal();
@@ -128,6 +135,8 @@ export const AddNewCourse = ({
         review: "",
         skillLevel: "",
         courseOutlines: [],
+        hasCertificate: false,
+        type: "",
       });
       setFile(null);
       toggleModal();
@@ -162,6 +171,8 @@ export const AddNewCourse = ({
     formDataToSend.append("rating", formData.rating);
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
+    formDataToSend.append("hasCertificate", String(formData.hasCertificate));
+    formDataToSend.append("type", formData.type);
     formDataToSend.append("coverImage", file);
     formDataToSend.append(
       "courseOutlines",
@@ -182,13 +193,15 @@ export const AddNewCourse = ({
     formDataToSend.append("rating", formData.rating);
     formDataToSend.append("review", formData.review);
     formDataToSend.append("skillLevel", formData.skillLevel);
+    formDataToSend.append("hasCertificate", String(formData.hasCertificate));
+    formDataToSend.append("type", formData.type);
+    if (file) {
+      formDataToSend.append("coverImage", file);
+    }
     formDataToSend.append(
       "courseOutlines",
       JSON.stringify(formData.courseOutlines)
     );
-    if (file) {
-      formDataToSend.append("coverImage", file);
-    }
     updateCourseMutation.mutate({ slug: courseToEdit.slug, formDataToSend });
   };
 
@@ -208,6 +221,8 @@ export const AddNewCourse = ({
             review: "",
             skillLevel: "",
             courseOutlines: [],
+            hasCertificate: false,
+            type: "",
           });
           setFile(null);
         }
@@ -295,7 +310,16 @@ export const AddNewCourse = ({
                       accept='image/*'
                       className='cursor-pointer'
                       ref={fileInputRef}
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null;
+                        if (file && file.size > 204800) {
+                          alert("File size must be less than 200KB.");
+                          e.target.value = "";
+                          setFile(null);
+                          return;
+                        }
+                        setFile(file);
+                      }}
                     />
                   </div>
                 </div>
@@ -368,6 +392,41 @@ export const AddNewCourse = ({
                     <SelectItem value='Advanced'>Advanced</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className='space-y-1 w-full'>
+                <Label>Type</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) => {
+                    setFormData({ ...formData, type: value });
+                  }}
+                >
+                  <SelectTrigger className='w-full'>
+                    <SelectValue placeholder='Select course type' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='Physical'>Physical</SelectItem>
+                    <SelectItem value='Virtual'>Virtual</SelectItem>
+                    <SelectItem value='Hybrid'>Hybrid</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='hasCertificate'
+                  checked={formData.hasCertificate}
+                  onCheckedChange={(checked: boolean) => {
+                    setFormData({
+                      ...formData,
+                      hasCertificate: checked,
+                    });
+                  }}
+                />
+                <Label htmlFor='hasCertificate'>
+                  This course offers a certificate
+                </Label>
               </div>
 
               <div className='space-y-2'>
@@ -524,6 +583,8 @@ export const AddNewCourse = ({
                   review: "",
                   skillLevel: "",
                   courseOutlines: [],
+                  hasCertificate: false,
+                  type: "",
                 });
                 setFile(null);
               }}
