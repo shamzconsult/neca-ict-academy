@@ -147,8 +147,8 @@ export const ManageCourses = () => {
         }
       />
       {/* Filter & Sort Controls */}
-      <div className='flex gap-4 mb-6'>
-        <div className='relative w-full'>
+      <div className='flex flex-col md:flex-row gap-4 mb-6'>
+        <div className='relative w-full md:w-1/2 lg:w-full'>
           <Input
             placeholder='Search course title...'
             value={search}
@@ -164,9 +164,9 @@ export const ManageCourses = () => {
             </button>
           )}
         </div>
-        <div className='flex justify-between gap-4'>
+        <div className='flex flex-col md:flex-row w-full md:w-auto gap-4'>
           <Select value={skillLevel} onValueChange={setSkillLevel}>
-            <SelectTrigger className='w-40'>
+            <SelectTrigger className='w-full md:w-40'>
               <SelectValue placeholder='Skill Level' />
             </SelectTrigger>
             <SelectContent>
@@ -177,7 +177,7 @@ export const ManageCourses = () => {
             </SelectContent>
           </Select>
           <Select value={order} onValueChange={setOrder}>
-            <SelectTrigger className='w-40'>
+            <SelectTrigger className='w-full md:w-40'>
               <SelectValue placeholder='Order' />
             </SelectTrigger>
             <SelectContent>
@@ -190,13 +190,13 @@ export const ManageCourses = () => {
             value={dateRange.start}
             onChange={(date) => setDateRange((r) => ({ ...r, start: date }))}
             placeholder='Start Date'
-            className='w-40'
+            className='w-full md:w-40'
           />
           <DatePicker
             value={dateRange.end}
             onChange={(date) => setDateRange((r) => ({ ...r, end: date }))}
             placeholder='End Date'
-            className='w-40'
+            className='w-full md:w-40'
           />
         </div>
       </div>

@@ -12,7 +12,7 @@ export function AdminSectionHeader({
 }) {
   const { sidebarCollapsed, toggleSidebar } = useSidebar();
   return (
-    <header className='flex gap-2 items-center justify-between mb-8'>
+    <header className='flex flex-col gap-2 md:flex-row md:items-center justify-between mb-8'>
       <div className='flex gap-2 items-center'>
         <div className='hidden lg:flex justify-start'>
           <button
@@ -25,7 +25,7 @@ export function AdminSectionHeader({
         </div>
         <Separator
           orientation='vertical'
-          className='mx-2 data-[orientation=vertical]:h-4'
+          className='mx-2 data-[orientation=vertical]:h-4 hidden lg:flex'
         />
         <h1 className='text-2xl font-bold text-gray-800'>{title}</h1>
       </div>
