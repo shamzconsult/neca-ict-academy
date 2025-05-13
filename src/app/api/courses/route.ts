@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { uploadToCloudinary } from "@/lib/cloudinary";
+import { Enrollment } from "@/models/enrollment";
 
 export const POST = async (req: Request) => {
   try {
@@ -16,6 +17,8 @@ export const POST = async (req: Request) => {
     const rating = formData.get("rating") as string;
     const review = formData.get("review") as string;
     const skillLevel = formData.get("skillLevel") as string;
+    const type = formData.get("type") as string;
+    const hasCertificate = formData.get("hasCertificate") === "true";
     const file = formData.get("coverImage") as File;
 
     const courseOutlinesRaw = formData.get("courseOutlines") as string;
@@ -49,6 +52,13 @@ export const POST = async (req: Request) => {
       );
     }
 
+    if (!type || !["Physical", "Virtual", "Hybrid"].includes(type)) {
+      return NextResponse.json(
+        { message: "Valid course type is required" },
+        { status: 400 }
+      );
+    }
+
     // Convert file to base64 for Cloudinary
     const buffer = Buffer.from(await file.arrayBuffer());
     const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
@@ -64,7 +74,8 @@ export const POST = async (req: Request) => {
       rating,
       review,
       skillLevel,
-
+      type,
+      hasCertificate,
       coverImage: url,
       courseOutlines,
     });
@@ -116,7 +127,20 @@ export const GET = async (req: Request) => {
       .sort({ [sort]: order })
       .exec();
 
-    return NextResponse.json(courses, { status: 200 });
+    // Fetch totalEnrolled for each course
+    const coursesWithEnrolled = await Promise.all(
+      courses.map(async (course) => {
+        const totalEnrolled = await Enrollment.countDocuments({
+          course: course._id,
+        });
+        return {
+          ...course.toObject(),
+          totalEnrolled,
+        };
+      })
+    );
+
+    return NextResponse.json(coursesWithEnrolled, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Error fetching courses", error },
