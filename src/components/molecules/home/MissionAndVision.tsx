@@ -3,10 +3,10 @@ import Image from "next/image";
 
 export const MissionAndVision = () => {
   return (
-    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-start items-center gap-8 lg:gap-16 my-16 lg:my-28 px-4 lg:px-0">
+    <div className="max-w-6xl mx-auto flex flex-col lg:flex-row justify-start items-center gap-8 lg:gap-16 my-22 lg:my-32 px-4 lg:px-0">
       <section className=" h-[300px] md:h-[525px] w-full  lg:w-[633px] relative ">
         <Image
-          src="https://res.cloudinary.com/dcgghkk7q/image/upload/v1743745210/Group_1_1_-min_qfn9md.png"
+          src="https://res.cloudinary.com/dtryuudiy/image/upload/v1746615645/Group_1_1_-min_qfn9md_qjpt7u.jpg"
           alt="mission&vission"
           fill
           className="object-cover"

@@ -1,124 +1,147 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { HiOutlinePlusCircle } from "react-icons/hi";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
+import { CohortType } from "@/types";
+import { HiOutlinePlusCircle } from "react-icons/hi";
 import { CohortForm } from "@/components/atom/CohortForm";
 import Link from "next/link";
-import { CohortsProps, CohortType } from "@/types";
 import EmptyState from "@/components/atom/EmptyState";
+import CohortTable from "@/components/atom/Table/CohortTable";
+import { adminCohortTableHead } from "@/const";
+import { toast } from "sonner";
 
-const statsData = [
-  { label: "Total applicants", value: "1,150,000" },
-  { label: "Total admitted", value: "25,985" },
-  { label: "Total graduated", value: "10,000" },
-  { label: "Total declined", value: "3,005" },
-];
+interface DashboardStat {
+  name: string;
+  value: number;
+}
 
-export const AdminDashboard = ({
-  cohortsData: initialCohorts,
-}: CohortsProps) => {
+interface AdminDashboardProps {
+  cohortsData: CohortType[];
+}
+
+const StatCard = ({ stat }: { stat: DashboardStat }) => (
+  <div className='p-6 bg-white rounded-lg shadow-md border border-gray-200'>
+    <p className='text-3xl font-bold text-gray-900'>{stat.value}</p>
+    <p className='text-sm text-gray-500'>{stat.name}</p>
+  </div>
+);
+
+const StatsSkeleton = () => (
+  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8'>
+    {[...Array(5)].map((_, i) => (
+      <div
+        key={i}
+        className='p-6 bg-white rounded-lg shadow-md border border-gray-200'
+      >
+        <div className='h-8 w-16 bg-gray-200 rounded animate-pulse mb-2' />
+        <div className='h-4 w-24 bg-gray-200 rounded animate-pulse' />
+      </div>
+    ))}
+  </div>
+);
+
+export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   const [showModal, setShowModal] = useState(false);
-  const [cohortsData, setCohortsData] = useState<CohortType[]>(initialCohorts);
+  const [localCohorts, setLocalCohorts] = useState<CohortType[]>(
+    cohortsData || []
+  );
 
-  useEffect(() => {
-    async function fetchCohorts() {
-      try {
-        const res = await fetch("/api/cohort");
-        const data: CohortType[] = await res.json();
-        setCohortsData(data);
-      } catch (error) {
-        console.error("Error fetching cohorts: ", error);
-      }
+  const { data: dashboardStats, isLoading } = useQuery<{
+    success: boolean;
+    data: DashboardStat[];
+  }>({
+    queryKey: ["dashboard-stats"],
+    queryFn: async () => {
+      const res = await fetch("/api/dashboard/stats");
+      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      return res.json();
+    },
+  });
+
+  // Transform cohorts data for the chart
+  const transformedCohortsData = localCohorts.map((cohort) => ({
+    name: cohort.name,
+    slug: cohort.slug,
+    total: 0, // These will be populated by the chart's own data fetching
+    male: 0,
+    female: 0,
+  }));
+
+  const firstFiveCohorts = localCohorts.slice(0, 5);
+
+  const checkAllCohortStatus = () => {
+    if (localCohorts.some((cohort) => cohort.active)) {
+      toast.error("There is an active cohort");
+    } else {
+      setShowModal(!showModal);
     }
-    fetchCohorts();
-  }, []);
-  console.log(cohortsData);
-
-  const firstFiveCohorts = cohortsData.slice(0, 5);
-
-  const toggleModal = () => {
-    setShowModal(!showModal);
   };
+
   return (
-    <div className="md:px-4 space-y-8 w-full pb-10">
-      <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white">
-        <h1 className="md:text-[20px] font-medium">Dashboard Overview</h1>
+    <div className='p-6 bg-gray-50 min-h-screen'>
+      {/* Header with title and create button */}
+      <header className='flex justify-between items-center mb-8'>
+        <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
         <button
-          onClick={toggleModal}
-          className="bg-[#E02B20] text-nowrap flex items-center gap-1 text-white px-6 py-2.5 rounded-md cursor-pointer"
+          onClick={checkAllCohortStatus}
+          className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
         >
           <HiOutlinePlusCircle /> Create Cohort
         </button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {statsData.map((stat, index) => (
-          <div
-            key={index}
-            className="p-4 border border-[#C4C4C4] rounded-md bg-white"
-          >
-            <p className="md:text-[20px] font-semibold">{stat.value}</p>
-            <p className="">{stat.label}</p>
-          </div>
-        ))}
-      </div>
-      <ApplicationStatsChart />
+      </header>
 
-      <section className="w-full">
-        <div className="flex justify-between items-center py-3">
-          <h2 className="text-xl font-semibold">Cohorts</h2>
-          <Link
-            href="/admin/cohorts"
-            className="text-[#E02B20] hover:underline hover:underline-offset-8"
-          >
+      {/* Stats cards */}
+      {isLoading ? (
+        <StatsSkeleton />
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8'>
+          {dashboardStats?.data.map((stat, index) => (
+            <StatCard key={index} stat={stat} />
+          ))}
+        </div>
+      )}
+
+      {/* Application stats chart */}
+      <section className='mb-8'>
+        <h2 className='text-xl font-semibold text-gray-800 mb-4'>
+          Application Statistics
+        </h2>
+        <ApplicationStatsChart initialData={transformedCohortsData} />
+      </section>
+
+      {/* Cohorts table */}
+      <section className='mb-8'>
+        <div className='flex justify-between items-center mb-4'>
+          <h2 className='text-xl font-semibold text-gray-800'>Cohorts</h2>
+          <Link href='/admin/cohorts' className='text-blue-600 hover:underline'>
             View All Cohorts
           </Link>
         </div>
-        <div className="overflow-x-auto border border-[#C4C4C4]  ">
-          {cohortsData.length > 0 ? (
-            <table className="w-full table-auto   bg-white">
-              <thead>
-                <tr className="text-nowrap">
-                  {[
-                    "Cohort Name",
-                    "Total Applicants",
-                    "Total Admitted",
-                    "Total Graduated",
-                    "Total Declined",
-                    "Start Date",
-                    "End Date",
-                  ].map((header) => (
-                    <th key={header} className="p-4 text-left font-medium">
-                      {header}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {firstFiveCohorts.map((cohort, index) => (
-                  <tr key={index} className="border-t border-[#C4C4C4]">
-                    <td className="p-4">{cohort.name}</td>
-                    <td className="p-4">{cohort.applicants.length || "0"}</td>
-                    <td className="p-4">{cohort.admitted || "0"}</td>
-                    <td className="p-4">{cohort.graduated || "0"}</td>
-                    <td className="p-4">{cohort.declined || "0"}</td>
-                    <td className="p-4">{cohort.startDate}</td>
-                    <td className="p-4">{cohort.endDate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className='bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden'>
+          {localCohorts?.length > 0 ? (
+            <CohortTable
+              tableHead={adminCohortTableHead}
+              tableData={firstFiveCohorts}
+              action={false}
+            />
           ) : (
             <EmptyState
-              title="No Cohort Created yet"
-              message="Click on the create Cohort button to start"
+              title='No Cohort Created yet'
+              message='Click on the create Cohort button to start'
             />
           )}
         </div>
       </section>
 
+      {/* Cohort creation modal */}
       {showModal && (
-        <CohortForm toggleModal={toggleModal} setCohortsData={setCohortsData} />
+        <CohortForm
+          toggleModal={checkAllCohortStatus}
+          setCohortsData={setLocalCohorts}
+          cohortsData={localCohorts}
+        />
       )}
     </div>
   );

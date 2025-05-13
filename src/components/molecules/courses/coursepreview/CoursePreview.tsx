@@ -23,7 +23,7 @@ export const CoursePreview = ({ course }: { course: CourseType }) => {
     );
   }
   return (
-    <div>
+    <div className="bg-[#FBFBFB] ">
       <Navbar />
       <CoursePreviewHero courseData={course} />
       <TrackCards courseData={course} />

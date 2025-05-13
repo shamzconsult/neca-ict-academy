@@ -1,24 +1,44 @@
-"use client";
-
 import { CohortType } from "@/types";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import Swal from "sweetalert2";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { DatePicker } from "@/components/ui/date-picker";
+import { Button } from "../ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const CohortForm = ({
   toggleModal,
   setCohortsData,
-  // handleUpdate,
-  // editingMode,
+  cohortToEdit,
+  setCohortToEdit,
+  cohortsData,
 }: {
   toggleModal: () => void;
-  handleUpdate?: (e: React.FormEvent<HTMLFormElement>) => void;
-  editingMode?: CohortType | null;
+  cohortToEdit?: CohortType | null;
+  cohortsData: CohortType[];
   setCohortsData: Dispatch<SetStateAction<CohortType[]>>;
+  setCohortToEdit?: (cohort: CohortType | null) => void;
 }) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     startDate: "",
     endDate: "",
+    active: true,
     applicationStartDate: "",
     applicationEndDate: "",
   });
@@ -32,9 +52,12 @@ export const CohortForm = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setLoading(true);
+
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("startDate", formData.startDate);
+    formDataToSend.append("active", formData.active.toString());
     formDataToSend.append("endDate", formData.endDate);
     formDataToSend.append(
       "applicationStartDate",
@@ -43,7 +66,7 @@ export const CohortForm = ({
     formDataToSend.append("applicationEndDate", formData.applicationEndDate);
 
     try {
-      const res = await fetch("/api/cohort", {
+      const res = await fetch("/api/cohorts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,145 +82,264 @@ export const CohortForm = ({
       const responseData = await res.json();
       setCohortsData((prevCohort) => [...prevCohort, responseData.newCohort]);
 
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Cohort Created Successfully🎉🎉",
-      });
+      toast.success("Cohort Created Successfully 🎉🎉");
 
       toggleModal();
       setFormData({
         name: "",
         startDate: "",
         endDate: "",
+        active: true,
         applicationStartDate: "",
         applicationEndDate: "",
       });
     } catch (error) {
       console.error("Error submitting form:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!cohortToEdit) return;
+
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("startDate", formData.startDate);
+    formDataToSend.append("active", formData.active.toString());
+    formDataToSend.append("endDate", formData.endDate);
+    formDataToSend.append(
+      "applicationStartDate",
+      formData.applicationStartDate
+    );
+    formDataToSend.append("applicationEndDate", formData.applicationEndDate);
+
+    if (
+      cohortsData.some(
+        (cohort) => cohort.active && cohortToEdit.active !== cohort.active
+      )
+    ) {
+      toast.error("There is an active cohort");
+    } else {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/cohorts/${cohortToEdit.slug}`, {
+          method: "PUT",
+          body: formDataToSend,
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Error updating course:", errorText);
+          return;
+        }
+
+        const responseData = await res.json();
+
+        setCohortsData((prev) =>
+          prev.map((cohort) =>
+            cohort.slug === cohortToEdit.slug
+              ? responseData.updatedCohort
+              : cohort
+          )
+        );
+
+        toast.success("Cohort Updated Successfully 🎉");
+
+        setCohortToEdit?.(null);
+        setFormData({
+          name: "",
+          startDate: "",
+          endDate: "",
+          active: formData.active,
+          applicationStartDate: "",
+          applicationEndDate: "",
+        });
+        toggleModal();
+      } catch (error) {
+        console.error("Error updating course:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (cohortToEdit) {
+      setFormData({
+        name: cohortToEdit.name,
+        startDate: cohortToEdit.startDate,
+        endDate: cohortToEdit.endDate,
+        active: cohortToEdit.active,
+        applicationStartDate: cohortToEdit.applicationStartDate,
+        applicationEndDate: cohortToEdit.applicationEndDate,
+      });
+    }
+  }, [cohortToEdit]);
   return (
-    <>
-      <div className="fixed lg:sticky h-screen inset-0 bg-black/60 bg-opacity-50 flex justify-center items-center ">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] md:w-[70%] lg:w-[600px]">
-          <h2 className="text-xl font-bold mb-4">
-            {/* {editingMode ? "Editing Cohort" : "Create Cohort"} */}
-            Create Cohort
-          </h2>
-          <form onSubmit={handleSubmit} className="space-y-4 ">
-            <div>
-              <label className="block text-sm font-semibold mb-1">
-                Cohort Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                placeholder="Enter cohort name"
+    <Dialog
+      open
+      onOpenChange={(openState) => {
+        if (!openState) {
+          toggleModal();
+        }
+      }}
+    >
+      <DialogContent className='max-h-[90vh] overflow-y-auto'>
+        <DialogHeader>
+          <DialogTitle>
+            {cohortToEdit ? "Updating Cohort" : "Create Cohort"}
+          </DialogTitle>
+        </DialogHeader>
+        <form
+          onSubmit={cohortToEdit ? handleUpdate : handleSubmit}
+          className='space-y-6'
+        >
+          <div className='space-y-2'>
+            <Label htmlFor='name'>Cohort Name</Label>
+            <Input
+              id='name'
+              name='name'
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder='Enter cohort name'
+            />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='active'>Status</Label>
+            <Select
+              value={formData.active ? "true" : "false"}
+              onValueChange={(val) =>
+                setFormData((prev) => ({ ...prev, active: val === "true" }))
+              }
+              name='active'
+              required
+            >
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Select status' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='true'>Active</SelectItem>
+                <SelectItem value='false'>Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className='flex flex-col md:flex-row gap-4'>
+            <div className='flex-1 space-y-2'>
+              <Label>Application Start Date</Label>
+              <DatePicker
+                value={
+                  formData.applicationStartDate
+                    ? new Date(formData.applicationStartDate)
+                    : undefined
+                }
+                onChange={(date) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    applicationStartDate: date
+                      ? date.toISOString().slice(0, 10)
+                      : "",
+                  }))
+                }
+                placeholder='Pick a date'
+                className='w-full'
               />
             </div>
-            {/* <div>
-              <label className="block text-sm font-semibold mb-1">
-                Cohort Slug
-              </label>
-              <input
-                type="text"
-                onChange={(e) => setSlug(e.target.value)}
-                value={slug}
-                required
-                className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                placeholder="cohort-1.0"
+            <div className='flex-1 space-y-2'>
+              <Label>Application End Date</Label>
+              <DatePicker
+                value={
+                  formData.applicationEndDate
+                    ? new Date(formData.applicationEndDate)
+                    : undefined
+                }
+                onChange={(date) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    applicationEndDate: date
+                      ? date.toISOString().slice(0, 10)
+                      : "",
+                  }))
+                }
+                placeholder='Pick a date'
+                className='w-full'
               />
-            </div> */}
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-semibold mb-1">
-                  Application Start-Date
-                </label>
-                <input
-                  type="date"
-                  name="applicationStartDate"
-                  value={formData.applicationStartDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-semibold mb-1">
-                  Application End-Date
-                </label>
-                <input
-                  type="date"
-                  name="applicationEndDate"
-                  value={formData.applicationEndDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                />
-              </div>
             </div>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <label className="block text-sm font-semibold mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="block text-sm font-semibold mb-1">
-                  End Date
-                </label>
-                <input
-                  type="date"
-                  name="endDate"
-                  value={formData.endDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full p-2 border border-[#C4C4C4] rounded-md"
-                />
-              </div>
+          </div>
+
+          <div className='flex flex-col md:flex-row gap-4'>
+            <div className='flex-1 space-y-2'>
+              <Label>Cohort Start Date</Label>
+              <DatePicker
+                value={
+                  formData.startDate ? new Date(formData.startDate) : undefined
+                }
+                onChange={(date) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    startDate: date ? date.toISOString().slice(0, 10) : "",
+                  }))
+                }
+                placeholder='Pick a date'
+                className='w-full'
+              />
             </div>
-            <div className="flex flex-col md:flex-row gap-2 justify-center space-x-2 mt-4">
-              <button
-                type="submit"
-                className="px-4 py-2 bg-[#E02B20]  hover:bg-[#e02a20ce] duration-300 text-white w-full rounded-md cursor-pointer"
-              >
-                {/* {editingMode ? "Update Cohort" : "Create Cohort"} */}
-                Create Cohort
-              </button>
-              <button
-                className="px-4 py-2 bg-black text-white rounded-md w-full cursor-pointer hover:bg-black/80"
-                onClick={toggleModal}
-              >
-                Cancel
-              </button>
+            <div className='flex-1 space-y-2'>
+              <Label>Cohort End Date</Label>
+              <DatePicker
+                value={
+                  formData.endDate ? new Date(formData.endDate) : undefined
+                }
+                onChange={(date) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    endDate: date ? date.toISOString().slice(0, 10) : "",
+                  }))
+                }
+                placeholder='Pick a date'
+                className='w-full'
+              />
             </div>
-          </form>
-        </div>
-      </div>
-    </>
+          </div>
+
+          <DialogFooter className='w-full flex flex-col md:flex-row gap-2 mt-6'>
+            <Button
+              type='submit'
+              disabled={loading}
+              className='w-full md:w-auto'
+            >
+              {loading
+                ? "Loading..."
+                : cohortToEdit
+                  ? "Update Cohort"
+                  : "Create Cohort"}
+            </Button>
+            <Button
+              variant='destructive'
+              type='button'
+              onClick={() => {
+                toggleModal();
+                setCohortToEdit?.(null);
+                setFormData({
+                  name: "",
+                  startDate: "",
+                  active: formData.active,
+                  endDate: "",
+                  applicationStartDate: "",
+                  applicationEndDate: "",
+                });
+              }}
+              className='w-full md:w-auto'
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };

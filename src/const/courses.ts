@@ -1,217 +1,27 @@
 import { BsPlayBtn } from "react-icons/bs";
-import {
-  FiAirplay,
-  FiBarChart,
-  FiCpu,
-  FiLayers,
-  FiServer,
-  FiSliders,
-} from "react-icons/fi";
+import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
-import { VscInbox } from "react-icons/vsc";
-
-export type CourseType = {
-  id: string;
-  slug?: string;
-  image: string;
-  title: string;
-  description: string;
-  ratings?: string;
-  reviews?: string;
-  lessons?: string;
-  duration?: string;
-  skillLevel?: string;
-  mode?: string;
-  category?: string;
-};
-
-// export const maincourses: CourseType[] = [
-//   {
-//     id: "1",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324797/photo-1610563166150-b34df4f3bcd6_gcmqes.png",
-//     title: "Software Engineering Track",
-//     slug: "software-engineering-track",
-//     description:
-//       "This track covers various aspects of the software development lifecycle, from writing clean code to testing, debugging, and deploying applications, preparing participants for careers as software engineers in diverse industries.",
-//     ratings: "5.0",
-//     reviews: "24 reviews",
-//     lessons: "128",
-//     duration: "3 Months",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "technical",
-//   },
-//   {
-//     id: "2",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324797/machine-learning1020114645_yhbng9.png",
-//     title: "AI & Machine Learning Track",
-//     slug: "ai-and-machine-learning",
-//     description:
-//       "Dive into the world of Artificial Intelligence and Machine Learning. This track covers key concepts, algorithms, and applications, equipping you with the skills to build intelligent systems and develop machine learning models for real-world challenges.",
-//     ratings: "4.8",
-//     reviews: "19 reviews",
-//     lessons: "128",
-//     duration: "3 weeks",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "technical",
-//   },
-//   {
-//     id: "3",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324797/data-anayatics-image_cuamla.png",
-//     title: "Data Analytics Track",
-//     slug: "data-analytics",
-//     description:
-//       "A specialized program designed to equip learners with essential skills in data collection, processing, analysis, and visualization. This track covers tools like Excel, SQL, Python, and data visualization platforms.",
-//     ratings: "4.9",
-//     reviews: "22 reviews",
-//     lessons: "128",
-//     duration: "48hrs 10mins",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "technical",
-//   },
-//   {
-//     id: "4",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324797/1725738547232_jcx0us.png",
-//     title: "Product Management Track",
-//     slug: "product-management",
-//     description:
-//       "A comprehensive program designed to equip individuals with the essential skills and knowledge needed to excel in product management.",
-//     ratings: "4.7 ",
-//     reviews: "18 reviews",
-//     lessons: "128",
-//     duration: "2 Month",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "professional",
-//   },
-//   {
-//     id: "5",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324797/Implementing-DevSecOps-in-Your-Organization-Blog-Fetaured-Image_tbujvf.png",
-//     title: "DevSecOps Engineering Track",
-//     slug: "devSecOps-engineering",
-//     description:
-//       "A specialized program focused on integrating security practices into every stage of the software development lifecycle.",
-//     ratings: "4.8",
-//     reviews: "21 reviews",
-//     lessons: "128",
-//     duration: "10 weeks",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "professional",
-//   },
-//   {
-//     id: "6",
-//     image:
-//       "https://res.cloudinary.com/dcgghkk7q/image/upload/v1741324796/Cloud-Computing-course-in-Noida_bw9wjp.png",
-//     title: "Cloud Computing Track",
-//     slug: "cloud-computing",
-//     description:
-//       "A specialized learning path focused on the principles and architecture of cloud computing. Gain hands-on experience in managing cloud-based solutions and optimizing performance.",
-//     ratings: "4.9",
-//     reviews: "20 reviews",
-//     lessons: "128",
-//     duration: "2hrs 20mins",
-//     skillLevel: "Beginner",
-//     mode: "Physical",
-//     category: "professional",
-//   },
-// ];
-
-export const courseModules = [
-  {
-    month: "Month 1",
-    title: "Web Development Foundations",
-    items: [
-      "HTML, CSS, JavaScript",
-      "Responsive design & accessibility",
-      "Git & GitHub workflow",
-      "Personal Project: Build a personal portfolio website",
-    ],
-    icon: FiLayers,
-  },
-  {
-    month: "Month 2",
-    title: "Frontend Development (React.js & UI Design)",
-    items: [
-      "React.js fundamentals",
-      "State management (useState, useEffect, Context API)",
-      "Tailwind CSS, Chakra UI, or Material UI",
-      "Personal Project: Build an interactive dashboard",
-    ],
-    icon: FiAirplay,
-  },
-  {
-    month: "Month 3",
-    title: "Backend Development & APIs",
-    items: [
-      "Node.js, Express.js",
-      "RESTful & GraphQL APIs",
-      "Database management (PostgreSQL, MongoDB)",
-      "Personal Project: Build a task management API",
-    ],
-    icon: FiCpu,
-  },
-  {
-    month: "Month 4",
-    title: "Authentication, Testing & DevOps",
-    items: [
-      "JWT authentication, OAuth, Role-based Access Control (RBAC)",
-      "Unit & integration testing with Jest",
-      "CI/CD pipelines, Docker basics",
-      "Personal Project: Deploy a secure SaaS application",
-    ],
-    icon: VscInbox,
-  },
-  {
-    month: "Month 5",
-    title: "Advanced Full-Stack & System Design",
-    items: [
-      "Microservices architecture",
-      "Serverless computing & cloud deployments",
-      "Performance optimization & caching strategies",
-      "Personal Project: Scalable real-world application",
-    ],
-    icon: FiServer,
-  },
-  {
-    month: "Month 6",
-    title: "Group Project & Job-Readiness",
-    items: [
-      "Group Project: Build a full-fledged SaaS platform",
-      "Agile workflow, version control, PR reviews",
-      "Resume writing, LinkedIn optimization, mock interviews",
-    ],
-    icon: FiSliders,
-  },
-];
 
 export const courseDetails = [
   {
     title: "Lessons",
     value: "128",
     description:
-      "Carefully structured lessons designed to take you from the basics of software engineering to advanced development skills. Each lesson is crafted to provide hands-on experience, covering front-end and back-end development, API integration, version control, testing, and deployment.",
+      "Carefully structured lessons designed to take you from foundational concepts to advanced skills. Each lesson is crafted to provide hands-on experience, covering key principles, practical applications, and essential techniques to ensure a well-rounded learning experience.",
     icon: BsPlayBtn,
   },
   {
     title: "Duration",
     value: "6 Months",
     description:
-      "Flexible and self-paced with live sessions and hands-on projects. You’ll have access to live sessions, recorded classes, and hands-on projects throughout the course. Learn at your own pace while receiving real-time support from instructors and peers.",
+      "Flexible and self-paced learning with interactive sessions and practical projects. Gain access to live sessions, recorded classes, and hands-on activities throughout your journey. Learn at a pace that suits you while benefiting from real-time guidance and support from mentors and fellow learners.",
     icon: MdAccessTime,
   },
   {
     title: "Skill Level",
     value: "Beginner to Advanced",
     description:
-      "This course is designed for learners at all levels. Whether you’re a complete beginner or someone looking to advance your software engineering skills, the structured lessons and hands-on projects will take you from the fundamentals to mastering full-stack development.",
+      "This course is designed for learners at all levels. Whether you’re a complete beginner or seeking to deepen your expertise, the structured lessons and practical projects will guide you from foundational concepts to mastering advanced skills in your chosen field",
     icon: FiBarChart,
   },
 ];

@@ -1,18 +1,21 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React from "react";
 
 interface LogoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
 }
 
-export const LogoutModal = ({
-  isOpen,
-  onClose,
-  onConfirm,
-}: LogoutModalProps) => {
+export const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
+  const router = useRouter();
+
+  const handleConfirm = () => {
+    localStorage.removeItem("isSignedIn");
+    router.push("/");
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -30,7 +33,7 @@ export const LogoutModal = ({
             No, Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className="bg-[#E02B20] cursor-pointer text-white px-4 py-2 rounded w-full md:w-[45%]"
           >
             Yes, Logout
