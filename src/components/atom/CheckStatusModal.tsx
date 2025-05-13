@@ -27,9 +27,9 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
 }) => {
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className='z-[999999999]'>
+      <DialogContent className='gap-2'>
         <DialogHeader>
-          <DialogTitle className='text-[17px] text-[#27156F] font-bold'>
+          <DialogTitle className='text-[17px] text-[#27156F]'>
             Check your application status.
           </DialogTitle>
         </DialogHeader>

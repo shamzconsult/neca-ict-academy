@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { Button } from "../ui/button";
 
 interface ApplicationReviewProps {
   onClose: () => void;
@@ -27,7 +28,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
       <DialogContent>
         {statusError ? (
           <DialogHeader>
-            <DialogTitle className='text-red-600 text-center pt-3 text-xl font-bold mb-6'>
+            <DialogTitle className='text-red-600 text-center pt-3 text-xl font-bold'>
               {statusError}
             </DialogTitle>
           </DialogHeader>
@@ -38,7 +39,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
               pending: (
                 <>
                   <DialogHeader>
-                    <DialogTitle className='text-[#27156F] text-center font-bold mb-6'>
+                    <DialogTitle className='text-[#27156F] text-center font-bold'>
                       Your Application is Under Review
                     </DialogTitle>
                   </DialogHeader>
@@ -55,7 +56,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
               interview: (
                 <>
                   <DialogHeader>
-                    <DialogTitle className='text-[#27156F] text-center font-bold mb-6'>
+                    <DialogTitle className='text-[#27156F] text-center font-bold'>
                       You&apos;re scheduled for an Interview
                     </DialogTitle>
                   </DialogHeader>
@@ -72,7 +73,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
               admitted: (
                 <>
                   <DialogHeader>
-                    <DialogTitle className='text-green-600 text-center font-bold mb-6'>
+                    <DialogTitle className='text-green-600 text-center font-bold'>
                       🎉 Application Accepted
                     </DialogTitle>
                   </DialogHeader>
@@ -89,7 +90,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
               declined: (
                 <>
                   <DialogHeader>
-                    <DialogTitle className='text-red-600 text-center font-bold mb-6'>
+                    <DialogTitle className='text-red-600 text-center font-bold'>
                       Application Not Successful
                     </DialogTitle>
                   </DialogHeader>
@@ -110,7 +111,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
               statusContent[applicantStatus.status] || (
                 <>
                   <DialogHeader>
-                    <DialogTitle className='text-gray-600 text-center font-bold mb-6'>
+                    <DialogTitle className='text-gray-600 text-center font-bold'>
                       Unknown Application Status
                     </DialogTitle>
                   </DialogHeader>
@@ -125,11 +126,11 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
             );
           })()
         ) : null}
-        <DialogFooter className='flex justify-center'>
+        <DialogFooter>
           <DialogClose asChild>
-            <button className='px-10 py-1.5 bg-[#E02B20] text-white rounded-md cursor-pointer mt-6'>
-              Okay
-            </button>
+            <div className='w-full flex justify-center align-center'>
+              <Button variant='outline'>Okay</Button>
+            </div>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
