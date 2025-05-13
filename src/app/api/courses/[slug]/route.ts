@@ -141,7 +141,11 @@ export const DELETE = async (req: Request) => {
     const url = new URL(req.url);
     const slug = url.pathname.split("/").pop();
 
-    const deletedCourse = await Course.findOneAndDelete({ slug });
+    const deletedCourse = await Course.findOneAndUpdate(
+      { slug },
+      { $set: { deleted: true } },
+      { new: true }
+    );
 
     if (!deletedCourse) {
       return NextResponse.json(
@@ -151,7 +155,7 @@ export const DELETE = async (req: Request) => {
     }
 
     return NextResponse.json(
-      { message: "Course deleted successfully" },
+      { message: "Course soft deleted successfully" },
       { status: 200 }
     );
   } catch (error) {

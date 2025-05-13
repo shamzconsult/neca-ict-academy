@@ -65,6 +65,7 @@ export type CohortType = {
   applicantCount: number;
   startDate: string;
   endDate: string;
+  courses: string[];
 };
 
 export type CohortsProps = {

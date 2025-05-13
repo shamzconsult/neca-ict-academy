@@ -72,11 +72,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   const firstFiveCohorts = localCohorts.slice(0, 5);
 
   const checkAllCohortStatus = () => {
-    if (localCohorts.some((cohort) => cohort.active)) {
-      toast.error("There is an active cohort");
-    } else {
-      setShowModal(!showModal);
-    }
+    setShowModal(!showModal);
   };
 
   return (

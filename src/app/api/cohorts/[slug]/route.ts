@@ -1,6 +1,8 @@
 import connectViaMongoose from "@/lib/db";
 import Cohort from "@/models/cohort";
 import { NextResponse } from "next/server";
+import { Enrollment } from "@/models/enrollment";
+import { Types } from "mongoose";
 
 export const GET = async (req: Request) => {
   try {
@@ -54,21 +56,13 @@ export const PUT = async (req: Request) => {
     const applicationStartDate = formData.get("applicationStartDate") as string;
     const applicationEndDate = formData.get("applicationEndDate") as string;
     const active = formData.get("active") === "true";
-
-    if (active) {
-      const activeCohort = await Cohort.findOne({ 
-        active: true, 
-        slug: { $ne: slug }
-      });
-      
-      if (activeCohort) {
-        return NextResponse.json(
-          { 
-            message: `Cannot activate this cohort. ${activeCohort.name} is already active.`,
-            activeCohort
-          },
-          { status: 400 }
-        );
+    const coursesRaw = formData.get("courses") as string;
+    let courses: string[] = [];
+    if (coursesRaw) {
+      try {
+        courses = JSON.parse(coursesRaw);
+      } catch {
+        courses = [];
       }
     }
 
@@ -85,11 +79,37 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    if (active === true) {
-      await Cohort.updateMany(
-        { slug: { $ne: slug } },
-        { $set: { active: false } }
+    // Get the current cohort to check for removed courses
+    const currentCohort = await Cohort.findOne({ slug });
+    if (!currentCohort) {
+      return NextResponse.json(
+        { message: "Cohort not found" },
+        { status: 404 }
       );
+    }
+
+    // Find courses that are being removed
+    const removedCourses = currentCohort.courses.filter(
+      (courseId: Types.ObjectId) => !courses.includes(courseId.toString())
+    );
+
+    // If there are courses being removed, check for enrollments
+    if (removedCourses.length > 0) {
+      const enrollments = await Enrollment.find({
+        cohort: currentCohort._id,
+        course: { $in: removedCourses },
+      });
+
+      if (enrollments.length > 0) {
+        return NextResponse.json(
+          {
+            message: "Cannot remove courses that have existing enrollments",
+            enrollmentsCount: enrollments.length,
+            affectedCourses: removedCourses,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const updatedCohort = await Cohort.findOneAndUpdate(
@@ -100,7 +120,8 @@ export const PUT = async (req: Request) => {
         endDate,
         applicationStartDate,
         applicationEndDate,
-        active
+        active,
+        courses,
       },
       { new: true }
     );
@@ -112,7 +133,10 @@ export const PUT = async (req: Request) => {
       );
     }
 
-    return NextResponse.json({ message: "Cohort updated", updatedCohort });
+    return NextResponse.json(
+      { message: "Cohort updated successfully", updatedCohort },
+      { status: 200 }
+    );
   } catch (error) {
     console.log(error);
     return NextResponse.json(
@@ -128,9 +152,13 @@ export const DELETE = async (req: Request) => {
     const url = new URL(req.url);
     const slug = url.pathname.split("/").pop();
 
-    const deletedCourse = await Cohort.findOneAndDelete({ slug });
+    const deletedCohort = await Cohort.findOneAndUpdate(
+      { slug },
+      { $set: { deleted: true } },
+      { new: true }
+    );
 
-    if (!deletedCourse) {
+    if (!deletedCohort) {
       return NextResponse.json(
         { message: "Cohort not found" },
         { status: 404 }
@@ -138,7 +166,7 @@ export const DELETE = async (req: Request) => {
     }
 
     return NextResponse.json(
-      { message: "Cohort deleted successfully" },
+      { message: "Cohort soft deleted successfully" },
       { status: 200 }
     );
   } catch (error) {

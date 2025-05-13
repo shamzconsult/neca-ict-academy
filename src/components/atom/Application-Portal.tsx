@@ -35,18 +35,13 @@ interface FormData {
   profileImage: File | null;
 }
 
-type ApplicationFormProps = {
+type ApplicationFormProps = Array<{
   _id: string;
   name: string;
-}[];
+  courses?: Array<{ _id: string; title: string }>;
+}>;
 
-const ApplicationPortal = ({
-  cohorts,
-  courses,
-}: {
-  cohorts: ApplicationFormProps;
-  courses: CourseType[];
-}) => {
+const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const searchParams = useSearchParams();
   const course = searchParams.get("course");
 
@@ -89,6 +84,24 @@ const ApplicationPortal = ({
   const [statusError, setStatusError] = useState("");
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [applicantStatus, setApplicantStatus] = useState<any>(null);
+  const [selectedCohort, setSelectedCohort] = useState<string>("");
+  const [cohortCourses, setCohortCourses] = useState<
+    { _id: string; title: string }[]
+  >([]);
+
+  // Fetch courses for selected cohort
+  useEffect(() => {
+    if (!selectedCohort) {
+      setCohortCourses([]);
+      return;
+    }
+    const foundCohort = cohorts.find((c) => c._id === selectedCohort);
+    if (foundCohort && Array.isArray(foundCohort.courses)) {
+      setCohortCourses(foundCohort.courses);
+    } else {
+      setCohortCourses([]);
+    }
+  }, [selectedCohort, cohorts]);
 
   // React Query: Application submission
   const submitMutation = useMutation({
@@ -178,7 +191,7 @@ const ApplicationPortal = ({
   return (
     <div className='relative min-h-screen bg-white overflow-hidden'>
       {/* Background Elements */}
-      <div className='fixed top-0 left-0 w-[8%] h-[73%] z-[99] transform rotate-[-0.47deg] origin-top-left'>
+      <div className='fixed top-0 left-0 w-[8%] h-[73%] z-10 transform rotate-[-0.47deg] origin-top-left'>
         <Image
           src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png'
           alt='Background Left'
@@ -440,6 +453,11 @@ const ApplicationPortal = ({
                         {...register("cohort", { required: true })}
                         disabled={submitMutation.status === "pending"}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
+                        onChange={(e) => {
+                          setValue("cohort", e.target.value);
+                          setSelectedCohort(e.target.value);
+                        }}
+                        value={selectedCohort}
                       >
                         <option value=''>
                           {!cohorts || cohorts.length === 0
@@ -476,12 +494,12 @@ const ApplicationPortal = ({
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
                       >
                         <option value=''>
-                          {!courses || courses.length === 0
+                          {!cohortCourses || cohortCourses.length === 0
                             ? "No courses available"
                             : "Select a course"}
                         </option>
-                        {courses.length > 0 &&
-                          courses.map((course) => (
+                        {cohortCourses.length > 0 &&
+                          cohortCourses.map((course) => (
                             <option key={course._id} value={course._id}>
                               {course.title}
                             </option>

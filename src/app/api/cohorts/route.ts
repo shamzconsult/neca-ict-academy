@@ -25,8 +25,8 @@ const POST = async (req: Request) => {
       applicationStartDate,
       applicationEndDate,
       active,
+      courses,
     } = await req.json();
-    
 
     if (
       !name ||
@@ -41,17 +41,6 @@ const POST = async (req: Request) => {
       );
     }
 
-    // To check for existing cohort
-    if (active) {
-      const activeCohort = await Cohort.findOne({ active: true });
-      if (activeCohort) {
-        return NextResponse.json(
-          { message: "Another cohort is already active. Deactivate it first." },
-          { status: 400 }
-        );
-      }
-    }
-
     const newCohort = await Cohort.create({
       name,
       startDate,
@@ -59,6 +48,7 @@ const POST = async (req: Request) => {
       applicationStartDate,
       applicationEndDate,
       active,
+      courses,
     });
 
     await newCohort.save();

@@ -34,14 +34,31 @@ export const CohortForm = ({
   setCohortToEdit?: (cohort: CohortType | null) => void;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [allCourses, setAllCourses] = useState<any[]>([]);
+  const [formData, setFormData] = useState<{
+    name: string;
+    startDate: string;
+    endDate: string;
+    active: boolean;
+    applicationStartDate: string;
+    applicationEndDate: string;
+    courses: string[];
+  }>({
     name: "",
     startDate: "",
     endDate: "",
     active: true,
     applicationStartDate: "",
     applicationEndDate: "",
+    courses: [],
   });
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    fetch("/api/courses")
+      .then((res) => res.json())
+      .then((data) => setAllCourses(data));
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -64,6 +81,7 @@ export const CohortForm = ({
       formData.applicationStartDate
     );
     formDataToSend.append("applicationEndDate", formData.applicationEndDate);
+    formDataToSend.append("courses", JSON.stringify(formData.courses));
 
     try {
       const res = await fetch("/api/cohorts", {
@@ -92,6 +110,7 @@ export const CohortForm = ({
         active: true,
         applicationStartDate: "",
         applicationEndDate: "",
+        courses: [],
       });
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -114,54 +133,49 @@ export const CohortForm = ({
       formData.applicationStartDate
     );
     formDataToSend.append("applicationEndDate", formData.applicationEndDate);
+    formDataToSend.append("courses", JSON.stringify(formData.courses));
 
-    if (
-      cohortsData.some(
-        (cohort) => cohort.active && cohortToEdit.active !== cohort.active
-      )
-    ) {
-      toast.error("There is an active cohort");
-    } else {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/cohorts/${cohortToEdit.slug}`, {
-          method: "PUT",
-          body: formDataToSend,
-        });
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/cohorts/${cohortToEdit.slug}`, {
+        method: "PUT",
+        body: formDataToSend,
+      });
 
-        if (!res.ok) {
-          const errorText = await res.text();
-          console.error("Error updating course:", errorText);
-          return;
-        }
-
-        const responseData = await res.json();
-
-        setCohortsData((prev) =>
-          prev.map((cohort) =>
-            cohort.slug === cohortToEdit.slug
-              ? responseData.updatedCohort
-              : cohort
-          )
-        );
-
-        toast.success("Cohort Updated Successfully 🎉");
-
-        setCohortToEdit?.(null);
-        setFormData({
-          name: "",
-          startDate: "",
-          endDate: "",
-          active: formData.active,
-          applicationStartDate: "",
-          applicationEndDate: "",
-        });
-        toggleModal();
-      } catch (error) {
-        console.error("Error updating course:", error);
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error("Error updating cohort:", errorData);
+        toast.error(errorData.message || "Error updating cohort");
+        return;
       }
+
+      const responseData = await res.json();
+
+      setCohortsData((prev) =>
+        prev.map((cohort) =>
+          cohort.slug === cohortToEdit.slug
+            ? responseData.updatedCohort
+            : cohort
+        )
+      );
+
+      toast.success("Cohort Updated Successfully 🎉");
+
+      setCohortToEdit?.(null);
+      setFormData({
+        name: "",
+        startDate: "",
+        endDate: "",
+        active: formData.active,
+        applicationStartDate: "",
+        applicationEndDate: "",
+        courses: [],
+      });
+      toggleModal();
+    } catch (error) {
+      console.error("Error updating course:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -174,6 +188,7 @@ export const CohortForm = ({
         active: cohortToEdit.active,
         applicationStartDate: cohortToEdit.applicationStartDate,
         applicationEndDate: cohortToEdit.applicationEndDate,
+        courses: cohortToEdit.courses || [],
       });
     }
   }, [cohortToEdit]);
@@ -306,6 +321,55 @@ export const CohortForm = ({
             </div>
           </div>
 
+          <div className='flex flex-col md:flex-row gap-4'>
+            <div className='flex-1 space-y-2'>
+              <Label>Courses</Label>
+              <Input
+                type='text'
+                placeholder='Search courses...'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className='mb-2'
+              />
+              <div className='border rounded p-2 h-48 overflow-y-auto bg-white'>
+                {allCourses
+                  .filter((course) =>
+                    course.title.toLowerCase().includes(search.toLowerCase())
+                  )
+                  .map((course) => (
+                    <label
+                      key={course._id}
+                      className='flex items-center gap-2 py-1 cursor-pointer'
+                    >
+                      <input
+                        type='checkbox'
+                        checked={formData.courses.includes(course._id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFormData((prev) => ({
+                              ...prev,
+                              courses: [...prev.courses, course._id],
+                            }));
+                          } else {
+                            setFormData((prev) => ({
+                              ...prev,
+                              courses: prev.courses.filter(
+                                (id) => id !== course._id
+                              ),
+                            }));
+                          }
+                        }}
+                      />
+                      <span>{course.title}</span>
+                    </label>
+                  ))}
+                {allCourses.length === 0 && (
+                  <span className='text-gray-400'>No courses available</span>
+                )}
+              </div>
+            </div>
+          </div>
+
           <DialogFooter className='w-full flex flex-col md:flex-row gap-2 mt-6'>
             <Button
               type='submit'
@@ -331,6 +395,7 @@ export const CohortForm = ({
                   endDate: "",
                   applicationStartDate: "",
                   applicationEndDate: "",
+                  courses: [],
                 });
               }}
               className='w-full md:w-auto'
