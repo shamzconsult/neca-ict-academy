@@ -14,39 +14,40 @@ const AD_IMAGES = [
   "https://cdn.hashnode.com/res/hashnode/image/upload/v1747089816647/d3363681-5a02-4626-91f8-934a5b183099.png",
 ];
 
-const STORAGE_KEY = "neca_advert_overlay_dismissed";
-const EXPIRATION_KEY = "neca_advert_overlay_expiration";
+// const STORAGE_KEY = "neca_advert_overlay_dismissed";
+// const EXPIRATION_KEY = "neca_advert_overlay_expiration";
 const SWITCH_INTERVAL = 5000; // 5 seconds between switches
-const EXPIRATION_HOURS = 24; // Advert will expire after 24 hours
+// const EXPIRATION_HOURS = 24; // Advert will expire after 24 hours
 
 export const AdvertOverlay: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  // useEffect(() => {
+  // if (typeof window === "undefined") return;
 
-    // Check if advert has expired
-    const expirationTime = localStorage.getItem(EXPIRATION_KEY);
-    const now = new Date().getTime();
+  // // Check if advert has expired
+  // const expirationTime = localStorage.getItem(EXPIRATION_KEY);
+  // const now = new Date().getTime();
 
-    if (expirationTime) {
-      // If we have an expiration time, check if we're past it
-      if (now > parseInt(expirationTime)) {
-        return;
-      }
-    } else {
-      // If no expiration time is set, set it to 24 hours from now
-      const newExpirationTime = now + EXPIRATION_HOURS * 60 * 60 * 1000;
-      localStorage.setItem(EXPIRATION_KEY, newExpirationTime.toString());
-    }
+  // if (expirationTime) {
+  //   // If we have an expiration time, check if we're past it
+  //   if (now > parseInt(expirationTime)) {
+  //     return;
+  //   }
+  // } else {
+  //   // If no expiration time is set, set it to 24 hours from now
+  //   const newExpirationTime = now + EXPIRATION_HOURS * 60 * 60 * 1000;
+  //   localStorage.setItem(EXPIRATION_KEY, newExpirationTime.toString());
+  // }
 
-    // Only show if not dismissed before
-    const dismissed = localStorage.getItem(STORAGE_KEY);
-    if (!dismissed) setOpen(true);
-  }, []);
+  // // Only show if not dismissed before
+  // const dismissed = localStorage.getItem(STORAGE_KEY);
+  // if (!dismissed) setOpen(true);
+
+  // }, []);
 
   useEffect(() => {
     if (!open || AD_IMAGES.length <= 1 || isHovered) return;
@@ -64,9 +65,9 @@ export const AdvertOverlay: React.FC = () => {
 
   const handleClose = () => {
     setOpen(false);
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEY, "1");
-    }
+    // if (typeof window !== "undefined") {
+    //   localStorage.setItem(STORAGE_KEY, "1");
+    // }
   };
 
   if (!open) return null;
