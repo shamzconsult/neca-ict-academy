@@ -156,6 +156,8 @@ export const Footer = () => {
                   <BsTwitterX className='text-sm text-[#27156F]  ' />
                 </a>
                 <a
+                  target='_blank'
+                  rel='noopener'
                   href='https://www.facebook.com/Nigemployers'
                   className='bg-white hover:bg-[#E02B20] duration-300 ease-in-out p-2 rounded-full'
                 >
