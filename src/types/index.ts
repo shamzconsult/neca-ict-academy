@@ -1,12 +1,6 @@
-<<<<<<< HEAD
-import { ApplicationLevel, ApplicationStatus, Gender } from '@/const';
-
-type Status = 'Admitted' | 'Pending' | 'Declined' | 'Graduated';
-=======
 import { ApplicationLevel, ApplicationStatus, Gender } from "@/const";
 
 type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
->>>>>>> unclebigbay/review
 
 export type CourseOutline = {
   header: string;
