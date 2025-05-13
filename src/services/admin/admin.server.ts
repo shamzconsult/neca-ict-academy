@@ -81,12 +81,13 @@ export const getAllCohorts = async () => {
   }
 };
 
-// get all cohorts with only id and name
-export const getCohortNames = async () => {
+export const getActiveCohortsForEnrollment = async () => {
   try {
     await connectViaMongoose();
+    const today = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
     const cohortNames = await Cohort.find({
       active: true,
+      applicationEndDate: { $gte: today },
     })
       .select("_id name courses")
       .populate("courses", "title _id", Course);

@@ -10,8 +10,9 @@ import {
 import { VisuallyHidden } from "../visually-hidden";
 
 const AD_IMAGES = [
-  "https://cdn.hashnode.com/res/hashnode/image/upload/v1747089812949/18572961-48de-4758-9455-38a83b677a5c.png",
-  "https://cdn.hashnode.com/res/hashnode/image/upload/v1747089816647/d3363681-5a02-4626-91f8-934a5b183099.png",
+  "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
+  "https://res.cloudinary.com/dtryuudiy/image/upload/v1747147393/enrollment/course/mxgu4h5xa295wk4igdr4.webp",
+  "https://res.cloudinary.com/dtryuudiy/image/upload/v1747134855/enrollment/course/nod3uf4l2bhrr4fzp9wc.webp",
 ];
 
 // const STORAGE_KEY = "neca_advert_overlay_dismissed";
@@ -78,7 +79,7 @@ export const AdvertOverlay: React.FC = () => {
         <VisuallyHidden>NECA ICT Academy Advert</VisuallyHidden>
       </DialogTitle>
       <DialogContent
-        className='w-full sm:max-w-full h-full bg-transparent border-none'
+        className='w-full sm:max-w-full h-full bg-transparent border-none shadow-none'
         hideClose
       >
         <DialogClose asChild>
@@ -108,7 +109,7 @@ export const AdvertOverlay: React.FC = () => {
             <img
               src={AD_IMAGES[activeIdx]}
               alt={`Advert ${activeIdx + 1}`}
-              className={`rounded-lg shadow-2xl bg-white h-[80vh] max-h-[80vh] object-contain transition-opacity duration-600 ${
+              className={`rounded-lg shadow-2xl sm:h-[80vh] sm:max-h-[80vh] object-contain transition-opacity duration-600 ${
                 isTransitioning ? "opacity-0" : "opacity-100"
               }`}
             />

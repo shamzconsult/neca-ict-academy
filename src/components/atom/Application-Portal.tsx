@@ -15,9 +15,8 @@ import {
   states,
   statusOptionsMap,
 } from "@/const";
-import { CourseType } from "@/types";
 import { useSearchParams } from "next/navigation";
-import { useForm, Controller, Form } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
 interface FormData {
@@ -45,7 +44,6 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const searchParams = useSearchParams();
   const course = searchParams.get("course");
 
-  // React Hook Form
   const {
     register,
     handleSubmit,

@@ -11,6 +11,8 @@ import EmptyState from "@/components/atom/EmptyState";
 import CohortTable from "@/components/atom/Table/CohortTable";
 import { adminCohortTableHead } from "@/const";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 interface DashboardStat {
   name: string;
@@ -80,12 +82,24 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       {/* Header with title and create button */}
       <header className='flex justify-between items-center mb-8'>
         <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
-        <button
-          onClick={checkAllCohortStatus}
-          className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
-        >
-          <HiOutlinePlusCircle /> Create Cohort
-        </button>
+        <div className='flex gap-3'>
+          <Button
+            onClick={checkAllCohortStatus}
+            className='flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors'
+          >
+            <HiOutlinePlusCircle /> Create Cohort
+          </Button>
+          <Button
+            variant='outline'
+            asChild
+            className='flex items-center gap-2 transition-colors'
+          >
+            <Link href='/enroll' target='_blank'>
+              <ExternalLink />
+              Go to Enroll Portal
+            </Link>
+          </Button>
+        </div>
       </header>
 
       {/* Stats cards */}

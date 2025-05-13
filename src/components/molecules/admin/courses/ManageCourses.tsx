@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useDebounce } from "@/hooks/useDebounce";
-import { X } from "lucide-react";
+import { ExternalLink, X } from "lucide-react";
+import Link from "next/link";
 
 export type CourseOutline = {
   header: string;
@@ -120,12 +121,24 @@ export const ManageCourses = () => {
       <div className='bg-white min-h-[95dvh] shadow-lg rounded-xl p-6'>
         <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center mb-10'>
           <h1 className='text-2xl font-bold text-gray-800'>Course Overview</h1>
-          <Button
-            onClick={toggleModal}
-            className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
-          >
-            <HiOutlinePlusCircle /> Add New Course
-          </Button>
+          <div className='flex gap-3'>
+            <Button
+              onClick={toggleModal}
+              className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+            >
+              <HiOutlinePlusCircle /> Add New Course
+            </Button>{" "}
+            <Button
+              variant='outline'
+              asChild
+              className='flex items-center gap-2 transition-colors'
+            >
+              <Link href='/courses' target='_blank'>
+                <ExternalLink />
+                Go to Courses Page
+              </Link>
+            </Button>
+          </div>
         </div>
         {/* Filter & Sort Controls */}
         <div className='flex gap-4 mb-6'>

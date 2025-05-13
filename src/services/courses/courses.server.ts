@@ -21,6 +21,14 @@ export const getAllCourses = async (options: GetAllCoursesOptions = {}) => {
       } else {
         return [];
       }
+    } else {
+      // Only fetch courses in active cohorts
+      const activeCohorts = await Cohort.find({ active: true });
+      const allCourseIds = activeCohorts.flatMap((cohort) =>
+        cohort.courses.map((id: any) => id.toString())
+      );
+      courseIds = [...new Set(allCourseIds)];
+      if (courseIds.length === 0) return [];
     }
     const query = courseIds
       ? Course.find({ _id: { $in: courseIds } })

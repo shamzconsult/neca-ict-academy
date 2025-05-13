@@ -10,6 +10,8 @@ import React, { useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
@@ -94,12 +96,25 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
       <div className='bg-white shadow-lg rounded-xl p-6'>
         <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center mb-4'>
           <h1 className='text-2xl font-bold text-gray-800'>Overview</h1>
-          <Button
-            onClick={checkAllCohortStatus}
-            className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
-          >
-            <HiOutlinePlusCircle /> Create Cohort
-          </Button>
+          <div className='flex gap-3'>
+            <Button
+              onClick={checkAllCohortStatus}
+              className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+            >
+              <HiOutlinePlusCircle /> Create Cohort
+            </Button>
+
+            <Button
+              variant='outline'
+              asChild
+              className='flex items-center gap-2 transition-colors'
+            >
+              <Link href='/enroll' target='_blank'>
+                <ExternalLink />
+                Go to Enroll Portal
+              </Link>
+            </Button>
+          </div>
         </div>
         <hr className='border-gray-200 mb-4' />
         {cohortsData?.length > 0 ? (

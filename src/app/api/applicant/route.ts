@@ -5,6 +5,7 @@ import { uploadFile } from "@/lib/cloudinary";
 import { Enrollment } from "@/models/enrollment";
 import { Applicant } from "@/models/applicant";
 import { levelOptionsMap, statusOptionsMap } from "@/const";
+import Cohort from "@/models/cohort";
 
 interface ApplicantFormData {
   firstName: string;
@@ -70,6 +71,16 @@ const POST = async (req: NextRequest) => {
           missingFields,
           receivedData: data,
         },
+        { status: 400 }
+      );
+    }
+
+    // Before creating applicant, check cohort is open
+    const cohort = await Cohort.findById(data.cohort);
+    const today = new Date().toISOString().split("T")[0];
+    if (!cohort || !cohort.active || cohort.applicationEndDate < today) {
+      return NextResponse.json(
+        { message: "This cohort is not accepting applications." },
         { status: 400 }
       );
     }
