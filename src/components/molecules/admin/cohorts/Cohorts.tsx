@@ -45,11 +45,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   };
 
   const checkAllCohortStatus = () => {
-    if (cohortsData.some((cohort) => cohort.active)) {
-      toast.error("There is an active cohort");
-    } else {
-      setShowModal(!showModal);
-    }
+    setShowModal(!showModal);
   };
 
   const handleDelete = async (slug: string, event: React.MouseEvent) => {

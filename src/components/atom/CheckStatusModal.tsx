@@ -27,21 +27,12 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
 }) => {
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className='z-[999999999]'>
         <DialogHeader>
-          <DialogTitle className='text-[17px] text-[#27156F] font-bold mb-4'>
+          <DialogTitle className='text-[17px] text-[#27156F] font-bold'>
             Check your application status.
           </DialogTitle>
         </DialogHeader>
-        <DialogClose asChild>
-          <button
-            onClick={onClose}
-            className='absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer'
-            aria-label='Close modal'
-          >
-            <FiX className='w-5 h-5' />
-          </button>
-        </DialogClose>
         <label htmlFor='email' className='text-[#1E1E1E]'>
           Email Address
         </label>
@@ -52,12 +43,10 @@ export const CheckStatusModal: React.FC<CheckStatusModalProps> = ({
           placeholder='Enter your email'
           className={`w-full p-3 border ${
             emailError ? "border-red-500" : "border-gray-300"
-          } rounded-md mb-1 mt-2`}
+          } rounded-md`}
         />
-        {emailError && (
-          <p className='text-red-500 text-sm mt-1'>{emailError}</p>
-        )}
-        <div className='flex justify-center space-x-2 mt-4'>
+        {emailError && <p className='text-red-500 text-sm'>{emailError}</p>}
+        <div className='flex justify-center space-x-2'>
           <button
             onClick={onCheckStatus}
             className='w-full bg-[#E02B20] text-white py-2.5 px-5 rounded-md hover:bg-[#C0241A] transition-colors cursor-pointer'
