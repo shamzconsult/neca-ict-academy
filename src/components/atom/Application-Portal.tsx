@@ -1,24 +1,19 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { SubHeading } from "@/components/atom/headers/SubHeading";
-import Link from "next/link";
-import { CheckStatusModal } from "./CheckStatusModal";
-import { ApplicationReview } from "./ApplicationReview";
-import SuccessModal from "./SuccessPage";
-import { FileUploader } from "@/components/atom/FileUploader";
-import { MdArrowDropDown, MdImage, MdDescription } from "react-icons/md";
-import {
-  genderOptions,
-  levelOptionsMap,
-  states,
-  statusOptionsMap,
-} from "@/const";
-import { CourseType } from "@/types";
-import { useSearchParams } from "next/navigation";
-import { useForm, Controller } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { SubHeading } from '@/components/atom/headers/SubHeading';
+import Link from 'next/link';
+import { CheckStatusModal } from './CheckStatusModal';
+import { ApplicationReview } from './ApplicationReview';
+import SuccessModal from './SuccessPage';
+import { FileUploader } from '@/components/atom/FileUploader';
+import { MdArrowDropDown, MdImage, MdDescription } from 'react-icons/md';
+import { genderOptions, levelOptionsMap, states, statusOptionsMap } from '@/const';
+import { CourseType } from '@/types';
+import { useSearchParams } from 'next/navigation';
+import { useForm, Controller } from 'react-hook-form';
+import { useMutation } from '@tanstack/react-query';
 
 interface FormData {
   firstName: string;
@@ -43,7 +38,7 @@ type ApplicationFormProps = Array<{
 
 const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const searchParams = useSearchParams();
-  const course = searchParams.get("course");
+  const course = searchParams.get('course');
 
   // React Hook Form
   const {
@@ -55,14 +50,14 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phoneNumber: "",
-      state: "",
-      gender: "",
-      course: course || "",
-      cohort: "",
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      state: '',
+      gender: '',
+      course: course || '',
+      cohort: '',
       level: levelOptionsMap.application,
       status: statusOptionsMap.pending,
       cv: null,
@@ -71,23 +66,21 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   });
 
   useEffect(() => {
-    if (course && typeof course === "string") {
-      setValue("course", course);
+    if (course && typeof course === 'string') {
+      setValue('course', course);
     }
   }, [course, setValue]);
 
   // Modal and status state
   const [showModal, setShowModal] = useState(false);
   const [showReview, setShowReview] = useState(false);
-  const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [statusError, setStatusError] = useState("");
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [statusError, setStatusError] = useState('');
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [applicantStatus, setApplicantStatus] = useState<any>(null);
-  const [selectedCohort, setSelectedCohort] = useState<string>("");
-  const [cohortCourses, setCohortCourses] = useState<
-    { _id: string; title: string }[]
-  >([]);
+  const [selectedCohort, setSelectedCohort] = useState<string>('');
+  const [cohortCourses, setCohortCourses] = useState<{ _id: string; title: string }[]>([]);
 
   // Fetch courses for selected cohort
   useEffect(() => {
@@ -95,7 +88,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
       setCohortCourses([]);
       return;
     }
-    const foundCohort = cohorts.find((c) => c._id === selectedCohort);
+    const foundCohort = cohorts.find(c => c._id === selectedCohort);
     if (foundCohort && Array.isArray(foundCohort.courses)) {
       setCohortCourses(foundCohort.courses);
     } else {
@@ -108,23 +101,19 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     mutationFn: async (data: FormData) => {
       const formDataToSend = new FormData();
       Object.entries(data).forEach(([key, value]) => {
-        if (key === "cv" || key === "profileImage") {
-          if (value)
-            formDataToSend.append(
-              key === "profileImage" ? "profilePicture" : key,
-              value as File
-            );
+        if (key === 'cv' || key === 'profileImage') {
+          if (value) formDataToSend.append(key === 'profileImage' ? 'profilePicture' : key, value as File);
         } else {
           formDataToSend.append(key, value as string);
         }
       });
-      const res = await fetch("/api/applicant", {
-        method: "POST",
+      const res = await fetch('/api/applicant', {
+        method: 'POST',
         body: formDataToSend,
       });
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.message || "Submission failed");
+        throw new Error(errorData.message || 'Submission failed');
       }
       return res.json();
     },
@@ -133,7 +122,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
       reset();
     },
     onError: (error: any) => {
-      alert(error.message || "Submission failed");
+      alert(error.message || 'Submission failed');
     },
   });
 
@@ -142,16 +131,16 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     mutationFn: async (email: string) => {
       const res = await fetch(`/api/applicant/status/${email}`);
       if (res.status === 404) {
-        throw new Error("No application found for this email.");
+        throw new Error('No application found for this email.');
       }
       if (!res.ok) {
-        throw new Error("Something went wrong. Please try again.");
+        throw new Error('Something went wrong. Please try again.');
       }
       return res.json();
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       setApplicantStatus(data);
-      setStatusError("");
+      setStatusError('');
       setShowReview(true);
     },
     onError: (error: any) => {
@@ -164,18 +153,18 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const toggleModal = () => {
     setShowModal(!showModal);
     setShowReview(false);
-    setStatusError("");
-    setEmailError("");
+    setStatusError('');
+    setEmailError('');
   };
 
   const handleCheckStatus = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailRegex.test(email)) {
       checkStatusMutation.mutate(email);
-      setEmail("");
-      setEmailError("");
+      setEmail('');
+      setEmailError('');
     } else {
-      setEmailError("Please enter a valid email address.");
+      setEmailError('Please enter a valid email address.');
     }
   };
 
@@ -213,7 +202,9 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
         <header className='fixed top-0 left-0 right-0 bg-white'>
           <div className='py-4 px-[8%]'>
             <div className='flex flex-col gap-5 md:flex-row justify-between items-center'>
-              <Link href='/' className='w-36 lg:w-48 relative'>
+              <Link
+                href='/'
+                className='w-36 lg:w-48 relative'>
                 <Image
                   src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png'
                   alt='NECA ICT ACADEMY Logo'
@@ -224,12 +215,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
               </Link>
               <div>
                 <h3 className='text-lg'>
-                  Already applied?{" "}
+                  Already applied?{' '}
                   <Link
                     href='#'
                     className='underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1'
-                    onClick={toggleModal}
-                  >
+                    onClick={toggleModal}>
                     Check Status
                   </Link>
                 </h3>
@@ -256,9 +246,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
 
                 {/* Timeline Section */}
                 <div className='pl-2 mb-8'>
-                  <h1 className='text-xl font-semibold text-[#1E1E1E] mb-8'>
-                    Application Timeline
-                  </h1>
+                  <h1 className='text-xl font-semibold text-[#1E1E1E] mb-8'>Application Timeline</h1>
                   <div className='flex gap-7 items-center'>
                     <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'>
                       <p>1</p>
@@ -294,111 +282,80 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
             <div className='relative z-50 w-full lg:w-1/2 lg:ml-[50%] overflow-y-auto h-full pt-5'>
               <div className='max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left'>
                 <SubHeading>NECA ICT Academy Application Portal</SubHeading>
-                <h2 className='text-2xl font-semibold text-[#27156F] mb-4 mt-6'>
-                  Register Now!
-                </h2>
+                <h2 className='text-2xl font-semibold text-[#27156F] mb-4 mt-6'>Register Now!</h2>
                 <p className='text-gray-600 text-xl mb-7'>
-                  Please fill out the form below with accurate and current
-                  information to begin your application.
+                  Please fill out the form below with accurate and current information to begin your application.
                 </p>
 
                 <form
-                  onSubmit={handleSubmit((data: FormData) =>
-                    submitMutation.mutate(data)
-                  )}
-                  className='space-y-6 bg-white'
-                >
+                  onSubmit={handleSubmit((data: FormData) => submitMutation.mutate(data))}
+                  className='space-y-6 bg-white'>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div className='md:col-span-2'>
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div>
-                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            First Name
-                          </label>
+                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>First Name</label>
                           <input
                             type='text'
                             placeholder='First Name'
-                            {...register("firstName", { required: true })}
+                            {...register('firstName', { required: true })}
                             className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                            disabled={submitMutation.status === "pending"}
+                            disabled={submitMutation.status === 'pending'}
                           />
-                          {errors.firstName && (
-                            <span className='text-red-500 text-xs'>
-                              First name is required
-                            </span>
-                          )}
+                          {errors.firstName && <span className='text-red-500 text-xs'>First name is required</span>}
                         </div>
                         <div>
-                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            Last Name
-                          </label>
+                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Last Name</label>
                           <input
                             type='text'
                             placeholder='Last Name'
-                            {...register("lastName", { required: true })}
+                            {...register('lastName', { required: true })}
                             className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                            disabled={submitMutation.status === "pending"}
+                            disabled={submitMutation.status === 'pending'}
                           />
-                          {errors.lastName && (
-                            <span className='text-red-500 text-xs'>
-                              Last name is required
-                            </span>
-                          )}
+                          {errors.lastName && <span className='text-red-500 text-xs'>Last name is required</span>}
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Email Address
-                      </label>
+                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Email Address</label>
                       <input
                         type='email'
-                        {...register("email", { required: true })}
-                        disabled={submitMutation.status === "pending"}
+                        {...register('email', { required: true })}
+                        disabled={submitMutation.status === 'pending'}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                         placeholder='Enter your email address'
                       />
-                      {errors.email && (
-                        <span className='text-red-500 text-xs'>
-                          Email is required
-                        </span>
-                      )}
+                      {errors.email && <span className='text-red-500 text-xs'>Email is required</span>}
                     </div>
 
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Phone Number
-                      </label>
+                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Phone Number</label>
                       <input
                         type='tel'
-                        {...register("phoneNumber", { required: true })}
-                        disabled={submitMutation.status === "pending"}
+                        {...register('phoneNumber', { required: true })}
+                        disabled={submitMutation.status === 'pending'}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                         placeholder='Enter your phone number'
                       />
-                      {errors.phoneNumber && (
-                        <span className='text-red-500 text-xs'>
-                          Phone number is required
-                        </span>
-                      )}
+                      {errors.phoneNumber && <span className='text-red-500 text-xs'>Phone number is required</span>}
                     </div>
                   </div>
 
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        State
-                      </label>
+                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>State</label>
                       <div className='relative'>
                         <select
-                          {...register("state", { required: true })}
-                          disabled={submitMutation.status === "pending"}
-                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                        >
+                          {...register('state', { required: true })}
+                          disabled={submitMutation.status === 'pending'}
+                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
                           <option value=''>Select your state</option>
-                          {states.map((state) => (
-                            <option key={state} value={state}>
+                          {states.map(state => (
+                            <option
+                              key={state}
+                              value={state}>
                               {state}
                             </option>
                           ))}
@@ -408,26 +365,21 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
                         />
                       </div>
-                      {errors.state && (
-                        <span className='text-red-500 text-xs'>
-                          State is required
-                        </span>
-                      )}
+                      {errors.state && <span className='text-red-500 text-xs'>State is required</span>}
                     </div>
 
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Gender
-                      </label>
+                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Gender</label>
                       <div className='relative'>
                         <select
-                          {...register("gender", { required: true })}
-                          disabled={submitMutation.status === "pending"}
-                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none capitalize'
-                        >
+                          {...register('gender', { required: true })}
+                          disabled={submitMutation.status === 'pending'}
+                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none capitalize'>
                           <option value=''>Select gender</option>
-                          {genderOptions.map((gender) => (
-                            <option key={gender} value={gender}>
+                          {genderOptions.map(gender => (
+                            <option
+                              key={gender}
+                              value={gender}>
                               {gender}
                             </option>
                           ))}
@@ -437,36 +389,27 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
                         />
                       </div>
-                      {errors.gender && (
-                        <span className='text-red-500 text-xs'>
-                          Gender is required
-                        </span>
-                      )}
+                      {errors.gender && <span className='text-red-500 text-xs'>Gender is required</span>}
                     </div>
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                      Cohorts
-                    </label>
+                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Cohorts</label>
                     <div className='relative'>
                       <select
-                        {...register("cohort", { required: true })}
-                        disabled={submitMutation.status === "pending"}
+                        {...register('cohort', { required: true })}
+                        disabled={submitMutation.status === 'pending'}
                         className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                        onChange={(e) => {
-                          setValue("cohort", e.target.value);
+                        onChange={e => {
+                          setValue('cohort', e.target.value);
                           setSelectedCohort(e.target.value);
                         }}
-                        value={selectedCohort}
-                      >
-                        <option value=''>
-                          {!cohorts || cohorts.length === 0
-                            ? "No cohorts in session"
-                            : "Select a cohort"}
-                        </option>
+                        value={selectedCohort}>
+                        <option value=''>{!cohorts || cohorts.length === 0 ? 'No cohorts in session' : 'Select a cohort'}</option>
                         {cohorts.length > 0 &&
-                          cohorts.map((cohort) => (
-                            <option key={cohort._id} value={cohort._id}>
+                          cohorts.map(cohort => (
+                            <option
+                              key={cohort._id}
+                              value={cohort._id}>
                               {cohort.name}
                             </option>
                           ))}
@@ -476,31 +419,22 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
                       />
                     </div>
-                    {errors.cohort && (
-                      <span className='text-red-500 text-xs'>
-                        Cohort is required
-                      </span>
-                    )}
+                    {errors.cohort && <span className='text-red-500 text-xs'>Cohort is required</span>}
                   </div>
 
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                      Course
-                    </label>
+                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>Course</label>
                     <div className='relative'>
                       <select
-                        {...register("course", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                      >
-                        <option value=''>
-                          {!cohortCourses || cohortCourses.length === 0
-                            ? "No courses available"
-                            : "Select a course"}
-                        </option>
+                        {...register('course', { required: true })}
+                        disabled={submitMutation.status === 'pending'}
+                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'>
+                        <option value=''>{!cohortCourses || cohortCourses.length === 0 ? 'No courses available' : 'Select a course'}</option>
                         {cohortCourses.length > 0 &&
-                          cohortCourses.map((course) => (
-                            <option key={course._id} value={course._id}>
+                          cohortCourses.map(course => (
+                            <option
+                              key={course._id}
+                              value={course._id}>
                               {course.title}
                             </option>
                           ))}
@@ -510,11 +444,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                         className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
                       />
                     </div>
-                    {errors.course && (
-                      <span className='text-red-500 text-xs'>
-                        Course is required
-                      </span>
-                    )}
+                    {errors.course && <span className='text-red-500 text-xs'>Course is required</span>}
                   </div>
 
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
@@ -527,7 +457,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           label='Upload CV'
                           name='cv'
                           required
-                          accept='.pdf,.doc,.docx'
+                          accept='.pdf'
                           icon={<MdDescription />}
                           placeholder='Upload your CV'
                           onFileChange={field.onChange}
@@ -555,14 +485,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                   </div>
                   <button
                     type='submit'
-                    disabled={submitMutation.status === "pending"}
+                    disabled={submitMutation.status === 'pending'}
                     className={`w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer ${
-                      submitMutation.status === "pending" ? "opacity-75" : ""
-                    }`}
-                  >
-                    {submitMutation.status === "pending"
-                      ? "Submitting..."
-                      : "Submit Application"}
+                      submitMutation.status === 'pending' ? 'opacity-75' : ''
+                    }`}>
+                    {submitMutation.status === 'pending' ? 'Submitting...' : 'Submit Application'}
                   </button>
                 </form>
               </div>
@@ -576,8 +503,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                 fill='none'
                 viewBox='0 0 24 24'
                 strokeWidth={1.5}
-                stroke='currentColor'
-              >
+                stroke='currentColor'>
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'
@@ -585,12 +511,9 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                 />
               </svg>
             </div>
-            <h1 className='text-2xl font-semibold text-gray-800 mb-3'>
-              No Active Cohorts at the Moment
-            </h1>
+            <h1 className='text-2xl font-semibold text-gray-800 mb-3'>No Active Cohorts at the Moment</h1>
             <p className='text-gray-600 max-w-md mb-6'>
-              We're currently preparing for our next cohort. Stay tuned for
-              exciting learning opportunities coming soon!
+              We're currently preparing for our next cohort. Stay tuned for exciting learning opportunities coming soon!
             </p>
             <div className='bg-blue-50 border border-blue-100 rounded-lg p-4 max-w-md'>
               <h2 className='text-blue-800 font-medium mb-2'>What to Expect</h2>
@@ -600,8 +523,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                     className='w-4 h-4'
                     fill='none'
                     stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
+                    viewBox='0 0 24 24'>
                     <path
                       strokeLinecap='round'
                       strokeLinejoin='round'
@@ -616,8 +538,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                     className='w-4 h-4'
                     fill='none'
                     stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
+                    viewBox='0 0 24 24'>
                     <path
                       strokeLinecap='round'
                       strokeLinejoin='round'
@@ -632,8 +553,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                     className='w-4 h-4'
                     fill='none'
                     stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
+                    viewBox='0 0 24 24'>
                     <path
                       strokeLinecap='round'
                       strokeLinejoin='round'
@@ -655,7 +575,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
               onCheckStatus={handleCheckStatus}
               emailError={emailError}
               onClose={toggleModal}
-              isPending={checkStatusMutation.status === "pending"}
+              isPending={checkStatusMutation.status === 'pending'}
             />
           ) : (
             <ApplicationReview
