@@ -35,7 +35,7 @@ export const HomePage = ({ courses }: { courses: CourseType[] }) => {
         aria-label='Watch our video'
       >
         <img
-          src='https://img.youtube.com/vi/t7MZk4PnTUI/hqdefault.jpg'
+          src='https://img.youtube.com/vi/vJz2ltuv9bY/hqdefault.jpg'
           alt='Video Preview'
           className='object-cover w-full h-full group-hover:opacity-80'
         />
@@ -70,7 +70,7 @@ export const HomePage = ({ courses }: { courses: CourseType[] }) => {
             <iframe
               width='100%'
               height='100%'
-              src='https://www.youtube.com/embed/t7MZk4PnTUI?autoplay=1'
+              src='https://www.youtube.com/embed/vJz2ltuv9bY?autoplay=1'
               title='YouTube video player'
               frameBorder='0'
               allow='autoplay; encrypted-media'
