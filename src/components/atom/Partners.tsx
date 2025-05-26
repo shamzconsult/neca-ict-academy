@@ -1,6 +1,5 @@
 import React from "react";
-import Image from "next/image";
-// import Marquee from "react-fast-marquee";
+import Marquee from "react-fast-marquee";
 import { partners } from "@/const/partners";
 import { Heading } from "./headers/Heading";
 import { SubHeading } from "./headers/SubHeading";
@@ -12,23 +11,22 @@ export const Partners = () => {
         <SubHeading>Partners</SubHeading>
         <Heading>Organisations That Trusts Us</Heading>
       </div>
-      {/* <Marquee speed={50} pauseOnHover={false}> */}
-      <div className="flex gap-3 justify-center items-center">
-        {partners?.map((partner, index) => (
-          <div
-            key={index}
-            className="w-fit h-32  flex justify-center items-center mx-6 "
-          >
-            <Image
-              src={partner?.src}
-              alt={partner?.alt}
-              width={100}
-              height={100}
-            />
-          </div>
-        ))}
-      </div>
-      {/* </Marquee> */}
+      <Marquee speed={50} pauseOnHover={false}>
+        <div className="flex gap-3 justify-center items-center">
+          {partners?.map((partner, index) => (
+            <div
+              key={index}
+              className="w-64 h-36  flex justify-center items-center mx-6 "
+            >
+              <img
+                src={partner?.src}
+                alt={partner?.alt}
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </Marquee>
     </div>
   );
 };
