@@ -210,7 +210,9 @@ export default function PhotoAlbumPage() {
       }
 
       const data = await response.json();
+      console.log(data)
       setGalleryImages(data.galleryItems);
+      console.log(galleryImages)
     } catch (error) {
       console.error("Error fetching gallery items:", error);
     }

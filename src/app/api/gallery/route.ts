@@ -61,7 +61,7 @@ export const GET = async () => {
   try {
     await connectViaMongoose();
 
-    const galleryItems = await Gallery.find().sort({ date: -1 });
+    const galleryItems = await Gallery.find({}).sort({ date: -1 });
 
     return NextResponse.json(
       { message: "Gallery images fetched successfully", galleryItems },
