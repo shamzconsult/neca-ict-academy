@@ -42,6 +42,7 @@ type GalleryFormProps = {
       images: File[];
     }>
   >;
+  fetchGallery: () => Promise<void>;
 };
 
 export const AddNewGalleryItem = ({
@@ -51,6 +52,7 @@ export const AddNewGalleryItem = ({
   setGalleryToEdit,
   formData,
   setFormData,
+  fetchGallery,
 }: GalleryFormProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,6 +70,7 @@ export const AddNewGalleryItem = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
       toast.success("Gallery item created successfully 🎉");
+      fetchGallery();
       resetForm();
     },
     onError: () => toast.error("Failed to create gallery item"),
@@ -93,6 +96,7 @@ export const AddNewGalleryItem = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
       toast.success("Gallery item updated successfully 🎉");
+      fetchGallery();
       resetForm();
     },
     onError: () => toast.error("Failed to update gallery item"),

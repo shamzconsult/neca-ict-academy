@@ -210,9 +210,9 @@ export default function PhotoAlbumPage() {
       }
 
       const data = await response.json();
-      console.log(data)
+      console.log(data);
       setGalleryImages(data.galleryItems);
-      console.log(galleryImages)
+      console.log(galleryImages);
     } catch (error) {
       console.error("Error fetching gallery items:", error);
     }
@@ -417,6 +417,7 @@ export default function PhotoAlbumPage() {
           galleryToEdit={galleryToEdit}
           setFormData={setFormData}
           formData={formData}
+          fetchGallery={fetchGallery}
         />
       )}
     </div>
