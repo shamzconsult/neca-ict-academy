@@ -10,164 +10,215 @@ import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
+import { useSession } from "next-auth/react";
+import { Pencil, Trash2 } from "lucide-react";
+import {
+  AddNewGalleryItem,
+  GalleryType,
+} from "@/components/atom/AddNewGalleryItem";
+import { Button } from "@/components/ui/button";
+import { HiOutlinePlusCircle } from "react-icons/hi";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
-const IMAGES = [
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139261/IMG_0285-min_1_11zon_tra6m7.jpg",
-    title: `Photo #1`,
-    date: `2024-06-01`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114958862/ed22696a-9b1f-4f4c-8c5b-378876c3740e.jpeg",
-    title: `Photo #2`,
-    date: `2024-06-02`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114957059/5467bbc5-999f-4785-8b62-63bb1542e3e3.jpeg",
-    title: `Photo #3`,
-    date: `2024-06-03`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114955415/5e1da090-ded0-4650-aaeb-1db6f8b0bf8c.jpeg",
-    title: `Photo #4`,
-    date: `2024-06-04`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114953408/1fd0cb67-41ef-4a36-b6a4-df80edb4ae44.jpeg",
-    title: `Photo #5`,
-    date: `2024-06-05`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114950213/34df36b7-88c3-4a9a-b8be-00c54253d723.jpeg",
-    title: `Photo #6`,
-    date: `2024-06-06`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139977/IMG-20250503-WA0160_1_bu5bhw.jpg",
-    title: `Photo #7`,
-    date: `2024-06-07`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114948320/e69d2f68-72b3-4b68-a4bd-4d8ecac6887b.jpeg",
-    title: `Photo #8`,
-    date: `2024-06-08`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137510/WhatsApp_Image_2025-05-08_at_1.22.46_PM_f9ari0.jpg",
-    title: `Photo #9`,
-    date: `2024-06-09`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137478/Lagos_Training_2_wkmgo5.jpg",
-    title: `Photo #10`,
-    date: `2024-06-10`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139260/IMG_0289_dkrtzx_e_improve-min_2_11zon_r6tulm.jpg",
-    title: `Photo #11`,
-    date: `2024-06-11`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137479/WhatsApp_Image_2025-05-08_at_1.22.47_PM_j9tabw.jpg",
-    title: `Photo #12`,
-    date: `2024-06-12`,
-    description: `UncleBigBay teaching AI and Vibe Coding at NECA ICT Academy`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139259/IMG_0569-min_3_11zon_owqran.jpg",
-    title: `Photo #13`,
-    date: `2024-06-13`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139257/IMG_0304-min_6_11zon_lgqtyq.jpg",
-    title: `Photo #14`,
-    date: `2024-06-14`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
-    title: `Photo #15`,
-    date: `2024-06-15`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139255/IMG_0280-min_5_11zon_lv2bwp.jpg",
-    title: `Photo #16`,
-    date: `2024-06-16`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0571-min_9_11zon_rghmsg.jpg",
-    title: `Photo #17`,
-    date: `2024-06-17`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
+// const IMAGES = [
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139261/IMG_0285-min_1_11zon_tra6m7.jpg",
+//     title: `Photo #1`,
+//     date: `2024-06-01`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114958862/ed22696a-9b1f-4f4c-8c5b-378876c3740e.jpeg",
+//     title: `Photo #2`,
+//     date: `2024-06-02`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114957059/5467bbc5-999f-4785-8b62-63bb1542e3e3.jpeg",
+//     title: `Photo #3`,
+//     date: `2024-06-03`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114955415/5e1da090-ded0-4650-aaeb-1db6f8b0bf8c.jpeg",
+//     title: `Photo #4`,
+//     date: `2024-06-04`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114953408/1fd0cb67-41ef-4a36-b6a4-df80edb4ae44.jpeg",
+//     title: `Photo #5`,
+//     date: `2024-06-05`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114950213/34df36b7-88c3-4a9a-b8be-00c54253d723.jpeg",
+//     title: `Photo #6`,
+//     date: `2024-06-06`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139977/IMG-20250503-WA0160_1_bu5bhw.jpg",
+//     title: `Photo #7`,
+//     date: `2024-06-07`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://cdn.hashnode.com/res/hashnode/image/upload/v1747114948320/e69d2f68-72b3-4b68-a4bd-4d8ecac6887b.jpeg",
+//     title: `Photo #8`,
+//     date: `2024-06-08`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137510/WhatsApp_Image_2025-05-08_at_1.22.46_PM_f9ari0.jpg",
+//     title: `Photo #9`,
+//     date: `2024-06-09`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137478/Lagos_Training_2_wkmgo5.jpg",
+//     title: `Photo #10`,
+//     date: `2024-06-10`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139260/IMG_0289_dkrtzx_e_improve-min_2_11zon_r6tulm.jpg",
+//     title: `Photo #11`,
+//     date: `2024-06-11`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747137479/WhatsApp_Image_2025-05-08_at_1.22.47_PM_j9tabw.jpg",
+//     title: `Photo #12`,
+//     date: `2024-06-12`,
+//     description: `UncleBigBay teaching AI and Vibe Coding at NECA ICT Academy`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139259/IMG_0569-min_3_11zon_owqran.jpg",
+//     title: `Photo #13`,
+//     date: `2024-06-13`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139257/IMG_0304-min_6_11zon_lgqtyq.jpg",
+//     title: `Photo #14`,
+//     date: `2024-06-14`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
+//     title: `Photo #15`,
+//     date: `2024-06-15`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139255/IMG_0280-min_5_11zon_lv2bwp.jpg",
+//     title: `Photo #16`,
+//     date: `2024-06-16`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0571-min_9_11zon_rghmsg.jpg",
+//     title: `Photo #17`,
+//     date: `2024-06-17`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
 
-  {
-    src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0505-min_7_11zon_ucvokd.jpg",
-    title: `Photo #18`,
-    date: `2024-06-18`,
-    description: `A memorable moment from our activities.`,
-    width: 800,
-    height: 600,
-  },
-];
+//   {
+//     src: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747139256/IMG_0505-min_7_11zon_ucvokd.jpg",
+//     title: `Photo #18`,
+//     date: `2024-06-18`,
+//     description: `A memorable moment from our activities.`,
+//     width: 800,
+//     height: 600,
+//   },
+// ];
 
 export default function PhotoAlbumPage() {
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
+  const [showModal, setShowModal] = useState(false);
+  const [galleryToEdit, setGalleryToEdit] = useState<GalleryType | null>(null);
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    date: string;
+    images: File[];
+  }>({
+    title: "",
+    description: "",
+    date: "",
+    images: [],
+  });
+  const isAdmin = !!session;
   const [lightboxIndex, setLightboxIndex] = useState(-1);
-  const [images, setImages] = useState(IMAGES);
+  const [galleryImages, setGalleryImages] = useState([]);
   const backgroundImages = [
     "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140810/899aad12-5c86-4d93-815a-30d3f7f39993_cgix5e.webp",
     "https://res.cloudinary.com/dtryuudiy/image/upload/v1747141648/image_jxqy5v.webp",
     "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
   ];
   const [bgIndex, setBgIndex] = useState(0);
+
+  const fetchGallery = async () => {
+    try {
+      const response = await fetch("/api/gallery", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setGalleryImages(data.galleryItems);
+    } catch (error) {
+      console.error("Error fetching gallery items:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchGallery();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -176,21 +227,58 @@ export default function PhotoAlbumPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Example infinite scroll: load more images (replace with your real fetch)
-  const loadMorePhotos = () => {
-    // Simulate loading more (repeat the same images for demo)
-    setImages((prev) => [...prev, ...IMAGES]);
+  const handleDelete = async (_id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+
+    if (!window.confirm("Are you sure you want to delete this gallery?"))
+      return;
+
+    try {
+      const res = await fetch(`/api/gallery/${_id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        console.error("Failed to delete gallery");
+        toast.error("Failed to delete the gallery.");
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["gallery"] });
+      toast.success("gallery deleted successfully");
+      fetchGallery();
+    } catch (error) {
+      console.error("Error deleting gallery: ", error);
+      toast.error("Something went wrong.");
+    }
+  };
+
+  const handleEdit = (gallery: GalleryType) => {
+    if (setGalleryToEdit && setFormData && setShowModal) {
+      setGalleryToEdit(gallery);
+      setFormData({
+        title: gallery.title,
+        description: gallery.description,
+        date: gallery.date,
+        images: [],
+      });
+      setShowModal(true);
+    }
+  };
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
   return (
-    <div className='min-h-screen flex flex-col'>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className='flex-1 pt-16 lg:pt-[106px] pb-16'>
+      <main className="flex-1 pt-16 lg:pt-[106px] pb-16">
         {/* Hero Section */}
-        <section className='w-full flex items-end h-[50vh] lg:h-[80vh] py-12 mb-10 border-b border-[#E02B20]/10 relative overflow-hidden'>
+        <section className="w-full flex items-end h-[50vh] lg:h-[80vh] py-12 mb-10 border-b border-[#E02B20]/10 relative overflow-hidden">
           {/* Hero Background Image */}
           <div
-            className='absolute inset-0 z-0 opacity-45 transition-all duration-1000'
+            className="absolute inset-0 z-0 opacity-45 transition-all duration-1000"
             style={{
               backgroundImage: `url('${backgroundImages[bgIndex]}')`,
               backgroundSize: "cover",
@@ -198,50 +286,60 @@ export default function PhotoAlbumPage() {
               transition: "background-image 1s ease-in-out",
             }}
           />
-          <div className='absolute inset-0 z-10 bg-[#27156F] opacity-20' />
-          <div className='max-w-6xl mx-auto px-4 text-center relative z-10'>
+          <div className="absolute inset-0 z-10 bg-[#27156F] opacity-20" />
+          <div className="max-w-6xl mx-auto px-4 text-center relative z-10">
             <h1
-              className='
+              className="
                 text-4xl md:text-[3rem] font-extrabold text-[#27156F]
                 mb-3 tracking-tight drop-shadow-2xl shadow-black
                 bg-white/80 px-8 py-4 rounded-xl inline-block
                 border-2 border-[#27156F]/20
                 backdrop-blur-sm
                 mx-auto
-              '
+              "
             >
               Gallery Photo Album
             </h1>
-            <div className='flex justify-center mt-2'>
+            <div className="flex justify-center mt-2">
               <svg
-                className='w-8 h-8 text-[#27156F] animate-bounce'
-                fill='none'
-                stroke='currentColor'
+                className="w-8 h-8 text-[#27156F] animate-bounce"
+                fill="none"
+                stroke="currentColor"
                 strokeWidth={2}
-                viewBox='0 0 24 24'
+                viewBox="0 0 24 24"
               >
                 <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M19 9l-7 7-7-7'
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
                 />
               </svg>
             </div>
-            {/* <p className='text-lg text-[#27156F]/80 max-w-2xl mx-auto'>
-              A visual journey through our teaching, workshops, and community
-              activities. Click any photo to view it larger.
-            </p> */}
           </div>
         </section>
+        <div className="flex flex-col justify-center items-center text-center px-4">
+          {isAdmin && (
+            <Button
+              onClick={toggleModal}
+              className="flex items-center gap-2 bg-blue-600 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-blue-700 transition-colors mb-4"
+            >
+              <HiOutlinePlusCircle /> Add New Images
+            </Button>
+          )}
+        </div>
         {/* Collage Grid with Infinite Scroll */}
-        <section className='max-w-6xl mx-auto px-2 md:px-4'>
-          <section className='max-w-6xl mx-auto px-2 md:px-4'>
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[180px] md:auto-rows-[220px]'>
-              {IMAGES.map((img, idx) => (
+        <section className="max-w-6xl mx-auto px-2 md:px-4">
+          <section className="max-w-6xl mx-auto px-2 md:px-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 auto-rows-[180px] md:auto-rows-[220px]">
+              {galleryImages.map((img: GalleryType, idx: number) => (
                 <div
                   key={idx}
                   className={`relative group cursor-pointer overflow-hidden rounded-2xl shadow-md border border-[#E02B20]/10 bg-white transition-all duration-300
-                  ${idx % 7 === 0 ? "row-span-2 col-span-2 md:col-span-2 md:row-span-2" : ""}
+                  ${
+                    idx % 7 === 0
+                      ? "row-span-2 col-span-2 md:col-span-2 md:row-span-2"
+                      : ""
+                  }
                   ${idx % 11 === 0 ? "col-span-2" : ""}
                   `}
                   onClick={() => setLightboxIndex(idx)}
@@ -249,18 +347,42 @@ export default function PhotoAlbumPage() {
                   aria-label={`View details for ${img.title}`}
                 >
                   <img
-                    src={img.src}
+                    src={img.images[0]}
                     alt={img.description}
-                    className='w-full h-full object-cover group-hover:scale-110 transition-transform duration-300'
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     style={{ aspectRatio: idx % 7 === 0 ? "2/2" : "1/1" }}
                   />
-                  <div className='absolute inset-0 flex flex-col justify-end p-4 pointer-events-none'>
-                    <div className='bg-[#27156F] opacity-20 group-hover:opacity-0 transition-all duration-300 absolute inset-0 z-10' />
-                    <div className='relative z-20 opacity-0 group-hover:opacity-100 transition-all duration-300'>
-                      <h2 className='text-lg font-semibold text-white drop-shadow mb-1'>
+                  {isAdmin && (
+                    <div className="absolute top-2 right-2 z-30 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEdit(img);
+                        }}
+                        className="bg-white/80 hover:bg-white cursor-pointer text-yellow-600 hover:text-yellow-800 p-1 rounded-full shadow transition"
+                        title="Edit image"
+                      >
+                        <Pencil size={16} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(img._id, e);
+                        }}
+                        className="bg-white/80 hover:bg-white text-red-600 cursor-pointer hover:text-red-800 p-1 rounded-full shadow transition"
+                        title="Delete image"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 flex flex-col justify-end p-4 pointer-events-none">
+                    <div className="bg-[#27156F] opacity-20 group-hover:opacity-0 transition-all duration-300 absolute inset-0 z-10" />
+                    <div className="relative z-20 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <h2 className="text-lg font-semibold text-white drop-shadow mb-1">
                         {img.title}
                       </h2>
-                      <span className='text-xs text-blue-100'>{img.date}</span>
+                      <span className="text-xs text-blue-100">{img.date}</span>
                     </div>
                   </div>
                 </div>
@@ -271,17 +393,30 @@ export default function PhotoAlbumPage() {
         {/* Lightbox */}
         <Lightbox
           open={lightboxIndex >= 0}
-          close={() => setLightboxIndex(-1)}
-          slides={images.map((img) => ({
-            src: img.src,
-            description: img.description,
-            title: img.title,
-          }))}
           index={lightboxIndex}
+          close={() => setLightboxIndex(-1)}
+          slides={galleryImages.flatMap((img: GalleryType) =>
+            img.images.map((url) => ({
+              src: url,
+              title: img.title,
+              description: img.description,
+            }))
+          )}
           plugins={[Thumbnails, Zoom, Slideshow]}
         />
       </main>
+
       <Footer />
+      {showModal && (
+        <AddNewGalleryItem
+          open={showModal}
+          toggleModal={toggleModal}
+          setGalleryToEdit={setGalleryToEdit}
+          galleryToEdit={galleryToEdit}
+          setFormData={setFormData}
+          formData={formData}
+        />
+      )}
     </div>
   );
 }
