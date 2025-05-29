@@ -10,48 +10,60 @@ export const POST = async (req: Request) => {
 
     const formData = await req.formData();
 
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const date = formData.get("date") as string;
-    const files = formData.getAll("images") as File[];
+    // Get all values as arrays
+    const titles = formData.getAll("title[]") as string[];
+    const descriptions = formData.getAll("description[]") as string[];
+    const dates = formData.getAll("date[]") as string[];
+    const files = formData.getAll("images[]") as File[];
 
-    if (!title || !files.length || !date) {
+    // Validate
+    if (!titles.length || !files.length || !dates.length) {
       return NextResponse.json(
         {
           message:
-            "Title, at least one image, description, and date are required.",
+            "At least one title, image, and date are required for batch upload.",
+        },
+        { status: 400 }
+      );
+    }
+    if (
+      titles.length !== files.length ||
+      titles.length !== dates.length ||
+      titles.length !== descriptions.length
+    ) {
+      return NextResponse.json(
+        {
+          message: "Mismatched batch array lengths.",
         },
         { status: 400 }
       );
     }
 
-    const uploadPromises = files.map(async (file) => {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
+    const createdGalleries = [];
+    for (let i = 0; i < titles.length; i++) {
+      const buffer = Buffer.from(await files[i].arrayBuffer());
+      const base64 = `data:${files[i].type};base64,${buffer.toString("base64")}`;
       const { url } = await uploadToCloudinary(base64, "gallery");
-      return url;
-    });
-
-    const imageUrls = await Promise.all(uploadPromises);
-
-    const newGallery = await Gallery.create({
-      title,
-      description,
-      images: imageUrls,
-      date,
-    });
+      const newGallery = await Gallery.create({
+        title: titles[i],
+        description: descriptions[i],
+        images: [url],
+        date: dates[i],
+      });
+      createdGalleries.push(newGallery);
+    }
 
     revalidatePath("/");
     revalidatePath("/gallery");
 
     return NextResponse.json(
-      { message: "Gallery images uploaded successfully!", newGallery },
+      { message: "Gallery batch uploaded successfully!", createdGalleries },
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error uploading gallery item:", error);
+    console.error("Error uploading gallery batch:", error);
     return NextResponse.json(
-      { message: "Error uploading gallery images", error },
+      { message: "Error uploading gallery batch", error },
       { status: 500 }
     );
   }

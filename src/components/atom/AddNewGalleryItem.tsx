@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Trash2, Plus, Loader2 } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export type GalleryType = {
   _id: string;
@@ -21,6 +23,14 @@ export type GalleryType = {
   description: string;
   url: string;
   images: string[];
+};
+
+type GalleryItem = {
+  title: string;
+  description: string;
+  date: string;
+  image: File | null;
+  id: string;
 };
 
 type GalleryFormProps = {
@@ -42,7 +52,6 @@ type GalleryFormProps = {
       images: File[];
     }>
   >;
-  fetchGallery: () => Promise<void>;
 };
 
 export const AddNewGalleryItem = ({
@@ -52,28 +61,43 @@ export const AddNewGalleryItem = ({
   setGalleryToEdit,
   formData,
   setFormData,
-  fetchGallery,
 }: GalleryFormProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [currentItem, setCurrentItem] = useState<GalleryItem>({
+    title: "",
+    description: "",
+    date: "",
+    image: null,
+    id: crypto.randomUUID(),
+  });
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   const createMutation = useMutation({
-    mutationFn: async (formDataToSend: FormData) => {
+    mutationFn: async (items: GalleryItem[]) => {
+      const formData = new FormData();
+      items.forEach((item) => {
+        formData.append("title[]", item.title);
+        formData.append("description[]", item.description);
+        formData.append("date[]", item.date);
+        if (item.image) formData.append("images[]", item.image);
+      });
       const res = await fetch("/api/gallery", {
         method: "POST",
-        body: formDataToSend,
+        body: formData,
       });
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
-      toast.success("Gallery item created successfully 🎉");
-      fetchGallery();
+      toast.success("Gallery items created successfully 🎉");
       resetForm();
     },
-    onError: () => toast.error("Failed to create gallery item"),
+    onError: () => toast.error("Failed to create gallery items"),
     onMutate: () => setLoading(true),
     onSettled: () => setLoading(false),
   });
@@ -96,7 +120,6 @@ export const AddNewGalleryItem = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["gallery"] });
       toast.success("Gallery item updated successfully 🎉");
-      fetchGallery();
       resetForm();
     },
     onError: () => toast.error("Failed to update gallery item"),
@@ -113,52 +136,101 @@ export const AddNewGalleryItem = ({
       date: "",
       images: [],
     });
+    setGalleryItems([]);
+    setCurrentItem({
+      title: "",
+      description: "",
+      date: "",
+      image: null,
+      id: crypto.randomUUID(),
+    });
+    setEditingItemId(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setCurrentItem({ ...currentItem, [e.target.name]: e.target.value });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    const fileArray = Array.from(files);
-    if (fileArray.length > 6) {
-      toast.error("You can only upload up to 5 images at once.");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 307200) {
+      toast.error("Image must be less than 300KB.");
       return;
     }
-    const tooLarge = fileArray.some((file) => file.size > 307200);
-    if (tooLarge) {
-      toast.error("Each image must be less than 300KB.");
-      return;
-    }
-    setFormData({ ...formData, images: fileArray });
+
+    setCurrentItem({ ...currentItem, image: file });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (formData.images.length === 0 && !galleryToEdit) {
-      toast.error("Please upload at least one image.");
+  const addItemToList = () => {
+    if (!currentItem.title || !currentItem.date || !currentItem.image) {
+      toast.error("Please fill in all required fields and select an image.");
       return;
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("title", formData.title);
-    formDataToSend.append("date", formData.date);
-    formDataToSend.append("description", formData.description);
+    if (galleryItems.length >= 6) {
+      toast.error("You can only add up to 6 items at once.");
+      return;
+    }
 
-    formData.images.forEach((img, i) => {
-      formDataToSend.append("images", img, `image-${i}`);
+    setGalleryItems([...galleryItems, currentItem]);
+    setCurrentItem({
+      title: "",
+      description: "",
+      date: "",
+      image: null,
+      id: crypto.randomUUID(),
     });
+    setEditingItemId(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeItem = (id: string) => {
+    setGalleryItems(galleryItems.filter((item) => item.id !== id));
+  };
+
+  const editItem = (id: string) => {
+    const itemToEdit = galleryItems.find((item) => item.id === id);
+    if (itemToEdit) {
+      setCurrentItem(itemToEdit);
+      setEditingItemId(id);
+      removeItem(id);
+      setTimeout(() => {
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          });
+        }
+      }, 0);
+    }
+  };
+
+  const handleSubmit = (
+    e: React.FormEvent<HTMLFormElement | HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+
+    if (galleryItems.length === 0) {
+      toast.error("Please add at least one gallery item.");
+      return;
+    }
 
     if (galleryToEdit) {
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", currentItem.title);
+      formDataToSend.append("date", currentItem.date);
+      formDataToSend.append("description", currentItem.description);
+      if (currentItem.image) {
+        formDataToSend.append("images", currentItem.image);
+      }
       updateMutation.mutate({ _id: galleryToEdit._id, formDataToSend });
     } else {
-      createMutation.mutate(formDataToSend);
+      createMutation.mutate(galleryItems);
     }
   };
 
@@ -169,74 +241,145 @@ export const AddNewGalleryItem = ({
         if (!openState) resetForm();
       }}
     >
-      <DialogContent className="max-h-[90vh] lg:max-w-xl px-0">
-        <DialogHeader className="px-6">
+      <DialogContent className='max-h-[90vh] lg:max-w-xl px-0'>
+        <div ref={scrollAreaRef} />
+        <DialogHeader className='px-6'>
           <DialogTitle>
-            {galleryToEdit ? "Edit Gallery Item" : "Add New Gallery Item"}
+            {galleryToEdit ? "Edit Gallery Item" : "Upload New Gallery Items"}
           </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4 px-6 pb-6">
-          <div className="space-y-2">
-            <Label>Title</Label>
-            <Input
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              placeholder="e.g. AI first month training"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <Textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Brief description..."
-              rows={4}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Date</Label>
-            <Input
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              required
-              placeholder="2024-06-14"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Upload Images (Max 6)</Label>
-            <Input
-              type="file"
-              accept="image/*"
-              multiple
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
-            <div className="grid grid-cols-3 gap-2">
-              {formData.images.map((img, i) => (
-                <img
-                  key={i}
-                  src={URL.createObjectURL(img)}
-                  alt={`preview-${i}`}
-                  className="h-24 w-full object-cover rounded-md"
+        <ScrollArea className='max-h-[70vh] px-6 pb-6'>
+          {(galleryItems.length < 6 || editingItemId !== null) && (
+            <form className='space-y-4'>
+              <div className='space-y-2'>
+                <Label>Title</Label>
+                <Input
+                  name='title'
+                  value={currentItem.title}
+                  onChange={handleChange}
+                  required
+                  placeholder='e.g. AI first month training'
                 />
-              ))}
+              </div>
+
+              <div className='space-y-2'>
+                <Label>Description</Label>
+                <Textarea
+                  name='description'
+                  value={currentItem.description}
+                  onChange={handleChange}
+                  placeholder='Brief description...'
+                  rows={4}
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label>Date</Label>
+                <Input
+                  name='date'
+                  value={currentItem.date}
+                  onChange={handleChange}
+                  required
+                  placeholder='2024-06-14'
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label>Upload Image</Label>
+                <Input
+                  type='file'
+                  accept='image/*'
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                />
+                {currentItem.image && (
+                  <img
+                    src={URL.createObjectURL(currentItem.image)}
+                    alt='preview'
+                    className='h-40 w-full object-cover rounded-md'
+                  />
+                )}
+              </div>
+
+              <Button
+                type='button'
+                onClick={addItemToList}
+                className='w-full cursor-pointer'
+                disabled={
+                  !currentItem.title || !currentItem.date || !currentItem.image
+                }
+              >
+                <Plus className='h-4 w-4' /> Add to Batch
+              </Button>
+            </form>
+          )}
+
+          {galleryItems.length > 0 && (
+            <div className='space-y-4 mt-4'>
+              <h3 className='font-semibold'>
+                Batch Items ({galleryItems.length}/6)
+              </h3>
+              <div className='space-y-3'>
+                {galleryItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className='p-3 border rounded-lg bg-gray-50 flex items-center gap-3'
+                  >
+                    {item.image && (
+                      <div className='w-16 h-16 flex-shrink-0'>
+                        <img
+                          src={URL.createObjectURL(item.image)}
+                          alt={item.title}
+                          className='w-full h-full object-cover rounded-md'
+                        />
+                      </div>
+                    )}
+                    <div className='flex-1 min-w-0'>
+                      <h4 className='font-medium truncate'>{item.title}</h4>
+                      <p className='text-sm text-gray-500'>{item.date}</p>
+                      {item.description && (
+                        <p className='text-sm text-gray-600 truncate mt-1'>
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className='flex gap-2 flex-shrink-0'>
+                      <button
+                        type='button'
+                        onClick={() => editItem(item.id)}
+                        className={`p-1 hover:bg-gray-200 rounded${editingItemId !== null && editingItemId !== item.id ? " cursor-not-allowed opacity-50" : ""}`}
+                        disabled={
+                          editingItemId !== null && editingItemId !== item.id
+                        }
+                      >
+                        <Pencil className='h-4 w-4 text-blue-600' />
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => removeItem(item.id)}
+                        className={`p-1 hover:bg-gray-200 rounded${editingItemId !== null && editingItemId !== item.id ? " cursor-not-allowed opacity-50" : ""}`}
+                        disabled={
+                          editingItemId !== null && editingItemId !== item.id
+                        }
+                      >
+                        <Trash2 className='h-4 w-4 text-red-600' />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <Button
-            type="submit"
-            disabled={loading}
-            className="w-full cursor-pointer"
+            onClick={(e) => handleSubmit(e)}
+            disabled={
+              editingItemId !== null || loading || galleryItems.length === 0
+            }
+            className='w-full cursor-pointer mt-4'
           >
-            {galleryToEdit ? "Update" : "Submit"}
+            {galleryToEdit ? "Update" : "Upload Batch"}
+            {loading && <Loader2 className='h-4 w-4 animate-spin' />}
           </Button>
-        </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

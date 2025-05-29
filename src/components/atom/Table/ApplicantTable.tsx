@@ -16,13 +16,7 @@ type ApplicantTableProps = {
   searchTerm: string;
 };
 
-const ApplicantTable = ({
-  tableData,
-  status,
-  level,
-  searchTerm,
-}: ApplicantTableProps) => {
-  console.log("tableData::", tableData);
+const ApplicantTable = ({ tableData }: ApplicantTableProps) => {
   return (
     <Table>
       <TableHead>
