@@ -6,6 +6,7 @@ import { Enrollment } from "@/models/enrollment";
 import { Applicant } from "@/models/applicant";
 import { levelOptionsMap, statusOptionsMap } from "@/const";
 import Cohort from "@/models/cohort";
+import { revalidatePath } from "next/cache";
 
 interface ApplicantFormData {
   firstName: string;
@@ -117,6 +118,9 @@ const POST = async (req: NextRequest) => {
       employmentStatus: data.employmentStatus,
     });
 
+    revalidatePath("/admin/cohorts");
+    revalidatePath("/admin/dashboard");
+
     return NextResponse.json(
       { message: "Applicant created successfully!" },
       { status: 201 }
@@ -131,13 +135,6 @@ const POST = async (req: NextRequest) => {
       error instanceof Error && process.env.NODE_ENV === "development"
         ? error.stack
         : undefined;
-
-    // if (error instanceof Error && "code" in error && error.code === 11000) {
-    //   return NextResponse.json(
-    //     { message: "Email already exists" },
-    //     { status: 400 }
-    //   );
-    // }
 
     return NextResponse.json(
       {
