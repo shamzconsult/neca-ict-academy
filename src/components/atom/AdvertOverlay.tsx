@@ -10,8 +10,9 @@ import {
 import { VisuallyHidden } from "../visually-hidden";
 
 const AD_IMAGES = [
-  "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
-  "https://res.cloudinary.com/dtryuudiy/image/upload/v1747147393/enrollment/course/mxgu4h5xa295wk4igdr4.webp",
+  // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
+  // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747147393/enrollment/course/mxgu4h5xa295wk4igdr4.webp",
+  "https://res.cloudinary.com/dtryuudiy/image/upload/v1748613785/neca_flier_2_2_pgmlai.webp",
   "https://res.cloudinary.com/dtryuudiy/image/upload/v1747134855/enrollment/course/nod3uf4l2bhrr4fzp9wc.webp",
 ];
 
