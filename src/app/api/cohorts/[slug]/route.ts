@@ -135,6 +135,8 @@ export const PUT = async (req: Request) => {
     }
 
     revalidatePath("/enroll");
+    revalidatePath("/admin/cohorts");
+    revalidatePath("/admin/dashboard");
 
     return NextResponse.json(
       { message: "Cohort updated successfully", updatedCohort },
