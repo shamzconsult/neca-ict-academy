@@ -25,10 +25,7 @@ export const authOptions: NextAuthOptions = {
           const email = credentials.email.trim().toLowerCase();
           const password = credentials.password.trim();
 
-          console.log("Email:", email);
-          console.log("Password:", password);
           const user = await User.findOne({ email });
-          console.log("User:", user);
           if (!user) return null;
 
           const isValid = await bcrypt.compare(password, user.password);
