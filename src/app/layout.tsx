@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from "next/font/google";
-import ReactQueryProvider from "@/components/ReactQueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { NECA_ICT_ACADEMY_LOGO } from "@/const";
+import ClientProviders from "./ClientProviders";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -68,10 +68,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body className={poppins.className}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
-        <Toaster position='top-center' />
+        <ClientProviders>{children}</ClientProviders>
+        <Toaster position="top-center" />
       </body>
     </html>
   );
