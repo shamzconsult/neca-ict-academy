@@ -559,7 +559,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           label='Upload CV'
                           name='cv'
                           required
-                          accept='.pdf,.doc,.docx'
+                          accept='.pdf'
                           icon={<MdDescription />}
                           placeholder='Upload your CV'
                           onFileChange={field.onChange}
