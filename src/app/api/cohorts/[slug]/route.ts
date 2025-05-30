@@ -3,6 +3,7 @@ import Cohort from "@/models/cohort";
 import { NextResponse } from "next/server";
 import { Enrollment } from "@/models/enrollment";
 import { Types } from "mongoose";
+import { revalidatePath } from "next/cache";
 
 export const GET = async (req: Request) => {
   try {
@@ -132,6 +133,8 @@ export const PUT = async (req: Request) => {
         { status: 404 }
       );
     }
+
+    revalidatePath("/enroll");
 
     return NextResponse.json(
       { message: "Cohort updated successfully", updatedCohort },
