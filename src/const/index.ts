@@ -103,3 +103,13 @@ export const adminCohortTableHead = [
   "Start Date",
   "End Date",
 ];
+
+export const employmentStatusOptions = [
+  { key: "employed", label: "Employed" },
+  { key: "unemployed", label: "Unemployed" },
+  { key: "student", label: "Student" },
+  { key: "self-employed", label: "Self-employed" },
+];
+
+export type EmploymentStatusKey =
+  (typeof employmentStatusOptions)[number]["key"];

@@ -88,6 +88,7 @@ export async function GET(
               : "No course",
           cohort: cohort.name,
           enrollmentId: latestEnrollment?._id,
+          employmentStatus: latestEnrollment.employmentStatus,
         };
       });
       // Convert to CSV
@@ -131,6 +132,7 @@ export async function GET(
             : "No course",
         cohort: cohort.name,
         enrollmentId: latestEnrollment?._id,
+        employmentStatus: latestEnrollment.employmentStatus,
       };
     });
 

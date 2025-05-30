@@ -1,6 +1,7 @@
 import connectViaMongoose from "@/lib/db";
 import Cohort from "@/models/cohort";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 const GET = async () => {
   try {
@@ -52,6 +53,9 @@ const POST = async (req: Request) => {
     });
 
     await newCohort.save();
+
+    revalidatePath("/admin/dashboard");
+    revalidatePath("/admin/cohorts");
 
     return NextResponse.json(
       { message: "Cohort created successfully!", newCohort },

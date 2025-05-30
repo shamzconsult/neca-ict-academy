@@ -14,6 +14,7 @@ import {
   levelOptionsMap,
   states,
   statusOptionsMap,
+  employmentStatusOptions,
 } from "@/const";
 import { useSearchParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
@@ -32,6 +33,7 @@ interface FormData {
   status: string;
   cv: File | null;
   profileImage: File | null;
+  employmentStatus: string;
 }
 
 type ApplicationFormProps = Array<{
@@ -65,6 +67,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
       status: statusOptionsMap.pending,
       cv: null,
       profileImage: null,
+      employmentStatus: "",
     },
   });
 
@@ -517,6 +520,35 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                     )}
                   </div>
 
+                  <div className='md:col-span-2'>
+                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
+                      Employment Status
+                    </label>
+                    <div className='relative'>
+                      <select
+                        {...register("employmentStatus", { required: true })}
+                        disabled={submitMutation.status === "pending"}
+                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
+                      >
+                        <option value=''>Select employment status</option>
+                        {employmentStatusOptions.map((opt) => (
+                          <option key={opt.key} value={opt.key}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      <MdArrowDropDown
+                        size={24}
+                        className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
+                      />
+                    </div>
+                    {errors.employmentStatus && (
+                      <span className='text-red-500 text-xs'>
+                        Employment status is required
+                      </span>
+                    )}
+                  </div>
+
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <Controller
                       name='cv'
@@ -555,6 +587,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       )}
                     />
                   </div>
+
                   <button
                     type='submit'
                     disabled={submitMutation.status === "pending"}
