@@ -151,7 +151,6 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
         <CohortForm
           toggleModal={checkAllCohortStatus}
           setCohortsData={setLocalCohorts}
-          cohortsData={localCohorts}
         />
       )}
     </>

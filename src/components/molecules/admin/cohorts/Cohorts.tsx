@@ -142,7 +142,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
         <CohortForm
           toggleModal={toggleModal}
           setCohortsData={setCohortsData}
-          cohortsData={cohortsData}
           cohortToEdit={cohortToEdit}
           setCohortToEdit={setCohortToEdit}
         />
