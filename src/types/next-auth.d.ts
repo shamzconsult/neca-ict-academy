@@ -3,11 +3,11 @@ import "next-auth";
 declare module "next-auth" {
   interface User {
     id: string;
-    role: string; 
-    firstName?: string;
-    lastName?: string;
+    role: string;
+    surname?: string;
+    otherNames?: string;
   }
-  
+
   interface Session {
     user: {
       id: string;
@@ -19,7 +19,7 @@ declare module "next-auth" {
 }
 
 declare module "next-auth" {
-    interface PagesOptions {
-      forgotPassword?: string;
-    }
+  interface PagesOptions {
+    forgotPassword?: string;
   }
+}

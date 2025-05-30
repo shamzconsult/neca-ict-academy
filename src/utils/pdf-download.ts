@@ -1,6 +1,6 @@
-import { EnrollmentType } from '@/types';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { EnrollmentType } from "@/types";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const pdfDownload = (docName: string, data: EnrollmentType[]) => {
   const doc = new jsPDF();
@@ -9,17 +9,19 @@ export const pdfDownload = (docName: string, data: EnrollmentType[]) => {
   doc.text(`${docName} - Applicants List`, 14, 15);
   doc.setFontSize(12);
 
-  const tableData = data.map(({ level, course, firstName, lastName, email, state, createdAt }) => [
-    `${firstName} ${lastName}\n${email}`,
-    state,
-    course,
-    level,
-    status,
-    new Date(createdAt).toDateString(),
-  ]);
+  const tableData = data.map(
+    ({ level, course, surname, otherNames, email, state, createdAt }) => [
+      `${surname} ${otherNames}\n${email}`,
+      state,
+      course,
+      level,
+      status,
+      new Date(createdAt).toDateString(),
+    ]
+  );
 
   autoTable(doc, {
-    head: [['Applicants', 'Location', 'Course', 'Level', 'Status', 'Date']],
+    head: [["Applicants", "Location", "Course", "Level", "Status", "Date"]],
     body: tableData,
     startY: 25,
     styles: {
@@ -29,7 +31,7 @@ export const pdfDownload = (docName: string, data: EnrollmentType[]) => {
     headStyles: {
       fillColor: [33, 33, 33],
       textColor: [255, 255, 255],
-      fontStyle: 'bold',
+      fontStyle: "bold",
     },
     columnStyles: {
       0: { cellWidth: 50 },

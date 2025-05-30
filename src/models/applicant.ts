@@ -5,11 +5,11 @@ const ALLOWED_GENDER = genderOptions;
 
 const ApplicantSchema = new Schema(
   {
-    firstName: {
+    surname: {
       type: String,
       required: true,
     },
-    lastName: {
+    otherNames: {
       type: String,
       required: true,
     },

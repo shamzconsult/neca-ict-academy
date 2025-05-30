@@ -15,8 +15,8 @@ export type CourseOutline = {
 export type EnrollmentType = {
   _id: string;
   course: string;
-  firstName: string;
-  lastName: string;
+  surname: string;
+  otherNames: string;
   applicant: ApplicantDetail;
   cohort: CohortType;
   level: ApplicationLevel;
@@ -41,8 +41,8 @@ export type EnrollmentsType = EnrollmentType[];
 
 export type ApplicantDetail = {
   _id: string;
-  firstName: string;
-  lastName: string;
+  surname: string;
+  otherNames: string;
   email: string;
   course: string;
   level: string;

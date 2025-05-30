@@ -10,13 +10,16 @@ export const GET = async (req: Request) => {
     const email = url.pathname.split("/").pop();
 
     if (!email) {
-      return NextResponse.json({ message: "Email is required" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Email is required" },
+        { status: 400 }
+      );
     }
 
     const decodedEmail = decodeURIComponent(email);
-    
+
     const applicant = await Applicant.findOne({ email: decodedEmail });
-    
+
     if (!applicant) {
       return NextResponse.json(
         { message: "Applicant not found" },
@@ -24,8 +27,8 @@ export const GET = async (req: Request) => {
       );
     }
 
-    const enrollment = await Enrollment.findOne({ 
-      applicant: applicant._id 
+    const enrollment = await Enrollment.findOne({
+      applicant: applicant._id,
     }).select("status level");
 
     if (!enrollment) {
@@ -38,12 +41,11 @@ export const GET = async (req: Request) => {
     return NextResponse.json({
       status: enrollment.status,
       level: enrollment.level,
-      applicant: { 
-        firstName: applicant.firstName,
-        lastName: applicant.lastName
-      }
+      applicant: {
+        surname: applicant.surname,
+        otherNames: applicant.otherNames,
+      },
     });
-    
   } catch (error) {
     console.error("Error fetching application status:", error);
     return NextResponse.json(

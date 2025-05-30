@@ -22,8 +22,8 @@ export const ApplicantInfoModal = ({
   const {
     profilePicture,
     phoneNumber,
-    firstName,
-    lastName,
+    surname,
+    otherNames,
     email,
     state,
     gender,
@@ -47,13 +47,13 @@ export const ApplicantInfoModal = ({
               {profilePicture?.url && (
                 <img
                   src={profilePicture.url.replace(/[`'"]/g, "").trim()}
-                  alt={`${firstName} ${lastName}`}
+                  alt={`${surname} ${otherNames}`}
                   className='w-24 h-24 rounded-full object-cover border'
                 />
               )}
               <div className='w-full'>
                 <div className='mb-2 break-all block w-[300px]'>
-                  <strong>Name:</strong> {firstName} {lastName}
+                  <strong>Name:</strong> {surname} {otherNames}
                 </div>
                 <div className='mb-2 break-all block w-[300px]'>
                   <strong>Email:</strong> {email}

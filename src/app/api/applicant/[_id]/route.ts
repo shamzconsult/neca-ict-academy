@@ -5,8 +5,8 @@ import { Enrollment } from "@/models/enrollment";
 import { NextResponse } from "next/server";
 
 interface UpdateApplicantData {
-  firstName?: string;
-  lastName?: string;
+  surname?: string;
+  otherNames?: string;
   email?: string;
   phoneNumber?: string;
   state?: string;
@@ -116,10 +116,11 @@ const PUT = async (req: Request) => {
       }
 
       const updateData: UpdateApplicantData = {
-        firstName:
-          (formData.get("firstName") as string) || existingApplicant.firstName,
-        lastName:
-          (formData.get("lastName") as string) || existingApplicant.lastName,
+        surname:
+          (formData.get("surname") as string) || existingApplicant.surname,
+        otherNames:
+          (formData.get("otherNames") as string) ||
+          existingApplicant.otherNames,
         email: (formData.get("email") as string) || existingApplicant.email,
         phoneNumber:
           (formData.get("phoneNumber") as string) ||

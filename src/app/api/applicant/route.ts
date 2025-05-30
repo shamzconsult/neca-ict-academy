@@ -9,8 +9,8 @@ import Cohort from "@/models/cohort";
 import { revalidatePath } from "next/cache";
 
 interface ApplicantFormData {
-  firstName: string;
-  lastName: string;
+  surname: string;
+  otherNames: string;
   email: string;
   phoneNumber: string;
   state: string;
@@ -37,8 +37,8 @@ const POST = async (req: NextRequest) => {
     const formData = await req.formData();
 
     const data: ApplicantFormData = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
+      surname: formData.get("surname") as string,
+      otherNames: formData.get("otherNames") as string,
       email: formData.get("email") as string,
       phoneNumber: formData.get("phoneNumber") as string,
       state: formData.get("state") as string,
@@ -54,8 +54,8 @@ const POST = async (req: NextRequest) => {
 
     // Validate required fields
     const requiredFields = [
-      "firstName",
-      "lastName",
+      "surname",
+      "otherNames",
       "email",
       "phoneNumber",
       "state",
@@ -98,8 +98,8 @@ const POST = async (req: NextRequest) => {
     let applicant = await Applicant.findOne({ email: data.email });
     if (!applicant) {
       applicant = await Applicant.create({
-        firstName: data.firstName,
-        lastName: data.lastName,
+        surname: data.surname,
+        otherNames: data.otherNames,
         email: data.email,
         phoneNumber: data.phoneNumber,
         state: data.state,

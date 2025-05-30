@@ -51,8 +51,8 @@ export async function GET(
     const query: Record<string, unknown> = { _id: { $in: applicantIds } };
     if (searchQuery) {
       query.$or = [
-        { firstName: { $regex: searchQuery, $options: "i" } },
-        { lastName: { $regex: searchQuery, $options: "i" } },
+        { surname: { $regex: searchQuery, $options: "i" } },
+        { otherNames: { $regex: searchQuery, $options: "i" } },
         { email: { $regex: searchQuery, $options: "i" } },
         { phoneNumber: { $regex: searchQuery, $options: "i" } },
       ];
@@ -74,8 +74,8 @@ export async function GET(
         });
         const latestEnrollment = applicantEnrollments[0] || null;
         return {
-          firstName: applicant.firstName,
-          lastName: applicant.lastName,
+          surname: applicant.surname,
+          otherNames: applicant.otherNames,
           email: applicant.email,
           phoneNumber: applicant.phoneNumber,
           state: applicant.state,

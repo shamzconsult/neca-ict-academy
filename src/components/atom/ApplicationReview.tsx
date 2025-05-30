@@ -13,7 +13,7 @@ interface ApplicationReviewProps {
   onClose: () => void;
   applicantStatus: {
     status: "pending" | "admitted" | "declined" | "interview";
-    applicant: { firstName: string; lastName: string };
+    applicant: { surname: string; otherNames: string };
   } | null;
   statusError: string;
 }
@@ -46,7 +46,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
                   <p className='text-sm text-center'>
                     Dear{" "}
                     <span className='font-semibold'>
-                      {applicant.firstName} {applicant.lastName}
+                      {applicant.surname} {applicant.otherNames}
                     </span>
                     , your application is currently under review. We'll notify
                     you once a decision has been made.
@@ -63,7 +63,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
                   <p className='text-sm text-center'>
                     Dear{" "}
                     <span className='font-semibold'>
-                      {applicant.firstName} {applicant.lastName}
+                      {applicant.surname} {applicant.otherNames}
                     </span>
                     , you&apos;ve been scheduled for an interview, check your
                     email box for more details.
@@ -80,7 +80,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
                   <p className='text-sm text-center'>
                     Congratulations{" "}
                     <span className='font-semibold'>
-                      {applicant.firstName} {applicant.lastName}
+                      {applicant.surname} {applicant.otherNames}
                     </span>
                     ! You have been admitted to the cohort. Check your email for
                     further details.
@@ -97,7 +97,7 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
                   <p className='text-sm text-center'>
                     Hi{" "}
                     <span className='font-semibold'>
-                      {applicant.firstName} {applicant.lastName}
+                      {applicant.surname} {applicant.otherNames}
                     </span>
                     , thank you for your interest in our program. While we are
                     unable to offer you a spot this time, we encourage you to
@@ -116,8 +116,8 @@ export const ApplicationReview: React.FC<ApplicationReviewProps> = ({
                     </DialogTitle>
                   </DialogHeader>
                   <p className='text-sm text-center'>
-                    Hi {applicant.firstName || "Applicant"}{" "}
-                    {applicant.lastName || ""}, we couldn't determine your
+                    Hi {applicant.surname || "Applicant"}{" "}
+                    {applicant.otherNames || ""}, we couldn't determine your
                     application status. Please contact support for more
                     information.
                   </p>

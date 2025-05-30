@@ -31,7 +31,7 @@ const ApplicantTable = ({ tableData }: ApplicantTableProps) => {
           tableData.map((applicant) => (
             <TableRow key={applicant._id} className='hover:bg-slate-50'>
               <TableCell>
-                {applicant.firstName} {applicant.lastName}
+                {applicant.surname} {applicant.otherNames}
               </TableCell>
               <TableCell>{applicant.email}</TableCell>
               <TableCell>{applicant.phoneNumber}</TableCell>

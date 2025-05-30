@@ -21,8 +21,8 @@ import { useForm, Controller } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 
 interface FormData {
-  firstName: string;
-  lastName: string;
+  surname: string;
+  otherNames: string;
   email: string;
   phoneNumber: string;
   state: string;
@@ -55,8 +55,8 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      surname: "",
+      otherNames: "",
       email: "",
       phoneNumber: "",
       state: "",
@@ -314,35 +314,35 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div>
                           <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            First Name
+                            Surname
                           </label>
                           <input
                             type='text'
-                            placeholder='First Name'
-                            {...register("firstName", { required: true })}
+                            placeholder='Surname'
+                            {...register("surname", { required: true })}
                             className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                             disabled={submitMutation.status === "pending"}
                           />
-                          {errors.firstName && (
+                          {errors.surname && (
                             <span className='text-red-500 text-xs'>
-                              First name is required
+                              Surname is required
                             </span>
                           )}
                         </div>
                         <div>
                           <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            Last Name
+                            Other Names
                           </label>
                           <input
                             type='text'
-                            placeholder='Last Name'
-                            {...register("lastName", { required: true })}
+                            placeholder='Other Names'
+                            {...register("otherNames", { required: true })}
                             className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
                             disabled={submitMutation.status === "pending"}
                           />
-                          {errors.lastName && (
+                          {errors.otherNames && (
                             <span className='text-red-500 text-xs'>
-                              Last name is required
+                              Other names is required
                             </span>
                           )}
                         </div>

@@ -22,8 +22,8 @@ export async function GET(request: Request) {
     const query: any = {};
     if (search) {
       query.$or = [
-        { firstName: { $regex: search, $options: "i" } },
-        { lastName: { $regex: search, $options: "i" } },
+        { surname: { $regex: search, $options: "i" } },
+        { otherNames: { $regex: search, $options: "i" } },
         { email: { $regex: search, $options: "i" } },
       ];
     }

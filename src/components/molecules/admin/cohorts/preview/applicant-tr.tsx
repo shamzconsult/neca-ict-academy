@@ -98,8 +98,8 @@ export const ApplicantTr = ({ enrollment }: Props) => {
 
   const {
     _id,
-    firstName,
-    lastName,
+    surname,
+    otherNames,
     email,
     course,
     level,
@@ -119,7 +119,7 @@ export const ApplicantTr = ({ enrollment }: Props) => {
           className='flex flex-col text-left cursor-pointer'
         >
           <span className='text-gray-900 font-semibold'>
-            {firstName} {lastName}
+            {surname} {otherNames}
           </span>
           <span className='text-sm text-gray-500'>{email}</span>
         </button>

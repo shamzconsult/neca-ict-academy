@@ -19,7 +19,7 @@ const GET = async () => {
 const POST = async (req: Request) => {
   try {
     await connectViaMongoose();
-    const { firstName, lastName, email, password } = await req.json();
+    const { surname, otherNames, email, password } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -42,8 +42,8 @@ const POST = async (req: Request) => {
     // console.log('Hashed password:', hashedPassword);
     // console.log('About to save user with hash:', hashedPassword);
     const user = await User.create({
-      firstName,
-      lastName,
+      surname,
+      otherNames,
       email,
       password,
       role: "Admin",
