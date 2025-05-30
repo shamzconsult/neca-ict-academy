@@ -20,8 +20,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { ExternalLink, PanelLeft, X } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { useSidebar } from "@/app/admin/layout";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 export type CourseOutline = {
   header: string;
@@ -124,21 +124,21 @@ export const ManageCourses = () => {
   return (
     <>
       <AdminSectionHeader
-        title='Course Overview'
+        title="Course Overview"
         cta={
           <>
             <Button
               onClick={toggleModal}
-              className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
             >
               <HiOutlinePlusCircle /> Add New Course
             </Button>
             <Button
-              variant='outline'
+              variant="outline"
               asChild
-              className='flex items-center gap-2 transition-colors'
+              className="flex items-center gap-2 transition-colors"
             >
-              <Link href='/courses' target='_blank'>
+              <Link href="/courses" target="_blank">
                 <ExternalLink />
                 Go to Courses Page
               </Link>
@@ -147,60 +147,60 @@ export const ManageCourses = () => {
         }
       />
       {/* Filter & Sort Controls */}
-      <div className='flex flex-col md:flex-row gap-4 mb-6'>
-        <div className='relative w-full md:w-1/2 lg:w-full'>
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="relative w-full md:w-1/2 lg:w-full">
           <Input
-            placeholder='Search course title...'
+            placeholder="Search course title..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className='pr-8'
+            className="pr-8"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className='absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700'
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             >
-              <X className='h-4 w-4' />
+              <X className="h-4 w-4" />
             </button>
           )}
         </div>
-        <div className='flex flex-col md:flex-row w-full md:w-auto gap-4'>
+        <div className="flex flex-col md:flex-row w-full md:w-auto gap-4">
           <Select value={skillLevel} onValueChange={setSkillLevel}>
-            <SelectTrigger className='w-full md:w-40'>
-              <SelectValue placeholder='Skill Level' />
+            <SelectTrigger className="w-full md:w-40">
+              <SelectValue placeholder="Skill Level" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='all'>All</SelectItem>
-              <SelectItem value='Beginner'>Beginner</SelectItem>
-              <SelectItem value='Intermediate'>Intermediate</SelectItem>
-              <SelectItem value='Advanced'>Advanced</SelectItem>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="Beginner">Beginner</SelectItem>
+              <SelectItem value="Intermediate">Intermediate</SelectItem>
+              <SelectItem value="Advanced">Advanced</SelectItem>
             </SelectContent>
           </Select>
           <Select value={order} onValueChange={setOrder}>
-            <SelectTrigger className='w-full md:w-40'>
-              <SelectValue placeholder='Order' />
+            <SelectTrigger className="w-full md:w-40">
+              <SelectValue placeholder="Order" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='desc'>Newest First</SelectItem>
-              <SelectItem value='asc'>Oldest First</SelectItem>
+              <SelectItem value="desc">Newest First</SelectItem>
+              <SelectItem value="asc">Oldest First</SelectItem>
             </SelectContent>
           </Select>
           {/* Date range picker: two DatePickers for start and end */}
           <DatePicker
             value={dateRange.start}
             onChange={(date) => setDateRange((r) => ({ ...r, start: date }))}
-            placeholder='Start Date'
-            className='w-full md:w-40'
+            placeholder="Start Date"
+            className="w-full md:w-40"
           />
           <DatePicker
             value={dateRange.end}
             onChange={(date) => setDateRange((r) => ({ ...r, end: date }))}
-            placeholder='End Date'
-            className='w-full md:w-40'
+            placeholder="End Date"
+            className="w-full md:w-40"
           />
         </div>
       </div>
-      <hr className='border-gray-200 mb-4' />
+      <hr className="border-gray-200 mb-4" />
       <CourseCard
         courses={courses}
         setShowModal={setShowModal}
