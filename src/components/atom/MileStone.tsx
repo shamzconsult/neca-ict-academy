@@ -1,9 +1,9 @@
 export const MileStone = () => {
   const milestones = [
-    { numbers: "100+", label: "Courses" },
-    { numbers: "90K+", label: "Successful Program" },
-    { numbers: "80K+", label: "Trained Professionals" },
-    { numbers: "70K+", label: "Graduates" },
+    { numbers: "5+", label: "Courses" },
+    { numbers: "10+", label: "Successful Programs" },
+    { numbers: "500+", label: "Trained Professionals" },
+    { numbers: "400+", label: "Graduates" },
   ];
 
   return (
