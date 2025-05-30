@@ -59,11 +59,14 @@ export async function GET(request: Request) {
           status: enrollment.status,
           level: enrollment.level,
           createdAt: enrollment.createdAt,
+          employmentStatus: enrollment.employmentStatus,
         });
         return acc;
       },
       {}
     );
+
+    console.log(applicantEnrollments);
 
     // Filter by status if specified
     let filteredApplicants = applicants;

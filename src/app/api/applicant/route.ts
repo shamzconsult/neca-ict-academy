@@ -20,6 +20,7 @@ interface ApplicantFormData {
   status: string;
   cv: File | null;
   profilePicture: File | null;
+  employmentStatus?: string;
   [key: string]: string | File | null | undefined;
 }
 
@@ -47,6 +48,7 @@ const POST = async (req: NextRequest) => {
       status: (formData.get("status") as string) || statusOptionsMap.pending,
       cv: formData.get("cv") as File | null,
       profilePicture: formData.get("profilePicture") as File | null,
+      employmentStatus: formData.get("employmentStatus") as string,
     };
 
     // Validate required fields
@@ -59,6 +61,7 @@ const POST = async (req: NextRequest) => {
       "gender",
       "course",
       "cohort",
+      "employmentStatus",
     ];
     const missingFields = requiredFields.filter(
       (field) => !data[field] || data[field] === ""
@@ -91,27 +94,31 @@ const POST = async (req: NextRequest) => {
       uploadFile(data.profilePicture, "profile"),
     ]);
 
-    const newApplicant = await Applicant.create({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phoneNumber: data.phoneNumber,
-      state: data.state,
-      gender: data.gender,
-      profilePicture: profilePicture || { url: "", public_id: "" },
-    });
+    let applicant = await Applicant.findOne({ email: data.email });
+    if (!applicant) {
+      applicant = await Applicant.create({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        state: data.state,
+        gender: data.gender,
+        profilePicture: profilePicture || { url: "", public_id: "" },
+      });
+    }
 
     await Enrollment.create({
-      applicant: newApplicant._id,
+      applicant: applicant._id,
       course: data.course,
       cohort: data.cohort,
       level: data.level,
       status: data.status,
       cv: cv || { url: "", public_id: "" },
+      employmentStatus: data.employmentStatus,
     });
 
     return NextResponse.json(
-      { message: "Applicant created successfully!", newApplicant },
+      { message: "Applicant created successfully!" },
       { status: 201 }
     );
   } catch (error: unknown) {
@@ -125,12 +132,12 @@ const POST = async (req: NextRequest) => {
         ? error.stack
         : undefined;
 
-    if (error instanceof Error && "code" in error && error.code === 11000) {
-      return NextResponse.json(
-        { message: "Email already exists" },
-        { status: 400 }
-      );
-    }
+    // if (error instanceof Error && "code" in error && error.code === 11000) {
+    //   return NextResponse.json(
+    //     { message: "Email already exists" },
+    //     { status: 400 }
+    //   );
+    // }
 
     return NextResponse.json(
       {

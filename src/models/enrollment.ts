@@ -3,6 +3,7 @@ import {
   levelOptionsMap,
   statusOptions,
   statusOptionsMap,
+  employmentStatusOptions,
 } from "@/const";
 import mongoose, { Schema } from "mongoose";
 
@@ -36,6 +37,11 @@ const EnrollmentSchema = new Schema(
     cv: {
       url: String,
       public_id: String,
+    },
+    employmentStatus: {
+      type: String,
+      enum: employmentStatusOptions.map((opt) => opt.key),
+      required: true,
     },
   },
   {
