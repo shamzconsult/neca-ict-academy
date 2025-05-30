@@ -210,7 +210,7 @@ export const CourseCard = ({
               </h3>
               <div>
                 {(isCoursesPath || admin) && (
-                  <p className='mt-2 text-sm'>About The Course</p>
+                  <p className='mt-2 text-sm font-semibold'>About The Course</p>
                 )}
                 <p
                   className={`mt-1 ${
@@ -222,7 +222,9 @@ export const CourseCard = ({
                 <div>
                   {(isCoursesPath || admin) && (
                     <div className='text-sm mt-3'>
-                      <h3 className='mb-2 text-sm'>Course Details</h3>
+                      <h3 className='mb-2 text-sm font-semibold'>
+                        Course Details
+                      </h3>
                       <div className='grid grid-cols-3 gap-3 text-xs'>
                         <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
                           <p className='font-medium'>Lesson</p>

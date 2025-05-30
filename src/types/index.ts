@@ -1,4 +1,9 @@
-import { ApplicationLevel, ApplicationStatus, Gender } from "@/const";
+import {
+  ApplicationLevel,
+  ApplicationStatus,
+  EmploymentStatusKey,
+  Gender,
+} from "@/const";
 
 type Status = "Admitted" | "Pending" | "Declined" | "Graduated";
 
@@ -29,6 +34,7 @@ export type EnrollmentType = {
     url: string;
     public_id: string;
   };
+  employmentStatus: EmploymentStatusKey;
 };
 
 export type EnrollmentsType = EnrollmentType[];

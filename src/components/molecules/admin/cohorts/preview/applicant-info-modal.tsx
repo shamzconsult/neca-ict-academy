@@ -32,7 +32,9 @@ export const ApplicantInfoModal = ({
     status,
     cv,
     createdAt,
+    employmentStatus,
   } = enrollment;
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={cn(!!cv?.url && "!max-w-6xl h-[80vh]")}>
@@ -73,6 +75,10 @@ export const ApplicantInfoModal = ({
                 </div>
                 <div className='mb-2'>
                   <strong>Status:</strong> {status}
+                </div>
+                <div className='mb-2'>
+                  <strong>Employment Status:</strong>{" "}
+                  {employmentStatus || "N/A"}
                 </div>
                 <div className='mb-2'>
                   <strong>Date Applied:</strong>{" "}
