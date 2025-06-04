@@ -129,7 +129,7 @@ export const ApplicantTr = ({ enrollment }: Props) => {
         {new Date(createdAt).toDateString()}
       </td>
       <td className='p-4 text-nowrap text-gray-700 font-medium'>
-        <p className='truncate w-[300px]'>{course}</p>
+        <p className='truncate w-[250px]'>{course}</p>
       </td>
       <td className='p-4 capitalize text-gray-700'>{level}</td>
       <td className='p-4'>

@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { EnrollmentType } from "@/types";
 import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   isOpen: boolean;
@@ -35,9 +36,11 @@ export const ApplicantInfoModal = ({
     employmentStatus,
   } = enrollment;
 
+  const isValidPdf = cv?.url?.toLowerCase().endsWith(".pdf");
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn(!!cv?.url && "!max-w-6xl h-[80vh]")}>
+      <DialogContent className={cn("!max-w-6xl h-[80vh]")}>
         <div className='flex flex-col gap-4'>
           <DialogHeader>
             <DialogTitle>Applicant Information</DialogTitle>
@@ -87,27 +90,60 @@ export const ApplicantInfoModal = ({
                 {cv?.url && (
                   <div className='mb-2'>
                     <strong>CV:</strong>{" "}
-                    <a
-                      href={cv.url.replace(/[`'"]/g, "").trim()}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-600 underline'
-                    >
-                      Download CV
-                    </a>
+                    {isValidPdf ? (
+                      <a
+                        href={cv.url.replace(/[`'"]/g, "").trim()}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 underline'
+                      >
+                        Download CV
+                      </a>
+                    ) : (
+                      <span className='text-red-500'>Invalid CV format</span>
+                    )}
                   </div>
                 )}
               </div>
             </div>
             {cv?.url && (
-              <div className='hidden lg:flex flex-1 w-full mt-4 md:mt-0'>
-                <iframe
-                  src={`${cv.url.replace(/[`'"]/g, "").trim()}#toolbar=0&navpanes=0`}
-                  title='Applicant CV'
-                  width='100%'
-                  height='700px'
-                  style={{ border: "1px solid #ccc", borderRadius: "8px" }}
-                />
+              <div
+                className='hidden lg:flex flex-1 w-full mt-4 md:mt-0'
+                style={{ maxHeight: "70vh", overflowY: "auto" }}
+              >
+                {isValidPdf ? (
+                  <div className='w-full relative flex justify-center items-center'>
+                    {/* loading state */}
+                    <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
+                      <Loader2 className='w-4 h-4 animate-spin' />
+                      <p className='sr-only'>Loading CV...</p>
+                    </div>
+                    <iframe
+                      src={`${cv.url.replace(/[`'\"]/g, "").trim()}#toolbar=0&navpanes=0`}
+                      title='Applicant CV'
+                      width='100%'
+                      height='700px'
+                      style={{
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        minHeight: "400px",
+                        maxHeight: "70vh",
+                        zIndex: 10,
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className='w-full h-[600px] flex items-center justify-center border border-red-200 bg-red-50 rounded-lg'>
+                    <div className='text-center'>
+                      <p className='text-red-600 font-medium'>
+                        Invalid CV Format
+                      </p>
+                      <p className='text-red-500 text-sm mt-1'>
+                        Applicant CV is an invalid PDF file
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

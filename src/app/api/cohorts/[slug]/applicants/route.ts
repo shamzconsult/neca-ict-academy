@@ -22,6 +22,7 @@ export async function GET(
     const searchQuery = searchParams.get("search") || "";
     const statusFilter = searchParams.get("status") || "";
     const levelFilter = searchParams.get("level") || "";
+    const locationFilter = searchParams.get("location") || "";
     const isDownload = searchParams.get("download") === "1";
 
     // Find cohort by slug
@@ -56,6 +57,9 @@ export async function GET(
         { email: { $regex: searchQuery, $options: "i" } },
         { phoneNumber: { $regex: searchQuery, $options: "i" } },
       ];
+    }
+    if (locationFilter) {
+      query.state = locationFilter;
     }
 
     // If download, fetch all matching applicants (no pagination)

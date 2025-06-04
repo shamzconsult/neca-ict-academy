@@ -14,15 +14,11 @@ import { useQuery } from "@tanstack/react-query";
 import { FaSearch } from "react-icons/fa";
 import { MdOutlineArrowCircleDown } from "react-icons/md";
 
-import { pdfDownload } from "@/utils/pdf-download";
-
 import { Table, TableBody, TableHead } from "@/components/atom/Table/Table";
 import EmptyState from "@/components/atom/EmptyState";
 import { ApplicantTr } from "./applicant-tr";
 import { Pagination } from "@/components/atom/Pagination";
-import { statusOptions } from "@/const";
-
-import { EnrollmentsType } from "@/types";
+import { states, statusOptions } from "@/const";
 
 import {
   Select,
@@ -34,10 +30,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
+import { EnrollmentsType } from "@/types";
+
 const LIMIT = 8;
 
 const TableSkeleton = ({
-  rows = 8,
+  rows = 15,
   columns = 7,
 }: {
   rows?: number;
@@ -111,11 +109,16 @@ export const CohortPreview = () => {
   );
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [status, setStatus] = useState(searchParams.get("status") ?? "all");
+  const [location, setLocation] = useState(
+    searchParams.get("location") ?? "all"
+  );
+  const [storedCohortName, setStoredCohortName] = useState<string | null>(null);
 
   // Build query string for API
   const queryParams = {
     search: debouncedSearchTerm,
     status: status !== "all" ? status : "",
+    location: location !== "all" ? location : "",
     page: String(page),
     limit: String(LIMIT),
   };
@@ -126,7 +129,14 @@ export const CohortPreview = () => {
 
   // React Query fetch
   const { data, isLoading } = useQuery<ApiResponse, Error>({
-    queryKey: ["cohort-applicants", slug, debouncedSearchTerm, status, page],
+    queryKey: [
+      "cohort-applicants",
+      slug,
+      debouncedSearchTerm,
+      status,
+      location,
+      page,
+    ],
     queryFn: async () => {
       if (!slug) throw new Error("No slug provided");
       const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
@@ -165,9 +175,17 @@ export const CohortPreview = () => {
     const params = new URLSearchParams();
     if (debouncedSearchTerm) params.set("search", debouncedSearchTerm);
     if (status && status !== "all") params.set("status", status);
+    if (location && location !== "all") params.set("location", location);
     if (page > 1) params.set("page", String(page));
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [debouncedSearchTerm, status, page, pathname, router]);
+  }, [debouncedSearchTerm, status, location, page, pathname, router]);
+
+  // Store cohort name when we first get it
+  useEffect(() => {
+    if (data?.cohort?.name && !storedCohortName) {
+      setStoredCohortName(data.cohort.name);
+    }
+  }, [data?.cohort?.name, storedCohortName]);
 
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -191,7 +209,7 @@ export const CohortPreview = () => {
     <>
       <AdminSectionHeader
         title={
-          cohortName || (
+          storedCohortName || (
             <div className='h-8 w-64 bg-gray-100 rounded animate-pulse' />
           )
         }
@@ -266,12 +284,34 @@ export const CohortPreview = () => {
                 ))}
               </SelectContent>
             </Select>
+            <Select
+              value={location}
+              onValueChange={(value) => {
+                setLocation(value);
+                setPage(1);
+              }}
+              disabled={isLoading}
+            >
+              <SelectTrigger className='min-w-[120px]'>
+                <SelectValue placeholder='All Locations' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>All Locations</SelectItem>
+                {states.map((loc, index) => (
+                  <SelectItem value={loc} key={index}>
+                    {loc}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button
               className='border text-nowrap border-gray-200 cursor-pointer rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
               onClick={() => {
                 const params = new URLSearchParams();
                 if (searchTerm) params.set("search", searchTerm);
                 if (status && status !== "all") params.set("status", status);
+                if (location && location !== "all")
+                  params.set("location", location);
                 params.set("download", "1");
                 window.open(
                   `/api/cohorts/${slug}/applicants?${params.toString()}`,
@@ -330,8 +370,8 @@ export const CohortPreview = () => {
             className='min-h-[500px]'
             title={
               searchTerm && status !== "all"
-                ? "No record found"
-                : `No applicants yet in "${cohortName}"`
+                ? `No applicants yet in "${cohortName}"`
+                : "No record found"
             }
             message={
               searchTerm && status !== "all"
@@ -340,7 +380,9 @@ export const CohortPreview = () => {
                   ? `No applicants match the search "${searchTerm}"`
                   : status !== "all"
                     ? `No applicants with status "${status}"`
-                    : "Applicants will appear here when they register for this cohort"
+                    : location !== "all"
+                      ? `No applicants from "${location}"`
+                      : "Applicants will appear here when they register for this cohort"
             }
             size='lg'
           />
