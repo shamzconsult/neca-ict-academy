@@ -327,6 +327,17 @@ export const CohortPreview = () => {
         </div>
         {showTable && (
           <div className='overflow-x-auto'>
+            <div className='px-4 py-2 text-sm text-gray-600 border-b'>
+              Showing {filteredEnrollments.length} of{" "}
+              {data?.pagination?.total || 0} applicants
+              {(searchTerm || status !== "all" || location !== "all") && (
+                <span className='ml-1'>
+                  {searchTerm && ` matching "${searchTerm}"`}
+                  {status !== "all" && ` with status "${status}"`}
+                  {location !== "all" && ` from "${location}"`}
+                </span>
+              )}
+            </div>
             <Table className='w-full table-auto bg-white rounded-lg overflow-hidden'>
               <TableHead>
                 <tr className='border-b border-gray-200 bg-gray-50'>
