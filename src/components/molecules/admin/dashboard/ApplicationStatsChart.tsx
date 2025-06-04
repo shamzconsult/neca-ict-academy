@@ -74,24 +74,21 @@ export const ApplicationStatsChart = ({
 }: ApplicationStatsChartProps) => {
   const [chartType, setChartType] = useState<"location" | "gender">("location");
 
-  // Sort location data by total applications in descending order
-  const sortedLocationData =
-    data?.locationStats?.sort(
-      (a: LocationStats, b: LocationStats) => b.total - a.total
-    ) || [];
+  // Use location data in the original order from states constant
+  const locationData = data?.locationStats || [];
 
   const locationChartData = {
-    labels: sortedLocationData.map((d: LocationStats) => d.state),
+    labels: locationData.map((d: LocationStats) => d.state),
     datasets: [
       {
         label: "Male",
-        data: sortedLocationData.map((d: LocationStats) => d.male),
+        data: locationData.map((d: LocationStats) => d.male),
         backgroundColor: "#3b82f6",
         stack: "stack0",
       },
       {
         label: "Female",
-        data: sortedLocationData.map((d: LocationStats) => d.female),
+        data: locationData.map((d: LocationStats) => d.female),
         backgroundColor: "#ec4899",
         stack: "stack0",
       },
