@@ -37,61 +37,66 @@ export const ApplicantInfoModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn(!!cv?.url && "!max-w-6xl h-[80vh]")}>
-        <div className='flex flex-col gap-4'>
+      <DialogContent
+        className={cn(
+          !!cv?.url && "!max-w-6xl",
+          "max-h-[80vh] overflow-y-auto"
+        )}
+      >
+        <div className="flex flex-col gap-4">
           <DialogHeader>
             <DialogTitle>Applicant Information</DialogTitle>
           </DialogHeader>
-          <div className='flex flex-col md:flex-row gap-6 items-start'>
-            <div className='flex flex-col items-center md:items-start gap-4 w-'>
+          <div className="flex flex-col md:flex-row gap-6 items-start">
+            <div className="flex flex-col items-center md:items-start gap-4 w-">
               {profilePicture?.url && (
                 <img
                   src={profilePicture.url.replace(/[`'"]/g, "").trim()}
                   alt={`${firstName} ${lastName}`}
-                  className='w-24 h-24 rounded-full object-cover border'
+                  className="w-24 h-24 rounded-full object-cover border"
                 />
               )}
-              <div className='w-full'>
-                <div className='mb-2 break-all block w-[300px]'>
+              <div className="w-full">
+                <div className="mb-2 break-all block w-[300px]">
                   <strong>Name:</strong> {firstName} {lastName}
                 </div>
-                <div className='mb-2 break-all block w-[300px]'>
+                <div className="mb-2 break-all block w-[300px]">
                   <strong>Email:</strong> {email}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Phone:</strong> {phoneNumber}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>State:</strong> {state}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Gender:</strong> {gender}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Course:</strong> {String(course)}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Level:</strong> {level}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Status:</strong> {status}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Employment Status:</strong>{" "}
                   {employmentStatus || "N/A"}
                 </div>
-                <div className='mb-2'>
+                <div className="mb-2">
                   <strong>Date Applied:</strong>{" "}
                   {new Date(createdAt).toLocaleString()}
                 </div>
                 {cv?.url && (
-                  <div className='mb-2'>
+                  <div className="mb-2">
                     <strong>CV:</strong>{" "}
                     <a
                       href={cv.url.replace(/[`'"]/g, "").trim()}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='text-blue-600 underline'
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
                     >
                       Download CV
                     </a>
@@ -100,12 +105,14 @@ export const ApplicantInfoModal = ({
               </div>
             </div>
             {cv?.url && (
-              <div className='hidden lg:flex flex-1 w-full mt-4 md:mt-0'>
+              <div className="hidden lg:flex flex-1 w-full mt-4 md:mt-0 h-[70vh] overflow-auto">
                 <iframe
-                  src={`${cv.url.replace(/[`'"]/g, "").trim()}#toolbar=0&navpanes=0`}
-                  title='Applicant CV'
-                  width='100%'
-                  height='700px'
+                  src={`${cv.url
+                    .replace(/[`'"]/g, "")
+                    .trim()}#toolbar=0&navpanes=0`}
+                  title="Applicant CV"
+                  width="100%"
+                  height="700px"
                   style={{ border: "1px solid #ccc", borderRadius: "8px" }}
                 />
               </div>
