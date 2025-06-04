@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -8,10 +8,19 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
 } from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import { AlertTriangle, Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChartSkeleton } from "./ChartSkeleton";
 
 ChartJS.register(
   CategoryScale,
@@ -19,71 +28,87 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement
 );
 
-interface CohortStats {
-  name: string;
-  slug: string;
-  total: number;
+type LocationStats = {
+  state: string;
   male: number;
   female: number;
-}
+  total: number;
+};
 
-interface ApplicationStatsChartProps {
-  initialData?: CohortStats[];
-}
+type GenderStats = {
+  male: number;
+  female: number;
+  total: number;
+};
 
-const ChartSkeleton = () => (
-  <div className='w-full h-full flex flex-col gap-4 p-4'>
-    <div className='h-6 w-1/3 bg-gray-200 rounded animate-pulse' />
-    <div className='flex-1 flex items-end gap-2'>
-      {[...Array(5)].map((_, i) => (
-        <div
-          key={i}
-          className='flex-1 bg-gray-200 rounded-t animate-pulse'
-          style={{ height: `${Math.random() * 60 + 20}%` }}
-        />
-      ))}
-    </div>
-  </div>
-);
+type Cohort = {
+  id: string;
+  name: string;
+};
+
+type ApplicationStatsChartProps = {
+  data?: {
+    locationStats: LocationStats[];
+    genderStats: GenderStats;
+    statusStats: Record<string, number>;
+    levelStats: Record<string, number>;
+    cohorts: Cohort[];
+    totalApplications: number;
+  };
+  selectedCohort: string;
+  onCohortChange: (cohort: string) => void;
+  isFetching: boolean;
+  error?: Error;
+};
 
 export const ApplicationStatsChart = ({
-  initialData,
+  data,
+  selectedCohort,
+  onCohortChange,
+  isFetching,
+  error,
 }: ApplicationStatsChartProps) => {
-  const { data, error, isLoading } = useQuery<{
-    success: boolean;
-    data: CohortStats[];
-  }>({
-    queryKey: ["cohorts-stats"],
-    queryFn: async () => {
-      const res = await fetch("/api/cohorts/stats");
-      if (!res.ok) throw new Error("Failed to fetch stats");
-      return res.json();
-    },
-    initialData: initialData ? { success: true, data: initialData } : undefined,
-  });
+  const [chartType, setChartType] = useState<"location" | "gender">("location");
 
-  const chartData = {
-    labels: data?.data.map((d) => d.name) || [],
+  // Sort location data by total applications in descending order
+  const sortedLocationData =
+    data?.locationStats?.sort(
+      (a: LocationStats, b: LocationStats) => b.total - a.total
+    ) || [];
+
+  const locationChartData = {
+    labels: sortedLocationData.map((d: LocationStats) => d.state),
     datasets: [
       {
         label: "Male",
-        data: data?.data.map((d) => d.male) || [],
+        data: sortedLocationData.map((d: LocationStats) => d.male),
         backgroundColor: "#3b82f6",
         stack: "stack0",
       },
       {
         label: "Female",
-        data: data?.data.map((d) => d.female) || [],
+        data: sortedLocationData.map((d: LocationStats) => d.female),
         backgroundColor: "#ec4899",
         stack: "stack0",
       },
     ],
   };
 
-  const options = {
+  const genderChartData = {
+    labels: ["Male", "Female"],
+    datasets: [
+      {
+        data: [data?.genderStats?.male || 0, data?.genderStats?.female || 0],
+        backgroundColor: ["#3b82f6", "#ec4899"],
+      },
+    ],
+  };
+
+  const locationChartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -98,12 +123,24 @@ export const ApplicationStatsChart = ({
           },
         },
       },
+      title: {
+        display: true,
+        text: `Applications by Location${selectedCohort !== "all" ? ` - ${data?.cohorts?.find((c) => c.id === selectedCohort)?.name}` : ""}`,
+        font: {
+          size: 16,
+          weight: "bold" as const,
+        },
+      },
     },
     scales: {
       x: {
         stacked: true,
         grid: {
           display: false,
+        },
+        ticks: {
+          maxRotation: 45,
+          minRotation: 45,
         },
       },
       y: {
@@ -112,31 +149,102 @@ export const ApplicationStatsChart = ({
         grid: {
           color: "rgba(0, 0, 0, 0.1)",
         },
+        title: {
+          display: true,
+          text: "Number of Applications",
+        },
+      },
+    },
+  };
+
+  const genderChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context: any) => {
+            const value = context.raw;
+            const total = context.dataset.data.reduce(
+              (a: number, b: number) => a + b,
+              0
+            );
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${context.label}: ${value} (${percentage}%)`;
+          },
+        },
+      },
+      title: {
+        display: true,
+        text: `Applications by Gender${selectedCohort !== "all" ? ` - ${data?.cohorts?.find((c) => c.id === selectedCohort)?.name}` : ""}`,
+        font: {
+          size: 16,
+          weight: "bold" as const,
+        },
       },
     },
   };
 
   return (
     <div className='w-full p-6 bg-white rounded-lg shadow-lg border border-gray-200'>
-      <div className='relative h-64'>
+      <div className='flex justify-between mb-4'>
+        <div className='flex gap-4'>
+          <Select value={selectedCohort} onValueChange={onCohortChange}>
+            <SelectTrigger className='w-[200px]'>
+              <SelectValue placeholder='Select cohort' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>All Cohorts</SelectItem>
+              {data?.cohorts?.map((cohort) => (
+                <SelectItem key={cohort.id} value={cohort.id}>
+                  {cohort.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={chartType}
+            onValueChange={(value: "location" | "gender") =>
+              setChartType(value)
+            }
+          >
+            <SelectTrigger className='w-[180px]'>
+              <SelectValue placeholder='Select chart type' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='location'>By Location</SelectItem>
+              <SelectItem value='gender'>By Gender</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className='text-sm text-gray-600'>
+          Total Applications: {data?.totalApplications || 0}
+        </div>
+      </div>
+      <div className='relative h-[400px]'>
         {error ? (
           <div className='flex flex-col items-center justify-center h-full gap-2 text-red-500'>
             <AlertTriangle className='w-8 h-8' />
             <p>Failed to load data</p>
             <p className='text-sm text-gray-500'>{error.message}</p>
           </div>
-        ) : isLoading ? (
+        ) : isFetching ? (
           <ChartSkeleton />
-        ) : data?.data.length === 0 ? (
+        ) : !data?.locationStats?.length ? (
           <div className='flex flex-col items-center justify-center h-full gap-2 text-gray-500'>
             <Search className='w-8 h-8' />
             <p>No application data available</p>
             <p className='text-sm'>
-              There are no cohorts with applicant data to display
+              There are no applications with data to display
             </p>
           </div>
+        ) : chartType === "location" ? (
+          <Bar data={locationChartData} options={locationChartOptions} />
         ) : (
-          <Bar data={chartData} options={options} />
+          <Pie data={genderChartData} options={genderChartOptions} />
         )}
       </div>
     </div>

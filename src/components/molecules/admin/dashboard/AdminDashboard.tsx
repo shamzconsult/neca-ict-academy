@@ -14,9 +14,28 @@ import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
+type LocationStats = {
+  state: string;
+  male: number;
+  female: number;
+  total: number;
+};
+
+type GenderStats = {
+  male: number;
+  female: number;
+  total: number;
+};
+
+type Cohort = {
+  id: string;
+  name: string;
+};
+
 interface DashboardStat {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface AdminDashboardProps {
@@ -24,8 +43,12 @@ interface AdminDashboardProps {
 }
 
 const StatCard = ({ stat }: { stat: DashboardStat }) => (
-  <div className='p-6 bg-white rounded-lg shadow-md border border-gray-200'>
-    <p className='text-3xl font-bold text-gray-900'>{stat.value}</p>
+  <div
+    className={`p-6 bg-white rounded-lg shadow-md border border-gray-200 ${stat.color ? "bg-opacity-5" : ""}`}
+  >
+    <p className={`text-3xl font-bold ${stat.color || "text-gray-900"}`}>
+      {stat.value}
+    </p>
     <p className='text-sm text-gray-500'>{stat.name}</p>
   </div>
 );
@@ -49,27 +72,59 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   const [localCohorts, setLocalCohorts] = useState<CohortType[]>(
     cohortsData || []
   );
+  const [selectedCohort, setSelectedCohort] = useState<string>("all");
 
-  const { data: dashboardStats, isLoading } = useQuery<{
+  const { data: statsData, isFetching } = useQuery<{
     success: boolean;
-    data: DashboardStat[];
+    data: {
+      locationStats: LocationStats[];
+      genderStats: GenderStats;
+      statusStats: Record<string, number>;
+      levelStats: Record<string, number>;
+      cohorts: Cohort[];
+      totalApplications: number;
+    };
   }>({
-    queryKey: ["dashboard-stats"],
+    queryKey: ["applications-stats", selectedCohort],
     queryFn: async () => {
-      const res = await fetch("/api/dashboard/stats");
-      if (!res.ok) throw new Error("Failed to fetch dashboard stats");
+      const res = await fetch(
+        `/api/applications/stats?cohortId=${selectedCohort}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
   });
 
-  // Transform cohorts data for the chart
-  const transformedCohortsData = localCohorts.map((cohort) => ({
-    name: cohort.name,
-    slug: cohort.slug,
-    total: 0, // These will be populated by the chart's own data fetching
-    male: 0,
-    female: 0,
-  }));
+  // Transform stats data for dashboard cards
+  const dashboardStats: DashboardStat[] = statsData?.data
+    ? [
+        {
+          name: "Total Applicants",
+          value: statsData.data.totalApplications,
+          color: "text-blue-600",
+        },
+        {
+          name: "Total Pending",
+          value: statsData.data.statusStats.pending || 0,
+          color: "text-yellow-600",
+        },
+        {
+          name: "Total Declined",
+          value: statsData.data.statusStats.declined || 0,
+          color: "text-red-600",
+        },
+        {
+          name: "Total Admitted",
+          value: statsData.data.statusStats.admitted || 0,
+          color: "text-green-600",
+        },
+        {
+          name: "Total Graduated",
+          value: statsData.data.statusStats.graduated || 0,
+          color: "text-purple-600",
+        },
+      ]
+    : [];
 
   const firstFiveCohorts = localCohorts.slice(0, 5);
 
@@ -104,11 +159,11 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       />
 
       {/* Stats cards */}
-      {isLoading ? (
+      {!statsData ? (
         <StatsSkeleton />
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8'>
-          {dashboardStats?.data.map((stat, index) => (
+          {dashboardStats.map((stat, index) => (
             <StatCard key={index} stat={stat} />
           ))}
         </div>
@@ -119,7 +174,12 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
         <h2 className='text-xl font-semibold text-gray-800 mb-4'>
           Application Statistics
         </h2>
-        <ApplicationStatsChart initialData={transformedCohortsData} />
+        <ApplicationStatsChart
+          data={statsData?.data}
+          selectedCohort={selectedCohort}
+          onCohortChange={setSelectedCohort}
+          isFetching={isFetching}
+        />
       </section>
 
       {/* Cohorts table */}
