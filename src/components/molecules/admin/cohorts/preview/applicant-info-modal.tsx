@@ -7,18 +7,25 @@ import {
 } from "@/components/ui/dialog";
 import { EnrollmentType } from "@/types";
 import { cn } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type Props = {
   isOpen: boolean;
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
   enrollment: EnrollmentType;
+  currentIndex: number;
+  totalEnrollments: number;
+  onNavigate: (direction: "next" | "prev") => void;
 };
 
 export const ApplicantInfoModal = ({
   isOpen,
   onOpenChange,
   enrollment,
+  currentIndex,
+  totalEnrollments,
+  onNavigate,
 }: Props) => {
   const {
     profilePicture,
@@ -40,10 +47,31 @@ export const ApplicantInfoModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn("!max-w-6xl h-[80vh]")}>
+      <DialogContent hideClose className={cn("!max-w-6xl min-h-[80vh]")}>
         <div className='flex flex-col gap-4'>
-          <DialogHeader>
+          <DialogHeader className='flex flex-row items-center justify-between'>
             <DialogTitle>Applicant Information</DialogTitle>
+            <div className='flex items-center gap-2'>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={() => onNavigate("prev")}
+                disabled={currentIndex === 0}
+              >
+                <ChevronLeft className='h-4 w-4' />
+              </Button>
+              <span className='text-sm text-gray-500'>
+                {currentIndex + 1} of {totalEnrollments}
+              </span>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={() => onNavigate("next")}
+                disabled={currentIndex === totalEnrollments - 1}
+              >
+                <ChevronRight className='h-4 w-4' />
+              </Button>
+            </div>
           </DialogHeader>
           <div className='flex flex-col md:flex-row gap-6 items-start'>
             <div className='flex flex-col items-center md:items-start gap-4 w-'>
@@ -147,15 +175,15 @@ export const ApplicantInfoModal = ({
               </div>
             )}
           </div>
-          {/* <div>
+          <div className='flex justify-end'>
             <button
-              className="mt-4 bg-black text-white py-2 px-4 rounded-lg cursor-pointer"
-              type="button"
+              className='mt-4 bg-black text-white py-2 px-4 rounded-lg cursor-pointer text-sm'
+              type='button'
               onClick={() => onOpenChange(false)}
             >
               Close
             </button>
-          </div> */}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

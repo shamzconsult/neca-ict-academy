@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Pencil } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,9 +31,9 @@ import { ApplicantInfoModal } from "./applicant-info-modal";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-type Props = { enrollment: EnrollmentType };
+type Props = { enrollment: EnrollmentType; onInfoClick?: () => void };
 
-export const ApplicantTr = ({ enrollment }: Props) => {
+export const ApplicantTr = ({ enrollment, onInfoClick }: Props) => {
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -115,7 +117,7 @@ export const ApplicantTr = ({ enrollment }: Props) => {
     >
       <td className='p-4'>
         <button
-          onClick={() => setShowInfoModal(true)}
+          onClick={() => onInfoClick?.()}
           className='flex flex-col text-left cursor-pointer'
         >
           <span className='text-gray-900 font-semibold'>
@@ -231,12 +233,6 @@ export const ApplicantTr = ({ enrollment }: Props) => {
           </DialogContent>
         </Dialog>
       </td>
-
-      <ApplicantInfoModal
-        enrollment={enrollment}
-        isOpen={showInfoModal}
-        onOpenChange={setShowInfoModal}
-      />
     </tr>
   );
 };

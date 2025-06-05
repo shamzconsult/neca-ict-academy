@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 import { EnrollmentsType } from "@/types";
+import { ApplicantInfoModal } from "./applicant-info-modal";
 
 const LIMIT = 10;
 
@@ -113,6 +114,8 @@ export const CohortPreview = () => {
     searchParams.get("location") ?? "all"
   );
   const [storedCohortName, setStoredCohortName] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   // Build query string for API
   const queryParams = {
@@ -191,6 +194,19 @@ export const CohortPreview = () => {
     const value = e.target.value;
     setSearchTerm(value);
     setPage(1);
+  };
+
+  const handleRowClick = (idx: number) => {
+    setCurrentIndex(idx);
+    setModalOpen(true);
+  };
+
+  const handleNavigate = (direction: "next" | "prev") => {
+    if (direction === "next" && currentIndex < filteredEnrollments.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    } else if (direction === "prev" && currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
   };
 
   if (!isLoading && (!data || !slug)) {
@@ -361,8 +377,12 @@ export const CohortPreview = () => {
               </TableHead>
               <TableBody>
                 {filteredEnrollments.length > 0 &&
-                  filteredEnrollments.map((enrollment) => (
-                    <ApplicantTr key={enrollment._id} enrollment={enrollment} />
+                  filteredEnrollments.map((enrollment, idx) => (
+                    <ApplicantTr
+                      key={enrollment._id}
+                      enrollment={enrollment}
+                      onInfoClick={() => handleRowClick(idx)}
+                    />
                   ))}
               </TableBody>
             </Table>
@@ -399,6 +419,16 @@ export const CohortPreview = () => {
           />
         )}
       </section>
+      {filteredEnrollments.length > 0 && (
+        <ApplicantInfoModal
+          isOpen={modalOpen}
+          onOpenChange={setModalOpen}
+          enrollment={filteredEnrollments[currentIndex]}
+          currentIndex={currentIndex}
+          totalEnrollments={filteredEnrollments.length}
+          onNavigate={handleNavigate}
+        />
+      )}
     </>
   );
 };

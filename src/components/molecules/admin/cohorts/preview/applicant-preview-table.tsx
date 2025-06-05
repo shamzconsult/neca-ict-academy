@@ -13,6 +13,8 @@ import { EnrollmentType } from "@/types";
 import ApplicantTable from "@/components/atom/Table/ApplicantTable";
 
 import { Pagination } from "@/components/atom/Pagination";
+import { ApplicantTr } from "./applicant-tr";
+import { ApplicantInfoModal } from "./applicant-info-modal";
 
 const LIMIT = 8;
 
@@ -78,6 +80,15 @@ const ApplicantPreviewForm = () => {
     setPage(1);
   };
 
+  const [modalOpen, setModalOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleRowClick = (idx: number) => {
+    console.log("Row clicked:", idx);
+    setCurrentIndex(idx);
+    setModalOpen(true);
+  };
+
   return (
     <section>
       <div className='px-4 space-y-8 w-full pb-10'>
@@ -129,12 +140,40 @@ const ApplicantPreviewForm = () => {
             <Loader className='absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] animate-spin text-red-700 size-8' />
           ) : (
             <>
-              <ApplicantTable
-                tableData={filteredApplicants}
-                status={status}
-                level={level}
-                searchTerm={searchTerm}
-              />
+              <table className='min-w-full divide-y divide-gray-200'>
+                <thead>
+                  <tr>
+                    <th className='px-6 py-3'>Name</th>
+                    <th className='px-6 py-3'>Email</th>
+                    <th className='px-6 py-3'>Phone Number</th>
+                    <th className='px-6 py-3'>State</th>
+                    <th className='px-6 py-3'>Course</th>
+                    <th className='px-6 py-3'>Level</th>
+                    <th className='px-6 py-3'>Status</th>
+                    <th className='px-6 py-3'>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredApplicants.length > 0 ? (
+                    filteredApplicants.map((applicant, idx) => (
+                      <ApplicantTr
+                        key={applicant._id}
+                        enrollment={applicant}
+                        onInfoClick={() => handleRowClick(idx)}
+                      />
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={8}
+                        className='text-center text-red-500 font-bold py-24'
+                      >
+                        No results found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
               <Pagination
                 currentPage={page}
                 onPageChange={setPage}
@@ -144,6 +183,23 @@ const ApplicantPreviewForm = () => {
           )}
         </div>
       </div>
+      <ApplicantInfoModal
+        isOpen={modalOpen}
+        onOpenChange={setModalOpen}
+        enrollment={filteredApplicants[currentIndex]}
+        currentIndex={currentIndex}
+        totalEnrollments={filteredApplicants.length}
+        onNavigate={(direction) => {
+          if (
+            direction === "next" &&
+            currentIndex < filteredApplicants.length - 1
+          ) {
+            setCurrentIndex(currentIndex + 1);
+          } else if (direction === "prev" && currentIndex > 0) {
+            setCurrentIndex(currentIndex - 1);
+          }
+        }}
+      />
     </section>
   );
 };
