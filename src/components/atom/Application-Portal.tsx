@@ -389,7 +389,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
                     <div>
                       <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        State
+                        State of Residence
                       </label>
                       <div className='relative'>
                         <select

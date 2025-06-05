@@ -93,7 +93,7 @@ export const ApplicantInfoModal = ({
                   <strong>Phone:</strong> {phoneNumber}
                 </div>
                 <div className='mb-2'>
-                  <strong>State:</strong> {state}
+                  <strong>State of Residence:</strong> {state}
                 </div>
                 <div className='mb-2'>
                   <strong>Gender:</strong> {gender}
