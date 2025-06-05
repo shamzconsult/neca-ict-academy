@@ -27,11 +27,21 @@ export const FileUploader = ({
 }: FileUploaderProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
-    if (file && maxSize && file.size > maxSize) {
-      alert(`File size must be less than ${Math.round(maxSize / 1024)}KB.`);
-      e.target.value = "";
-      onFileChange(null);
-      return;
+    if (file) {
+      if (maxSize && file.size > maxSize) {
+        alert(`File size must be less than ${Math.round(maxSize / 1024)}KB.`);
+        e.target.value = "";
+        onFileChange(null);
+        return;
+      }
+
+      // Check if file is a PDF when accept is .pdf
+      if (accept === ".pdf" && file.type !== "application/pdf") {
+        alert("Please upload a valid PDF file.");
+        e.target.value = "";
+        onFileChange(null);
+        return;
+      }
     }
     onFileChange(file);
   };

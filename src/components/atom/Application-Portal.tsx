@@ -189,6 +189,8 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     setIsSuccessModalOpen(false);
   };
 
+  console.log(cohorts);
+
   return (
     <div className='relative min-h-screen bg-white overflow-hidden'>
       {/* Background Elements */}

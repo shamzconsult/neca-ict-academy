@@ -32,7 +32,7 @@ import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 import { EnrollmentsType } from "@/types";
 
-const LIMIT = 8;
+const LIMIT = 10;
 
 const TableSkeleton = ({
   rows = 15,

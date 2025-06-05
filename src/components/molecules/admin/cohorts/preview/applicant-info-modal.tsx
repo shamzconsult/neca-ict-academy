@@ -55,10 +55,10 @@ export const ApplicantInfoModal = ({
                 />
               )}
               <div className='w-full'>
-                <div className='mb-2 break-all block w-[300px]'>
+                <div className='mb-2 break-all block w-[400px]'>
                   <strong>Name:</strong> {surname} {otherNames}
                 </div>
-                <div className='mb-2 break-all block w-[300px]'>
+                <div className='mb-2 break-all block w-[400px]'>
                   <strong>Email:</strong> {email}
                 </div>
                 <div className='mb-2'>
