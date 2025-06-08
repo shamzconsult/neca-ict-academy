@@ -144,7 +144,15 @@ export const CohortPreview = () => {
       if (!slug) throw new Error("No slug provided");
       const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
       if (!res.ok) throw new Error("Network response was not ok");
-      return res.json();
+      const data = await res.json();
+      console.log("[Frontend] Pagination data:", {
+        total: data?.pagination?.total,
+        currentPage: data?.pagination?.page,
+        totalPages: data?.pagination?.totalPages,
+        filteredCount: data?.data?.length,
+        queryParams: queryParams,
+      });
+      return data;
     },
     enabled: !!slug,
   });
@@ -168,10 +176,43 @@ export const CohortPreview = () => {
         };
       const res = await fetch(`/api/cohorts/${slug}/applicants/stats`);
       if (!res.ok) throw new Error("Failed to fetch stats");
-      return res.json();
+      const data = await res.json();
+      console.log("[Frontend] Stats data:", {
+        stats: data?.stats,
+        slug,
+        timestamp: new Date().toISOString(),
+      });
+      return data;
     },
     enabled: !!slug,
   });
+
+  // Add effect to compare stats and pagination data
+  useEffect(() => {
+    if (
+      data?.pagination?.total !== undefined &&
+      statsData?.stats?.total !== undefined
+    ) {
+      console.log("[Frontend] Comparing totals:", {
+        paginationTotal: data.pagination.total,
+        statsTotal: statsData.stats.total,
+        difference: data.pagination.total - statsData.stats.total,
+        currentFilters: {
+          search: searchTerm,
+          status,
+          location,
+          page,
+        },
+      });
+    }
+  }, [
+    data?.pagination?.total,
+    statsData?.stats?.total,
+    searchTerm,
+    status,
+    location,
+    page,
+  ]);
 
   // Update router for deep-linking
   useEffect(() => {
