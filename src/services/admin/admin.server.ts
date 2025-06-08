@@ -17,11 +17,20 @@ export const getAllCohorts = async () => {
   try {
     await connectViaMongoose();
 
-    // Aggregate stats per cohort
+    // Aggregate stats per cohort with unique applicants
     const stats = await Enrollment.aggregate([
       {
         $group: {
-          _id: "$cohort",
+          _id: {
+            cohort: "$cohort",
+            applicant: "$applicant",
+          },
+          status: { $first: "$status" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.cohort",
           totalApplicants: { $sum: 1 },
           admitted: {
             $sum: {
@@ -49,7 +58,9 @@ export const getAllCohorts = async () => {
 
     // Map stats by cohort ID for quick lookup, with proper type
     const statsMap = stats.reduce<Record<string, CohortStats>>((acc, stat) => {
-      acc[stat._id?.toString()] = stat as CohortStats;
+      if (stat._id) {
+        acc[stat._id.toString()] = stat as CohortStats;
+      }
       return acc;
     }, {});
 

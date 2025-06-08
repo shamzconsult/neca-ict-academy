@@ -5,10 +5,8 @@ import CohortTable from "@/components/atom/Table/CohortTable";
 import EmptyState from "@/components/atom/EmptyState";
 import { cohortTableHead } from "@/const";
 import { CohortsProps, CohortType } from "@/types";
-import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { HiOutlinePlusCircle } from "react-icons/hi";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
@@ -29,12 +27,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     applicationEndDate: "",
   });
 
-  const router = useRouter();
-
-  const handleRowClick = (slug: string) => {
-    router.push(`/admin/cohorts/${slug}`);
-  };
-
   const toggleModal = () => {
     setShowModal(!showModal);
   };
@@ -49,33 +41,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
 
   const checkAllCohortStatus = () => {
     setShowModal(!showModal);
-  };
-
-  const handleDelete = async (slug: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-
-    if (window.confirm("Are you sure you want to delete this cohort?")) {
-      try {
-        const res = await fetch(`/api/cohorts/${slug}`, {
-          method: "DELETE",
-        });
-
-        if (!res.ok) {
-          console.error("Failed to delete cohort");
-          toast.error("Failed to delete the cohort.");
-          return;
-        }
-
-        setCohortsData((prevCohort) =>
-          prevCohort.filter((cohort) => cohort.slug !== slug)
-        );
-
-        toast.success("Cohort deleted successfully");
-      } catch (error) {
-        console.error("Error deleting cohort: ", error);
-        toast.error("Something went wrong.");
-      }
-    }
   };
 
   const handleEdit = (cohort: CohortType, event: React.MouseEvent) => {
@@ -123,12 +88,9 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
         <div className='overflow-x-auto border border-[#C4C4C4] rounded-lg'>
           <CohortTable
             tableHead={cohortTableHead}
-            handleDelete={handleDelete}
             handleEdit={handleEdit}
-            handleRowClick={handleRowClick}
             tableData={cohortsData}
             action={true}
-            isEditToggle={isEditToggle}
             handleEditToggle={handleEditToggle}
           />
         </div>

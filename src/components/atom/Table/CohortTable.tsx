@@ -42,9 +42,6 @@ type CohortTableProps = {
   action: boolean;
   tableHead: Array<string>;
   handleEdit?: (cohort: CohortType, event: React.MouseEvent) => void;
-  handleDelete?: (slug: string, event: React.MouseEvent) => void;
-  handleRowClick?: (slug: string) => void;
-  isEditToggle?: number | null;
   handleEditToggle?: (id: number | null) => void;
 };
 
@@ -53,9 +50,6 @@ const CohortTable = ({
   action,
   tableHead,
   handleEdit,
-  handleRowClick,
-  handleDelete,
-  isEditToggle,
   handleEditToggle,
 }: CohortTableProps) => {
   const menuRef = useRef<HTMLDivElement>(null);
