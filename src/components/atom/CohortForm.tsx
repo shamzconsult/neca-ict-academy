@@ -99,11 +99,23 @@ export const CohortForm = ({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cohorts"] });
+      queryClient.invalidateQueries({ queryKey: ["cohort-stats"] });
+
       setCohortsData((prev) =>
-        prev.map((cohort) =>
-          cohort.slug === cohortToEdit?.slug ? data.updatedCohort : cohort
-        )
+        prev.map((cohort) => {
+          if (cohort.slug === cohortToEdit?.slug) {
+            return {
+              ...data.updatedCohort,
+              applicantCount: cohort.applicantCount,
+              admitted: cohort.admitted,
+              graduated: cohort.graduated,
+              declined: cohort.declined,
+            };
+          }
+          return cohort;
+        })
       );
+
       toast.success("Cohort Updated Successfully 🎉");
       setCohortToEdit?.(null);
       resetForm();

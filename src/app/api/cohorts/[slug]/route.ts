@@ -5,6 +5,18 @@ import { Enrollment } from "@/models/enrollment";
 import { Types } from "mongoose";
 import { revalidatePath } from "next/cache";
 
+interface CohortDocument {
+  _id: Types.ObjectId;
+  name: string;
+  slug: string;
+  startDate: string;
+  endDate: string;
+  applicationStartDate: string;
+  applicationEndDate: string;
+  active: boolean;
+  courses: Types.ObjectId[];
+}
+
 export const GET = async (req: Request) => {
   try {
     await connectViaMongoose();
@@ -113,7 +125,7 @@ export const PUT = async (req: Request) => {
       }
     }
 
-    const updatedCohort = await Cohort.findOneAndUpdate(
+    const updatedCohort = (await Cohort.findOneAndUpdate(
       { slug },
       {
         name,
@@ -125,7 +137,7 @@ export const PUT = async (req: Request) => {
         courses,
       },
       { new: true }
-    );
+    ).lean()) as unknown as CohortDocument;
 
     if (!updatedCohort) {
       return NextResponse.json(
@@ -134,12 +146,73 @@ export const PUT = async (req: Request) => {
       );
     }
 
+    // Get the current stats for this cohort
+    const stats = await Enrollment.aggregate([
+      {
+        $match: { cohort: updatedCohort._id },
+      },
+      {
+        $group: {
+          _id: {
+            cohort: "$cohort",
+            applicant: "$applicant",
+          },
+          status: { $first: "$status" },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.cohort",
+          totalApplicants: { $sum: 1 },
+          admitted: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "admitted"] }, 1, 0],
+            },
+          },
+          graduated: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "graduated"] }, 1, 0],
+            },
+          },
+          declined: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "declined"] }, 1, 0],
+            },
+          },
+          pending: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "pending"] }, 1, 0],
+            },
+          },
+        },
+      },
+    ]);
+
+    const cohortStats = stats[0] || {
+      totalApplicants: 0,
+      admitted: 0,
+      graduated: 0,
+      declined: 0,
+      pending: 0,
+    };
+
+    const updatedCohortWithStats = {
+      ...updatedCohort,
+      applicantCount: cohortStats.totalApplicants,
+      admitted: cohortStats.admitted,
+      graduated: cohortStats.graduated,
+      declined: cohortStats.declined,
+    };
+
     revalidatePath("/enroll");
     revalidatePath("/admin/cohorts");
     revalidatePath("/admin/dashboard");
 
     return NextResponse.json(
-      { message: "Cohort updated successfully", updatedCohort },
+      {
+        message: "Cohort updated successfully",
+        updatedCohort: updatedCohortWithStats,
+      },
       { status: 200 }
     );
   } catch (error) {
