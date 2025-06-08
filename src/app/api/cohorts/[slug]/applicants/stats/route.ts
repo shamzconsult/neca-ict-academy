@@ -20,26 +20,36 @@ export async function GET(
       );
     }
     const cohortId = cohort._id;
-    // Aggregate stats by status for the given cohort
+
+    // First get total count of enrollments
+    const totalEnrollments = await Enrollment.countDocuments({
+      cohort: cohortId,
+    });
+
+    // Then get stats by status
     const statsAgg = await Enrollment.aggregate([
       { $match: { cohort: new Types.ObjectId(cohortId) } },
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]);
+
     // Build stats object
     const stats: Record<string, number> = {
-      total: 0,
+      total: totalEnrollments,
       admitted: 0,
       pending: 0,
       declined: 0,
       graduated: 0,
     };
-    let total = 0;
+
+    // Only count valid status values
     for (const s of statsAgg) {
-      const key = String(s._id).toLowerCase();
-      stats[key] = s.count;
-      total += s.count;
+      if (s._id) {
+        // Only process if status exists
+        const key = String(s._id).toLowerCase();
+        stats[key] = s.count;
+      }
     }
-    stats.total = total;
+
     return NextResponse.json({ success: true, stats });
   } catch (error) {
     console.error("Error fetching cohort applicant stats:", error);
