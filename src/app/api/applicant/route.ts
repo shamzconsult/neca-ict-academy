@@ -108,6 +108,19 @@ const POST = async (req: NextRequest) => {
       });
     }
 
+    // Check if applicant is already enrolled in this cohort
+    const existingEnrollment = await Enrollment.findOne({
+      applicant: applicant._id,
+      cohort: data.cohort,
+    });
+
+    if (existingEnrollment) {
+      return NextResponse.json(
+        { message: "You have already applied to this cohort" },
+        { status: 400 }
+      );
+    }
+
     await Enrollment.create({
       applicant: applicant._id,
       course: data.course,

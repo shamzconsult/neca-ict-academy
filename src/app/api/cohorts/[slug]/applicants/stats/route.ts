@@ -28,7 +28,6 @@ export async function GET(
       { $count: "total" },
     ]);
     const total = totalApplicants[0]?.total || 0;
-    console.log(`[Stats] Total unique applicants for cohort ${slug}:`, total);
 
     // Then get stats by status for unique applicants
     const statsAgg = await Enrollment.aggregate([
@@ -47,10 +46,6 @@ export async function GET(
         },
       },
     ]);
-    console.log(
-      `[Stats] Raw aggregation results for cohort ${slug}:`,
-      JSON.stringify(statsAgg, null, 2)
-    );
 
     // Build stats object
     const stats: Record<string, number> = {
@@ -69,23 +64,7 @@ export async function GET(
         const key = String(s._id).toLowerCase();
         stats[key] = s.count;
         statusTotal += s.count;
-      } else {
-        console.log(
-          `[Stats] Found enrollment with null/undefined status in cohort ${slug}`
-        );
       }
-    }
-    console.log(`[Stats] Status total for cohort ${slug}:`, statusTotal);
-    console.log(
-      `[Stats] Final stats for cohort ${slug}:`,
-      JSON.stringify(stats, null, 2)
-    );
-
-    // Verify totals match
-    if (total !== statusTotal) {
-      console.log(
-        `[Stats] Warning: Total (${total}) does not match sum of status counts (${statusTotal})`
-      );
     }
 
     return NextResponse.json({ success: true, stats });
