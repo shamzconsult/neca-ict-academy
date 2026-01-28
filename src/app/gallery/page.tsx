@@ -1,23 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Navbar } from "@/components/atom/Navbar";
-import { Footer } from "@/components/atom/Footer";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import "yet-another-react-lightbox/plugins/thumbnails.css";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
-import { useSession } from "next-auth/react";
-import { Pencil, Trash2, Upload } from "lucide-react";
 import {
   AddNewGalleryItem,
   GalleryType,
 } from "@/components/atom/AddNewGalleryItem";
+import { Footer } from "@/components/atom/Footer";
+import { Navbar } from "@/components/atom/Navbar";
 import { Button } from "@/components/ui/button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Pencil, Trash2, Upload } from "lucide-react";
+import { useSession } from "next-auth/react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import Lightbox from "yet-another-react-lightbox";
+import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
+import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import "yet-another-react-lightbox/styles.css";
 
 const GallerySkeleton = () => {
   return (
@@ -59,10 +59,11 @@ export default function PhotoAlbumPage() {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const backgroundImages = [
     "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140810/899aad12-5c86-4d93-815a-30d3f7f39993_cgix5e.webp",
-    "https://res.cloudinary.com/dtryuudiy/image/upload/v1747141648/image_jxqy5v.webp",
-    "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
+    // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747141648/image_jxqy5v.webp",
+    // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
   ];
   const [bgIndex, setBgIndex] = useState(0);
+  const [backgroundImagesAndGalleryImages, setBackgroundImagesAndGalleryImages] = useState<string[]>([]);
 
   const { data: galleryData, isLoading } = useQuery({
     queryKey: ["gallery"],
@@ -86,11 +87,12 @@ export default function PhotoAlbumPage() {
   const galleryImages = galleryData?.galleryItems || [];
 
   useEffect(() => {
+    if (backgroundImagesAndGalleryImages.length === 0) return;
     const interval = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % backgroundImages.length);
+      setBgIndex((prev) => (prev + 1) % backgroundImagesAndGalleryImages.length);
     }, 5000); // Change image every 5 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [backgroundImagesAndGalleryImages.length]);
 
   const handleDelete = async (_id: string, event: React.MouseEvent) => {
     event.stopPropagation();
@@ -134,6 +136,13 @@ export default function PhotoAlbumPage() {
     setShowModal(!showModal);
   };
 
+  useEffect(() => {
+    // Randomly select 5 gallery images
+    const shuffled = [...galleryImages].sort(() => Math.random() - 0.5);
+    const randomGalleryImages = shuffled.slice(0, 5).map((img: GalleryType) => img.images[0]);
+    setBackgroundImagesAndGalleryImages([...backgroundImages, ...randomGalleryImages]);
+  }, [galleryImages])
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -144,7 +153,7 @@ export default function PhotoAlbumPage() {
           <div
             className="absolute inset-0 z-0 opacity-45 transition-all duration-1000"
             style={{
-              backgroundImage: `url('${backgroundImages[bgIndex]}')`,
+              backgroundImage: `url('${backgroundImagesAndGalleryImages[bgIndex]}')`,
               backgroundSize: "cover",
               backgroundPosition: "top",
               transition: "background-image 1s ease-in-out",

@@ -17,7 +17,7 @@ const AD_IMAGES = [
   },
   {
     url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
-    active: true,
+    active: false,
   },
   {
     url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747147393/enrollment/course/mxgu4h5xa295wk4igdr4.webp",
@@ -73,7 +73,10 @@ export const AdvertOverlay: React.FC = () => {
   };
 
   useEffect(() => {
-    updateScrollButtons();
+    if (!open) return;
+    // Wait for DOM to settle before checking scroll state
+    const timer = setTimeout(updateScrollButtons, 100);
+    return () => clearTimeout(timer);
   }, [open]);
 
   // useEffect(() => {
