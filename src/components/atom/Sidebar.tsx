@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { BookOpen, ChartPieIcon, ImageIcon, SquareLibrary } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { AdminLogo } from "./AdminLogo";
 import { LogoutModal } from "./LogoutModal";
-import { BookOpen, ChartPieIcon, SquareLibrary } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export const Sidebar = ({
   collapsed = false,
@@ -109,6 +109,16 @@ export const Sidebar = ({
               onClick={() => setIsOpen(false)}
               collapsed={collapsed}
             />
+            <SidebarLink
+              href='/gallery'
+              target='_blank'
+              icon={<ImageIcon size={20} />}
+              label='Manage Gallery'
+              active={false}
+              onClick={() => setIsOpen(false)}
+              collapsed={collapsed}
+            />
+
           </nav>
         </div>
         {/* Logout */}
@@ -139,6 +149,7 @@ export const Sidebar = ({
 
 function SidebarLink({
   href,
+  target="self",
   icon,
   label,
   active,
@@ -146,6 +157,7 @@ function SidebarLink({
   collapsed,
 }: {
   href: string;
+  target?: string;
   icon: React.ReactNode;
   label: string;
   active: boolean;
@@ -155,6 +167,7 @@ function SidebarLink({
   return (
     <Link
       href={href}
+      target={target}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
       className={`flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition
