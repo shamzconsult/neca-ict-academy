@@ -59,6 +59,7 @@ export default function PhotoAlbumPage() {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const backgroundImages = [
     "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140810/899aad12-5c86-4d93-815a-30d3f7f39993_cgix5e.webp",
+    "https://res.cloudinary.com/dtryuudiy/image/upload/v1758804540/enrollment/gallery/l7mlld1kaxopafi6suif.jpg",
     // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747141648/image_jxqy5v.webp",
     // "https://res.cloudinary.com/dtryuudiy/image/upload/v1747140614/NECA_DIRECTOR_GENERAL_VISIT_THE_AI_CLASS_VIRTUALLY_DURING_NECA_ICT_ACADEMY_SESSION_WITH_UNCLEBIGBAY_ootply.jpg",
   ];
