@@ -26,6 +26,7 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_KB } from "@/const";
 
 type AddNewCourseProps = {
   toggleModal: () => void;
@@ -312,8 +313,8 @@ export const AddNewCourse = ({
                       ref={fileInputRef}
                       onChange={(e) => {
                         const file = e.target.files?.[0] || null;
-                        if (file && file.size > 307200) {
-                          alert("File size must be less than 300KB.");
+                        if (file && file.size > MAX_UPLOAD_SIZE_BYTES) {
+                          alert(`File size must be less than ${MAX_UPLOAD_SIZE_KB}KB (1MB).`);
                           e.target.value = "";
                           setFile(null);
                           return;

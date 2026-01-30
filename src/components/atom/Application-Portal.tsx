@@ -15,6 +15,7 @@ import {
   states,
   statusOptionsMap,
   employmentStatusOptions,
+  MAX_UPLOAD_SIZE_BYTES,
 } from "@/const";
 import { useSearchParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
@@ -564,7 +565,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           placeholder='Upload your CV'
                           onFileChange={field.onChange}
                           currentFile={field.value}
-                          maxSize={307200}
+                          maxSize={MAX_UPLOAD_SIZE_BYTES}
                         />
                       )}
                     />
@@ -582,7 +583,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                           placeholder='Upload your image'
                           onFileChange={field.onChange}
                           currentFile={field.value}
-                          maxSize={307200}
+                          maxSize={MAX_UPLOAD_SIZE_BYTES}
                         />
                       )}
                     />

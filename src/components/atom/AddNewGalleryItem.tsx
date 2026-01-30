@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_KB } from "@/const";
 
 export type GalleryType = {
   _id: string;
@@ -158,8 +159,8 @@ export const AddNewGalleryItem = ({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 307200) {
-      toast.error("Image must be less than 300KB.");
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      toast.error(`Image must be less than ${MAX_UPLOAD_SIZE_KB}KB (1MB).`);
       return;
     }
 

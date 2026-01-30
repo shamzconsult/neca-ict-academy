@@ -20,6 +20,10 @@ const genderOptionsMap = {
 export const NECA_ICT_ACADEMY_LOGO =
   "https://res.cloudinary.com/dtryuudiy/image/upload/v1747163205/image-removebg-preview_ukiafb.png";
 
+/** Max upload file size: 1MB (used for images, CVs, etc.) */
+export const MAX_UPLOAD_SIZE_BYTES = 1024 * 1024; // 1MB
+export const MAX_UPLOAD_SIZE_KB = 1024;
+
 export const genderOptions = Object.keys(genderOptionsMap);
 export const statusOptions = Object.keys(statusOptionsMap);
 export const levelOptions = Object.keys(levelOptionsMap);
