@@ -300,7 +300,7 @@ function EnquiryContact() {
       <div className='mt-4 space-y-3'>
         <a
           href='mailto:contact@necaictacademy.org'
-          className='flex items-center gap-2.5 text-sm text-[#27156F] transition-colors hover:text-[#27156F]/80 hover:underline'
+          className='flex items-center [word-break:break-all] gap-2.5 text-sm text-[#27156F] transition-colors hover:text-[#27156F]/80 hover:underline'
         >
           <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm'>
             <Mail className='size-4' />
@@ -504,7 +504,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
 
       {/* Fixed Header */}
       <header className='fixed top-0 left-0 right-0 z-30 border-b border-[#27156F]/10 bg-white/95 backdrop-blur-sm'>
-        <div className='px-[8%] py-3 sm:py-4'>
+        <div className='px-5 lg:px-[8%] py-3 sm:py-4'>
           <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
             <Link href='/' className='relative w-36 shrink-0 lg:w-44'>
               <Image
@@ -519,7 +519,9 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
               <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm'>
                 <MailSearch className='size-4 text-[#27156F]' />
               </div>
-              <p className='text-sm text-gray-600'>Already applied?</p>
+              <p className='text-sm text-gray-600 hidden min-[450px]:block'>
+                Already applied?
+              </p>
               <Button
                 type='button'
                 variant='outline'
@@ -527,7 +529,8 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                 className='shrink-0 border-[#27156F]/20 bg-white text-[#27156F] hover:bg-[#27156F]/5'
                 onClick={toggleModal}
               >
-                Check status
+                <span className='sm:hidden'>Check application status</span>
+                <span className='hidden sm:block'>Check status</span>
               </Button>
             </div>
           </div>
@@ -535,8 +538,8 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
       </header>
 
       {/* Main Content */}
-      {cohorts.length > 0 ? (
-        <main className='pl-[8.5%] pr-[8%] relative z-10 grid min-w-0 pt-24 lg:grid-cols-2 lg:items-start gap-10 xl:gap-20'>
+      {cohorts?.length > 0 ? (
+        <main className='px-5 lg:pl-[8.5%] lg:pr-[8%] relative z-10 grid min-w-0 pt-24 lg:grid-cols-2 lg:items-start gap-10 xl:gap-20'>
           {/* Left column — desktop only */}
           <aside className='hidden min-w-0 lg:block lg:py-8'>
             <PortalInfoColumn variant='sidebar' />
@@ -865,14 +868,14 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
           </section>
 
           {/* Left column — mobile only, below the form */}
-          <aside className='min-w-0 px-6 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
+          <aside className='min-w-0 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
             <div className='mx-auto min-w-0 max-w-2xl'>
               <PortalInfoColumn variant='mobile' />
             </div>
           </aside>
         </main>
       ) : (
-        <div className='flex min-h-[70vh] flex-col items-center justify-center px-4 pt-24 text-center sm:pt-20'>
+        <div className='flex min-h-[70vh] flex-col items-center justify-center px-4 pt-44 text-center sm:pt-20'>
           <div className='mb-6 flex size-20 items-center justify-center rounded-full bg-[#DBEAF6]/50 text-[#27156F]/40'>
             <svg
               xmlns='http://www.w3.org/2000/svg'

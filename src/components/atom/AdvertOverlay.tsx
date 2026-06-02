@@ -6,8 +6,9 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { VisuallyHidden } from "../visually-hidden";
 import Link from "next/link";
 
@@ -42,10 +43,7 @@ const AD_IMAGES = [
   },
 ];
 
-// const STORAGE_KEY = "neca_advert_overlay_dismissed";
-// const EXPIRATION_KEY = "neca_advert_overlay_expiration";
-const SWITCH_INTERVAL = 5000; // 5 seconds between switches
-// const EXPIRATION_HOURS = 24; // Advert will expire after 24 hours
+const SWITCH_INTERVAL = 5000;
 
 export const AdvertOverlay: React.FC = () => {
   const [open, setOpen] = useState(true);
@@ -56,21 +54,23 @@ export const AdvertOverlay: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Check scroll position to show/hide arrows
-  const updateScrollButtons = () => {
+  const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
     setCanScrollLeft(container.scrollLeft > 0);
     setCanScrollRight(
       container.scrollLeft < container.scrollWidth - container.clientWidth - 1,
     );
-  };
+  }, []);
 
-  // Scroll by one card width
   const scrollThumbnails = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    const scrollAmount = 76; // 64px card + 12px gap
+
+    const firstThumb = container.firstElementChild as HTMLElement | null;
+    const gap = window.innerWidth < 640 ? 8 : 12;
+    const scrollAmount = firstThumb ? firstThumb.offsetWidth + gap : 76;
+
     container.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
       behavior: "smooth",
@@ -79,45 +79,23 @@ export const AdvertOverlay: React.FC = () => {
 
   useEffect(() => {
     if (!open) return;
-    // Wait for DOM to settle before checking scroll state
+
     const timer = setTimeout(updateScrollButtons, 100);
-    return () => clearTimeout(timer);
-  }, [open]);
+    window.addEventListener("resize", updateScrollButtons);
 
-  // useEffect(() => {
-  // if (typeof window === "undefined") return;
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, [open, activeIdx, updateScrollButtons]);
 
-  // // Check if advert has expired
-  // const expirationTime = localStorage.getItem(EXPIRATION_KEY);
-  // const now = new Date().getTime();
-
-  // if (expirationTime) {
-  //   // If we have an expiration time, check if we're past it
-  //   if (now > parseInt(expirationTime)) {
-  //     return;
-  //   }
-  // } else {
-  //   // If no expiration time is set, set it to 24 hours from now
-  //   const newExpirationTime = now + EXPIRATION_HOURS * 60 * 60 * 1000;
-  //   localStorage.setItem(EXPIRATION_KEY, newExpirationTime.toString());
-  // }
-
-  // // Only show if not dismissed before
-  // const dismissed = localStorage.getItem(STORAGE_KEY);
-  // if (!dismissed) setOpen(true);
-
-  // }, []);
-
-  // Only auto-scroll if the current image has active: true
   const currentImage = AD_IMAGES[activeIdx];
   const shouldAutoScroll = currentImage?.active && !isHovered;
-  console.log(currentImage?.active);
-  // Get indices of all active images for cycling
+
   const activeIndices = AD_IMAGES.map((img, idx) =>
     img.active ? idx : -1,
   ).filter((idx) => idx !== -1);
 
-  // Find the next active image index
   const getNextActiveIdx = (currentIdx: number) => {
     if (activeIndices.length <= 1) return currentIdx;
     const currentPos = activeIndices.indexOf(currentIdx);
@@ -133,25 +111,27 @@ export const AdvertOverlay: React.FC = () => {
       setTimeout(() => {
         setActiveIdx((prev) => getNextActiveIdx(prev));
         setIsTransitioning(false);
-      }, 300); // Half of the transition duration
+      }, 300);
     }, SWITCH_INTERVAL);
 
     return () => clearInterval(interval);
-  }, [open, shouldAutoScroll, activeIdx]);
+  }, [open, shouldAutoScroll, activeIdx, activeIndices.length]);
 
   const handleClose = () => {
     setOpen(false);
-    // if (typeof window !== "undefined") {
-    //   localStorage.setItem(STORAGE_KEY, "1");
-    // }
   };
+
+  const pauseAutoScroll = () => setIsHovered(true);
+  const resumeAutoScroll = () => setIsHovered(false);
 
   if (!open) return null;
 
   const sharedWrapperProps = {
-    className: "relative" as const,
-    onMouseEnter: () => setIsHovered(true),
-    onMouseLeave: () => setIsHovered(false),
+    className: "relative block w-full max-w-full",
+    onMouseEnter: pauseAutoScroll,
+    onMouseLeave: resumeAutoScroll,
+    onTouchStart: pauseAutoScroll,
+    onTouchEnd: resumeAutoScroll,
   };
 
   const advertImage = (
@@ -159,12 +139,14 @@ export const AdvertOverlay: React.FC = () => {
       <img
         src={AD_IMAGES[activeIdx].url}
         alt={`Advert ${activeIdx + 1}`}
-        className={`rounded-lg shadow-2xl sm:h-[80vh] sm:max-h-[80vh] object-contain transition-opacity duration-600 ${
-          isTransitioning ? "opacity-0" : "opacity-100"
-        }`}
+        className={cn(
+          "mx-auto w-full max-w-full rounded-lg object-contain shadow-2xl transition-opacity duration-300",
+          "max-h-[min(62dvh,520px)] sm:max-h-[80vh]",
+          isTransitioning ? "opacity-0" : "opacity-100",
+        )}
       />
       {!currentImage?.active && (
-        <div className='absolute top-4 left-4 bg-red-600/70 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm'>
+        <div className="absolute left-2 top-2 rounded-full bg-red-600/70 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-sm">
           Past Event
         </div>
       )}
@@ -177,82 +159,82 @@ export const AdvertOverlay: React.FC = () => {
         <VisuallyHidden>NECA ICT Academy Advert</VisuallyHidden>
       </DialogTitle>
       <DialogContent
-        className='w-full sm:max-w-full h-full bg-transparent border-none shadow-none'
+        className={cn(
+          "flex max-h-[100dvh] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col",
+          "overflow-x-hidden overflow-y-auto border-none bg-transparent p-2 shadow-none",
+          "sm:h-auto sm:max-h-[95vh] sm:w-full sm:max-w-[min(100vw,56rem)] sm:p-4",
+        )}
         hideClose
       >
         <DialogClose asChild>
           <button
-            className='absolute top-4 right-4 text-white text-3xl font-bold hover:text-red-400 transition z-50'
+            type="button"
+            className="absolute right-2 top-2 z-50 flex size-9 items-center justify-center rounded-full bg-black/30 text-2xl font-bold text-white transition hover:bg-black/40 hover:text-red-300 sm:right-4 sm:top-4 sm:size-11 sm:text-3xl"
             onClick={handleClose}
-            aria-label='Close advert'
-            style={{
-              background: "rgba(0,0,0,0.2)",
-              borderRadius: "50%",
-              width: 44,
-              height: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            aria-label="Close advert"
           >
             &times;
           </button>
         </DialogClose>
-        <div className='flex flex-col items-center justify-center'>
+
+        <div className="flex w-full min-w-0 flex-col items-center justify-center gap-3 py-1 sm:gap-4 sm:py-2">
           {currentImage?.active ? (
-            <Link href='/enroll' {...sharedWrapperProps}>
+            <Link href="/enroll" {...sharedWrapperProps}>
               {advertImage}
             </Link>
           ) : (
             <div {...sharedWrapperProps}>{advertImage}</div>
           )}
-          <div className='mt-4 flex items-center gap-2'>
-            {/* Left Arrow */}
+
+          <div className="flex w-full min-w-0 max-w-full items-center gap-1.5 px-0.5 sm:gap-2 sm:px-0">
             <button
+              type="button"
               onClick={() => scrollThumbnails("left")}
               disabled={!canScrollLeft}
-              aria-label='Scroll thumbnails left'
-              className={`flex-shrink-0 w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center transition ${
+              aria-label="Scroll thumbnails left"
+              className={cn(
+                "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
                 canScrollLeft
-                  ? "hover:bg-white hover:scale-110 cursor-pointer"
-                  : "opacity-30 cursor-not-allowed"
-              }`}
+                  ? "cursor-pointer hover:scale-110 hover:bg-white"
+                  : "cursor-not-allowed opacity-30",
+              )}
             >
-              <ChevronLeft className='w-5 h-5 text-gray-700' />
+              <ChevronLeft className="size-4 text-gray-700 sm:size-5" />
             </button>
 
             <div
               ref={scrollContainerRef}
               onScroll={updateScrollButtons}
-              className='flex gap-3 px-2 py-1 overflow-x-auto no-scrollbar'
-              style={{ maxWidth: "calc(64px * 4 + 12px * 3 + 16px)" }} // 4 cards + 3 gaps + padding
+              className="flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 py-1 no-scrollbar sm:gap-3 sm:px-2"
             >
               {AD_IMAGES.map((image, idx) => (
                 <button
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
-                  key={image.url}
+                  type="button"
+                  key={`${image.url}-${idx}`}
+                  onMouseEnter={pauseAutoScroll}
+                  onMouseLeave={resumeAutoScroll}
+                  onTouchStart={pauseAutoScroll}
                   onClick={() => setActiveIdx(idx)}
                   aria-label={`Show advert ${idx + 1}${!image.active ? " (Past Event)" : ""}`}
-                  className={`relative flex-shrink-0 border-2 rounded shadow-md bg-white p-0.5 transition ${
+                  aria-current={idx === activeIdx ? "true" : undefined}
+                  className={cn(
+                    "relative size-12 shrink-0 rounded border-2 bg-white p-0.5 shadow-md transition sm:size-16",
                     idx === activeIdx
-                      ? "border-blue-600 ring-2 ring-blue-300"
-                      : "border-white opacity-80 hover:scale-105"
-                  }`}
-                  style={{
-                    width: 64,
-                    height: 64,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                  }}
+                      ? "border-[#27156F] ring-2 ring-[#27156F]/30"
+                      : "border-white opacity-80 hover:scale-105",
+                  )}
                 >
                   <img
                     src={image.url}
                     alt={`Advert ${idx + 1} thumbnail`}
-                    className={`object-cover w-full h-full rounded ${!image.active ? "grayscale" : ""}`}
+                    className={cn(
+                      "size-full rounded object-cover",
+                      !image.active && "grayscale",
+                    )}
                   />
                   {!image.active && (
-                    <div className='absolute inset-0 bg-black/30 rounded flex items-center justify-center'>
-                      <span className='text-white text-[8px] font-medium'>
+                    <div className="absolute inset-0 flex items-center justify-center rounded bg-black/30">
+                      <span className="text-[7px] font-medium text-white sm:text-[8px]">
                         Past
                       </span>
                     </div>
@@ -261,18 +243,19 @@ export const AdvertOverlay: React.FC = () => {
               ))}
             </div>
 
-            {/* Right Arrow */}
             <button
+              type="button"
               onClick={() => scrollThumbnails("right")}
               disabled={!canScrollRight}
-              aria-label='Scroll thumbnails right'
-              className={`flex-shrink-0 w-8 h-8 rounded-full bg-white/90 shadow-md flex items-center justify-center transition ${
+              aria-label="Scroll thumbnails right"
+              className={cn(
+                "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
                 canScrollRight
-                  ? "hover:bg-white hover:scale-110 cursor-pointer"
-                  : "opacity-30 cursor-not-allowed"
-              }`}
+                  ? "cursor-pointer hover:scale-110 hover:bg-white"
+                  : "cursor-not-allowed opacity-30",
+              )}
             >
-              <ChevronRight className='w-5 h-5 text-gray-700' />
+              <ChevronRight className="size-4 text-gray-700 sm:size-5" />
             </button>
           </div>
         </div>
