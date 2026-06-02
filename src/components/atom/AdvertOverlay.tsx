@@ -57,17 +57,19 @@ export const AdvertOverlay: React.FC = () => {
   const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 1,
-    );
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const maxScrollLeft = Math.max(0, scrollWidth - clientWidth);
+
+    setCanScrollLeft(scrollLeft > 1);
+    setCanScrollRight(scrollLeft < maxScrollLeft - 1);
   }, []);
 
   const scrollThumbnails = (direction: "left" | "right") => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
-    const firstThumb = container.firstElementChild as HTMLElement | null;
+    const firstThumb = container.querySelector<HTMLElement>("[data-thumb]");
     const gap = window.innerWidth < 640 ? 8 : 12;
     const scrollAmount = firstThumb ? firstThumb.offsetWidth + gap : 76;
 
@@ -77,17 +79,48 @@ export const AdvertOverlay: React.FC = () => {
     });
   };
 
+  const scrollActiveThumbIntoView = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const activeThumb = container.querySelector<HTMLElement>(
+      `[data-thumb][data-active="true"]`,
+    );
+    activeThumb?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, []);
+
   useEffect(() => {
     if (!open) return;
 
-    const timer = setTimeout(updateScrollButtons, 100);
-    window.addEventListener("resize", updateScrollButtons);
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const update = () => requestAnimationFrame(updateScrollButtons);
+
+    update();
+    const timer = setTimeout(update, 100);
+
+    const resizeObserver = new ResizeObserver(update);
+    resizeObserver.observe(container);
+
+    window.addEventListener("resize", update);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", updateScrollButtons);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", update);
     };
   }, [open, activeIdx, updateScrollButtons]);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = setTimeout(scrollActiveThumbIntoView, 50);
+    return () => clearTimeout(timer);
+  }, [open, activeIdx, scrollActiveThumbIntoView]);
 
   const currentImage = AD_IMAGES[activeIdx];
   const shouldAutoScroll = currentImage?.active && !isHovered;
@@ -146,7 +179,7 @@ export const AdvertOverlay: React.FC = () => {
         )}
       />
       {!currentImage?.active && (
-        <div className="absolute left-2 top-2 rounded-full bg-red-600/70 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-sm">
+        <div className='absolute left-2 top-2 rounded-full bg-red-600/70 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-sm'>
           Past Event
         </div>
       )}
@@ -168,30 +201,30 @@ export const AdvertOverlay: React.FC = () => {
       >
         <DialogClose asChild>
           <button
-            type="button"
-            className="absolute right-2 top-2 z-50 flex size-9 items-center justify-center rounded-full bg-black/30 text-2xl font-bold text-white transition hover:bg-black/40 hover:text-red-300 sm:right-4 sm:top-4 sm:size-11 sm:text-3xl"
+            type='button'
+            className='absolute right-2 top-2 z-50 flex size-9 items-center justify-center rounded-full bg-black/30 text-2xl font-bold text-white transition hover:bg-black/40 hover:text-red-300 sm:right-4 sm:top-4 sm:size-11 sm:text-3xl'
             onClick={handleClose}
-            aria-label="Close advert"
+            aria-label='Close advert'
           >
             &times;
           </button>
         </DialogClose>
 
-        <div className="flex w-full min-w-0 flex-col items-center justify-center gap-3 py-1 sm:gap-4 sm:py-2">
+        <div className='flex w-full min-w-0 flex-col items-center justify-center gap-3 py-1 sm:gap-4 sm:py-2'>
           {currentImage?.active ? (
-            <Link href="/enroll" {...sharedWrapperProps}>
+            <Link href='/enroll' {...sharedWrapperProps}>
               {advertImage}
             </Link>
           ) : (
             <div {...sharedWrapperProps}>{advertImage}</div>
           )}
 
-          <div className="flex w-full min-w-0 max-w-full items-center gap-1.5 px-0.5 sm:gap-2 sm:px-0">
+          <div className='flex w-full min-w-0 max-w-full items-center gap-1.5 px-0.5 sm:gap-2 sm:px-0 justify-center'>
             <button
-              type="button"
+              type='button'
               onClick={() => scrollThumbnails("left")}
               disabled={!canScrollLeft}
-              aria-label="Scroll thumbnails left"
+              aria-label='Scroll thumbnails left'
               className={cn(
                 "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
                 canScrollLeft
@@ -199,55 +232,62 @@ export const AdvertOverlay: React.FC = () => {
                   : "cursor-not-allowed opacity-30",
               )}
             >
-              <ChevronLeft className="size-4 text-gray-700 sm:size-5" />
+              <ChevronLeft className='size-4 text-gray-700 sm:size-5' />
             </button>
 
             <div
               ref={scrollContainerRef}
               onScroll={updateScrollButtons}
-              className="flex min-w-0 flex-1 gap-2 overflow-x-auto px-1 py-1 no-scrollbar sm:gap-3 sm:px-2"
+              className={cn(
+                "min-w-0 flex-1 overflow-x-auto px-1 py-1 no-scrollbar sm:px-2",
+                "max-w-[calc(3*3rem+2*0.5rem+0.5rem)] sm:max-w-[calc(5*4rem+4*0.75rem+1rem)]",
+              )}
             >
-              {AD_IMAGES.map((image, idx) => (
-                <button
-                  type="button"
-                  key={`${image.url}-${idx}`}
-                  onMouseEnter={pauseAutoScroll}
-                  onMouseLeave={resumeAutoScroll}
-                  onTouchStart={pauseAutoScroll}
-                  onClick={() => setActiveIdx(idx)}
-                  aria-label={`Show advert ${idx + 1}${!image.active ? " (Past Event)" : ""}`}
-                  aria-current={idx === activeIdx ? "true" : undefined}
-                  className={cn(
-                    "relative size-12 shrink-0 rounded border-2 bg-white p-0.5 shadow-md transition sm:size-16",
-                    idx === activeIdx
-                      ? "border-[#27156F] ring-2 ring-[#27156F]/30"
-                      : "border-white opacity-80 hover:scale-105",
-                  )}
-                >
-                  <img
-                    src={image.url}
-                    alt={`Advert ${idx + 1} thumbnail`}
+              <div className='flex w-max gap-2 sm:gap-3'>
+                {AD_IMAGES.map((image, idx) => (
+                  <button
+                    type='button'
+                    data-thumb
+                    data-active={idx === activeIdx ? "true" : "false"}
+                    key={`${image.url}-${idx}`}
+                    onMouseEnter={pauseAutoScroll}
+                    onMouseLeave={resumeAutoScroll}
+                    onTouchStart={pauseAutoScroll}
+                    onClick={() => setActiveIdx(idx)}
+                    aria-label={`Show advert ${idx + 1}${!image.active ? " (Past Event)" : ""}`}
+                    aria-current={idx === activeIdx ? "true" : undefined}
                     className={cn(
-                      "size-full rounded object-cover",
-                      !image.active && "grayscale",
+                      "relative size-12 shrink-0 rounded border-2 bg-white p-0.5 shadow-md transition sm:size-16",
+                      idx === activeIdx
+                        ? "border-[#27156F] ring-2 ring-[#27156F]/30"
+                        : "border-white opacity-80 hover:scale-105",
                     )}
-                  />
-                  {!image.active && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded bg-black/30">
-                      <span className="text-[7px] font-medium text-white sm:text-[8px]">
-                        Past
-                      </span>
-                    </div>
-                  )}
-                </button>
-              ))}
+                  >
+                    <img
+                      src={image.url}
+                      alt={`Advert ${idx + 1} thumbnail`}
+                      className={cn(
+                        "size-full rounded object-cover",
+                        !image.active && "grayscale",
+                      )}
+                    />
+                    {!image.active && (
+                      <div className='absolute inset-0 flex items-center justify-center rounded bg-black/30'>
+                        <span className='text-[7px] font-medium text-white sm:text-[8px]'>
+                          Past
+                        </span>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button
-              type="button"
+              type='button'
               onClick={() => scrollThumbnails("right")}
               disabled={!canScrollRight}
-              aria-label="Scroll thumbnails right"
+              aria-label='Scroll thumbnails right'
               className={cn(
                 "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
                 canScrollRight
@@ -255,7 +295,7 @@ export const AdvertOverlay: React.FC = () => {
                   : "cursor-not-allowed opacity-30",
               )}
             >
-              <ChevronRight className="size-4 text-gray-700 sm:size-5" />
+              <ChevronRight className='size-4 text-gray-700 sm:size-5' />
             </button>
           </div>
         </div>
