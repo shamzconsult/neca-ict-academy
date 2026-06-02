@@ -10,6 +10,8 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  type ChartOptions,
+  type TooltipItem,
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
 import { AlertTriangle, BarChart3, Search } from "lucide-react";
@@ -139,7 +141,7 @@ export const ApplicationStatsChart = ({
     ],
   };
 
-  const locationChartOptions = {
+  const locationChartOptions: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -149,8 +151,11 @@ export const ApplicationStatsChart = ({
       },
       tooltip: {
         callbacks: {
-          footer: (items: { raw: number }[]) => {
-            const total = items.reduce((sum, item) => sum + item.raw, 0);
+          footer: (items: TooltipItem<"bar">[]) => {
+            const total = items.reduce(
+              (sum, item) => sum + Number(item.raw ?? 0),
+              0,
+            );
             return `Total: ${total}`;
           },
         },
@@ -184,7 +189,7 @@ export const ApplicationStatsChart = ({
     },
   };
 
-  const genderChartOptions = {
+  const genderChartOptions: ChartOptions<"pie"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -194,14 +199,13 @@ export const ApplicationStatsChart = ({
       },
       tooltip: {
         callbacks: {
-          label: (context: {
-            label: string;
-            raw: number;
-            dataset: { data: number[] };
-          }) => {
-            const value = context.raw;
-            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = total ? ((value / total) * 100).toFixed(1) : "0";
+          label: (context: TooltipItem<"pie">) => {
+            const value = Number(context.raw ?? 0);
+            const datasetData = context.dataset.data as number[];
+            const total = datasetData.reduce((a, b) => a + b, 0);
+            const percentage = total
+              ? ((value / total) * 100).toFixed(1)
+              : "0";
             return `${context.label}: ${value} (${percentage}%)`;
           },
         },
