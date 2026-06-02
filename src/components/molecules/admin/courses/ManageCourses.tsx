@@ -4,7 +4,6 @@ import { AddNewCourse } from "@/components/atom/AddNewCourse";
 import { CourseCard } from "@/components/atom/CourseCard";
 import { CourseType } from "@/types";
 import React, { useState } from "react";
-import { HiOutlinePlusCircle } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useDebounce } from "@/hooks/useDebounce";
-import { ExternalLink, PanelLeft, X } from "lucide-react";
+import { ExternalLink, PlusCircle, X } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
@@ -129,17 +128,18 @@ export const ManageCourses = () => {
           <>
             <Button
               onClick={toggleModal}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90"
             >
-              <HiOutlinePlusCircle /> Add New Course
+              <PlusCircle className="size-4" />
+              Add New Course
             </Button>
             <Button
               variant="outline"
               asChild
-              className="flex items-center gap-2 transition-colors"
+              className="gap-2 border-[#27156F]/20"
             >
               <Link href="/courses" target="_blank">
-                <ExternalLink />
+                <ExternalLink className="size-4" />
                 Go to Courses Page
               </Link>
             </Button>

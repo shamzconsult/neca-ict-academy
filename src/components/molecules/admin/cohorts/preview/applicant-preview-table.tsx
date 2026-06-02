@@ -2,7 +2,7 @@
 
 import { useSearchParams, useParams } from "next/navigation";
 import { useState } from "react";
-import { useDebounce } from "../../../../../../hooks/useDebounce";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useQuery } from "@tanstack/react-query";
 
 import { Loader } from "lucide-react";
@@ -10,13 +10,32 @@ import { FaSearch } from "react-icons/fa";
 
 import { levelOptions, statusOptions } from "@/const";
 import { EnrollmentType } from "@/types";
-import ApplicantTable from "@/components/atom/Table/ApplicantTable";
+import {
+  Table,
+  TableBody,
+  TableContainer,
+  TableEmptyRow,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/atom/Table/Table";
 
 import { Pagination } from "@/components/atom/Pagination";
 import { ApplicantTr } from "./applicant-tr";
 import { ApplicantInfoModal } from "./applicant-info-modal";
 
 const LIMIT = 8;
+
+const APPLICANT_HEADERS = [
+  "Name",
+  "Email",
+  "Phone Number",
+  "State",
+  "Course",
+  "Level",
+  "Status",
+  "Review",
+] as const;
 
 const ApplicantPreviewForm = () => {
   const params = useParams();
@@ -31,7 +50,6 @@ const ApplicantPreviewForm = () => {
   const [status, setStatus] = useState(searchParams.get("status") ?? "all");
   const [level, setLevel] = useState(searchParams.get("level") ?? "all");
 
-  // Build query string for API
   const queryParams = {
     search: debouncedSearchTerm,
     status: status !== "all" ? status : "",
@@ -84,40 +102,40 @@ const ApplicantPreviewForm = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleRowClick = (idx: number) => {
-    console.log("Row clicked:", idx);
     setCurrentIndex(idx);
     setModalOpen(true);
   };
 
   return (
     <section>
-      <div className='px-4 space-y-8 w-full pb-10'>
-        <div className='flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4'>
-          <h1 className='md:text-[20px] font-medium'>All Applicants</h1>
+      <div className="px-4 space-y-8 w-full pb-10">
+        <div className="flex flex-col md:flex-row gap-3 justify-between md:items-center p-4 bg-white mb-4 rounded-xl border border-[#27156F]/10">
+          <h1 className="md:text-[20px] font-semibold text-[#27156F]">
+            All Applicants
+          </h1>
         </div>
-        <div className='border border-[#C4C4C4] w-full'>
-          <div className='flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 w-full'>
-            <div className='relative w-full md:w-[70%]'>
-              <FaSearch className='absolute left-3 top-3 ' />
-
+        <TableContainer>
+          <div className="flex flex-col items-start md:flex-row justify-between md:items-center gap-4 p-4 border-b border-[#27156F]/10">
+            <div className="relative w-full md:w-[70%]">
+              <FaSearch className="absolute left-3 top-3 text-gray-400" />
               <input
-                type='text'
-                placeholder='Search...'
+                type="text"
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className='pl-10 pr-4 py-2 border w-full border-[#C4C4C4] rounded-md focus:outline-none focus:ring-none focus:border-gray-400'
+                className="pl-10 pr-4 py-2 border w-full border-[#27156F]/15 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#27156F]/20 focus:border-[#27156F]/30"
               />
             </div>
-            <div className='flex gap-2'>
+            <div className="flex gap-2">
               <select
                 value={status}
                 onChange={handleStatusChange}
-                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md capitalize'
+                className="flex items-center px-3 py-2 border border-[#27156F]/15 cursor-pointer rounded-lg capitalize text-sm"
               >
-                <option value='all'>All Status</option>
-                {statusOptions.map((status, index) => (
-                  <option value={status} className='capitalize' key={index}>
-                    {status}
+                <option value="all">All Status</option>
+                {statusOptions.map((statusOption, index) => (
+                  <option value={statusOption} className="capitalize" key={index}>
+                    {statusOption}
                   </option>
                 ))}
               </select>
@@ -125,35 +143,41 @@ const ApplicantPreviewForm = () => {
               <select
                 value={level}
                 onChange={handleLevelChange}
-                className='flex items-center px-2 py-2 border text-nowrap border-[#C4C4C4] cursor-pointer rounded-md capitalize'
+                className="flex items-center px-3 py-2 border border-[#27156F]/15 cursor-pointer rounded-lg capitalize text-sm"
               >
-                <option value='all'>All Level</option>
-                {levelOptions.map((level, index) => (
-                  <option value={level} className='capitalize' key={index}>
-                    {level}
+                <option value="all">All Level</option>
+                {levelOptions.map((levelOption, index) => (
+                  <option value={levelOption} className="capitalize" key={index}>
+                    {levelOption}
                   </option>
                 ))}
               </select>
             </div>
           </div>
           {isLoading ? (
-            <Loader className='absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%] animate-spin text-red-700 size-8' />
+            <div className="flex min-h-[300px] items-center justify-center">
+              <Loader className="animate-spin text-[#E02B20] size-8" />
+            </div>
           ) : (
             <>
-              <table className='min-w-full divide-y divide-gray-200'>
-                <thead>
-                  <tr>
-                    <th className='px-6 py-3'>Name</th>
-                    <th className='px-6 py-3'>Email</th>
-                    <th className='px-6 py-3'>Phone Number</th>
-                    <th className='px-6 py-3'>State</th>
-                    <th className='px-6 py-3'>Course</th>
-                    <th className='px-6 py-3'>Level</th>
-                    <th className='px-6 py-3'>Status</th>
-                    <th className='px-6 py-3'>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <Table className="min-w-[1100px]">
+                <TableHead>
+                  <TableRow className="hover:bg-transparent border-b border-[#27156F]/10">
+                    {APPLICANT_HEADERS.map((header) => (
+                      <TableHeader
+                        key={header}
+                        align={
+                          header === "Status" || header === "Review"
+                            ? "center"
+                            : "left"
+                        }
+                      >
+                        {header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
                   {filteredApplicants.length > 0 ? (
                     filteredApplicants.map((applicant, idx) => (
                       <ApplicantTr
@@ -163,25 +187,20 @@ const ApplicantPreviewForm = () => {
                       />
                     ))
                   ) : (
-                    <tr>
-                      <td
-                        colSpan={8}
-                        className='text-center text-red-500 font-bold py-24'
-                      >
-                        No results found
-                      </td>
-                    </tr>
+                    <TableEmptyRow colSpan={APPLICANT_HEADERS.length} />
                   )}
-                </tbody>
-              </table>
-              <Pagination
-                currentPage={page}
-                onPageChange={setPage}
-                totalPages={totalPages}
-              />
+                </TableBody>
+              </Table>
+              <div className="border-t border-[#27156F]/10 px-4 py-3">
+                <Pagination
+                  currentPage={page}
+                  onPageChange={setPage}
+                  totalPages={totalPages}
+                />
+              </div>
             </>
           )}
-        </div>
+        </TableContainer>
       </div>
       <ApplicantInfoModal
         isOpen={modalOpen}

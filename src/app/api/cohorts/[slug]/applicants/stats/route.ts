@@ -6,7 +6,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<Record<string, unknown>> }
+  { params }: { params: Promise<Record<string, unknown>> },
 ) {
   try {
     await connectViaMongoose();
@@ -16,7 +16,7 @@ export async function GET(
     if (!cohort) {
       return NextResponse.json(
         { message: "Cohort not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
     const cohortId = cohort._id;
@@ -50,9 +50,9 @@ export async function GET(
     // Build stats object
     const stats: Record<string, number> = {
       total,
-      admitted: 0,
       pending: 0,
       declined: 0,
+      admitted: 0,
       graduated: 0,
     };
 
@@ -72,7 +72,7 @@ export async function GET(
     console.error("Error fetching cohort stats:", error);
     return NextResponse.json(
       { success: false, error: error?.toString() },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

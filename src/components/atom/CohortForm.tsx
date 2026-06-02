@@ -11,20 +11,91 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "../ui/select";
 import { DatePicker } from "../ui/date-picker";
+import { parseApiError } from "@/lib/parse-api-error";
+import {
+  FieldError,
+  FormErrorBanner,
+  fieldErrorClass,
+} from "./form/FormFeedback";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 interface CourseType {
   _id: string;
   title: string;
+}
+
+type CohortFormData = {
+  name: string;
+  startDate: string;
+  endDate: string;
+  active: boolean;
+  applicationStartDate: string;
+  applicationEndDate: string;
+  courses: string[];
+};
+
+type FieldErrors = Partial<Record<keyof CohortFormData, string>>;
+
+const EMPTY_FORM: CohortFormData = {
+  name: "",
+  startDate: "",
+  endDate: "",
+  active: true,
+  applicationStartDate: "",
+  applicationEndDate: "",
+  courses: [],
+};
+
+function validateCohortForm(data: CohortFormData): FieldErrors {
+  const errors: FieldErrors = {};
+
+  if (!data.name.trim()) {
+    errors.name = "Cohort name is required.";
+  }
+
+  if (!data.applicationStartDate) {
+    errors.applicationStartDate = "Application start date is required.";
+  }
+  if (!data.applicationEndDate) {
+    errors.applicationEndDate = "Application end date is required.";
+  }
+  if (data.applicationStartDate && data.applicationEndDate) {
+    if (new Date(data.applicationEndDate) < new Date(data.applicationStartDate)) {
+      errors.applicationEndDate =
+        "Application end date must be on or after the start date.";
+    }
+  }
+
+  if (!data.startDate) {
+    errors.startDate = "Cohort start date is required.";
+  } else if (
+    data.applicationEndDate &&
+    new Date(data.startDate) <= new Date(data.applicationEndDate)
+  ) {
+    errors.startDate = "Cohort start date must be after the application end date.";
+  }
+
+  if (!data.endDate) {
+    errors.endDate = "Cohort end date is required.";
+  } else if (
+    data.startDate &&
+    new Date(data.endDate) <= new Date(data.startDate)
+  ) {
+    errors.endDate = "Cohort end date must be after the cohort start date.";
+  }
+
+  return errors;
 }
 
 export const CohortForm = ({
@@ -40,9 +111,13 @@ export const CohortForm = ({
 }) => {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
+  const [formData, setFormData] = useState<CohortFormData>(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [apiError, setApiError] = useState("");
 
-  // Fetch courses
-  const { data: allCourses = [] } = useQuery<CourseType[]>({
+  const { data: allCourses = [], isError: coursesLoadError } = useQuery<
+    CourseType[]
+  >({
     queryKey: ["courses"],
     queryFn: async () => {
       const res = await fetch("/api/courses");
@@ -51,50 +126,73 @@ export const CohortForm = ({
     },
   });
 
-  // Create cohort mutation
+  const resetForm = () => {
+    setFormData(EMPTY_FORM);
+    setFieldErrors({});
+    setApiError("");
+    setSearch("");
+  };
+
+  const clearFieldError = (field: keyof CohortFormData) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setApiError("");
+  };
+
   const createCohort = useMutation({
-    mutationFn: async (formData: any) => {
+    mutationFn: async (payload: CohortFormData) => {
       const res = await fetch("/api/cohorts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error("Failed to create cohort");
+      if (!res.ok) {
+        throw new Error(await parseApiError(res, "Failed to create cohort"));
+      }
       return res.json();
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cohorts"] });
       setCohortsData((prev) => [...prev, data.newCohort]);
-      toast.success("Cohort Created Successfully 🎉🎉");
-      toggleModal();
+      toast.success("Cohort created successfully");
       resetForm();
+      toggleModal();
     },
-    onError: (error) => {
-      toast.error("Failed to create cohort");
-      console.error("Error creating cohort:", error);
+    onError: (error: Error) => {
+      const message = error.message || "Failed to create cohort";
+      setApiError(message);
+      toast.error(message);
     },
   });
 
-  // Update cohort mutation
   const updateCohort = useMutation({
-    mutationFn: async ({ slug, formData }: { slug: string; formData: any }) => {
+    mutationFn: async ({
+      slug,
+      payload,
+    }: {
+      slug: string;
+      payload: CohortFormData;
+    }) => {
       const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("startDate", formData.startDate);
-      formDataToSend.append("endDate", formData.endDate);
-      formDataToSend.append(
-        "applicationStartDate",
-        formData.applicationStartDate
-      );
-      formDataToSend.append("applicationEndDate", formData.applicationEndDate);
-      formDataToSend.append("active", formData.active.toString());
-      formDataToSend.append("courses", JSON.stringify(formData.courses));
+      formDataToSend.append("name", payload.name);
+      formDataToSend.append("startDate", payload.startDate);
+      formDataToSend.append("endDate", payload.endDate);
+      formDataToSend.append("applicationStartDate", payload.applicationStartDate);
+      formDataToSend.append("applicationEndDate", payload.applicationEndDate);
+      formDataToSend.append("active", payload.active.toString());
+      formDataToSend.append("courses", JSON.stringify(payload.courses));
 
       const res = await fetch(`/api/cohorts/${slug}`, {
         method: "PUT",
         body: formDataToSend,
       });
-      if (!res.ok) throw new Error("Failed to update cohort");
+      if (!res.ok) {
+        throw new Error(await parseApiError(res, "Failed to update cohort"));
+      }
       return res.json();
     },
     onSuccess: (data) => {
@@ -116,62 +214,52 @@ export const CohortForm = ({
         })
       );
 
-      toast.success("Cohort Updated Successfully 🎉");
+      toast.success("Cohort updated successfully");
       setCohortToEdit?.(null);
       resetForm();
       toggleModal();
     },
-    onError: (error) => {
-      toast.error("Failed to update cohort");
-      console.error("Error updating cohort:", error);
+    onError: (error: Error) => {
+      const message = error.message || "Failed to update cohort";
+      setApiError(message);
+      toast.error(message);
     },
   });
 
-  const [formData, setFormData] = useState<{
-    name: string;
-    startDate: string;
-    endDate: string;
-    active: boolean;
-    applicationStartDate: string;
-    applicationEndDate: string;
-    courses: string[];
-  }>({
-    name: "",
-    startDate: "",
-    endDate: "",
-    active: true,
-    applicationStartDate: "",
-    applicationEndDate: "",
-    courses: [],
-  });
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      startDate: "",
-      endDate: "",
-      active: true,
-      applicationStartDate: "",
-      applicationEndDate: "",
-      courses: [],
-    });
-  };
+  const isSubmitting = createCohort.isPending || updateCohort.isPending;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    clearFieldError(name as keyof CohortFormData);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    createCohort.mutate(formData);
+    setApiError("");
+
+    const errors = validateCohortForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below before submitting.");
+      return;
+    }
+
+    setFieldErrors({});
+    if (cohortToEdit) {
+      updateCohort.mutate({ slug: cohortToEdit.slug, payload: formData });
+    } else {
+      createCohort.mutate(formData);
+    }
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!cohortToEdit) return;
-    updateCohort.mutate({ slug: cohortToEdit.slug, formData });
+  const handleClose = () => {
+    if (isSubmitting) return;
+    toggleModal();
+    setCohortToEdit?.(null);
+    resetForm();
   };
 
   useEffect(() => {
@@ -185,83 +273,92 @@ export const CohortForm = ({
         applicationEndDate: cohortToEdit.applicationEndDate,
         courses: cohortToEdit.courses || [],
       });
+      setFieldErrors({});
+      setApiError("");
     }
   }, [cohortToEdit]);
 
   return (
-    <Dialog
-      open
-      onOpenChange={(openState) => {
-        if (!openState) {
-          toggleModal();
-        }
-      }}
-    >
-      <DialogContent className='max-h-[90vh] overflow-y-auto'>
+    <Dialog open onOpenChange={(openState) => !openState && handleClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {cohortToEdit ? "Updating Cohort" : "Create Cohort"}
+            {cohortToEdit ? "Update Cohort" : "Create Cohort"}
           </DialogTitle>
+          <p className="text-sm text-muted-foreground">
+            {cohortToEdit
+              ? "Edit cohort details and linked courses."
+              : "Set up a new cohort with application and schedule dates."}
+          </p>
         </DialogHeader>
-        <form
-          onSubmit={cohortToEdit ? handleUpdate : handleSubmit}
-          className='space-y-6'
-        >
-          <div className='space-y-2'>
-            <Label htmlFor='name'>Cohort Name</Label>
+
+        <form onSubmit={handleFormSubmit} className="space-y-5" noValidate>
+          <FormErrorBanner message={apiError} onDismiss={() => setApiError("")} />
+
+          <div className="space-y-2">
+            <Label htmlFor="name">
+              Cohort Name <span className="text-red-500">*</span>
+            </Label>
             <Input
-              id='name'
-              name='name'
+              id="name"
+              name="name"
               value={formData.name}
               onChange={handleChange}
-              required
-              placeholder='Enter cohort name'
+              placeholder="e.g. AI & 3D Animation — Cohort 3"
+              aria-invalid={!!fieldErrors.name}
+              className={fieldErrorClass(!!fieldErrors.name)}
             />
+            <FieldError message={fieldErrors.name} />
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='active'>Status</Label>
+          <div className="space-y-2">
+            <Label htmlFor="active">Status</Label>
             <Select
               value={formData.active ? "true" : "false"}
-              onValueChange={(val) =>
-                setFormData((prev) => ({ ...prev, active: val === "true" }))
-              }
-              name='active'
-              required
+              onValueChange={(val) => {
+                setFormData((prev) => ({ ...prev, active: val === "true" }));
+                setApiError("");
+              }}
             >
-              <SelectTrigger className='w-full'>
-                <SelectValue placeholder='Select status' />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='true'>Active</SelectItem>
-                <SelectItem value='false'>Inactive</SelectItem>
+                <SelectItem value="true">Active</SelectItem>
+                <SelectItem value="false">Inactive</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className='flex flex-col md:flex-row gap-4'>
-            <div className='flex-1 space-y-2'>
-              <Label>Application Start Date</Label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>
+                Application Start <span className="text-red-500">*</span>
+              </Label>
               <DatePicker
                 value={
                   formData.applicationStartDate
                     ? new Date(formData.applicationStartDate)
                     : undefined
                 }
-                onChange={(date: Date | undefined) =>
+                onChange={(date: Date | undefined) => {
                   setFormData((prev) => ({
                     ...prev,
                     applicationStartDate: date
                       ? format(date, "yyyy-MM-dd")
                       : "",
-                  }))
-                }
-                placeholder='Pick a date'
-                className='w-full'
+                  }));
+                  clearFieldError("applicationStartDate");
+                }}
+                placeholder="Pick a date"
+                className={cn("w-full", fieldErrorClass(!!fieldErrors.applicationStartDate))}
               />
+              <FieldError message={fieldErrors.applicationStartDate} />
             </div>
-            <div className='flex-1 space-y-2'>
-              <Label>Application End Date</Label>
+            <div className="space-y-2">
+              <Label>
+                Application End <span className="text-red-500">*</span>
+              </Label>
               <DatePicker
                 value={
                   formData.applicationEndDate
@@ -269,149 +366,137 @@ export const CohortForm = ({
                     : undefined
                 }
                 onChange={(date: Date | undefined) => {
-                  if (date && formData.applicationStartDate) {
-                    const startDate = new Date(formData.applicationStartDate);
-                    if (date < startDate) {
-                      toast.error(
-                        "Application end date must be after start date"
-                      );
-                      return;
-                    }
-                  }
                   setFormData((prev) => ({
                     ...prev,
                     applicationEndDate: date ? format(date, "yyyy-MM-dd") : "",
                   }));
+                  clearFieldError("applicationEndDate");
                 }}
-                placeholder='Pick a date'
-                className='w-full'
+                placeholder="Pick a date"
+                className={cn("w-full", fieldErrorClass(!!fieldErrors.applicationEndDate))}
               />
+              <FieldError message={fieldErrors.applicationEndDate} />
             </div>
           </div>
 
-          <div className='flex flex-col md:flex-row gap-4'>
-            <div className='flex-1 space-y-2'>
-              <Label>Cohort Start Date</Label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>
+                Cohort Start <span className="text-red-500">*</span>
+              </Label>
               <DatePicker
                 value={
                   formData.startDate ? new Date(formData.startDate) : undefined
                 }
                 onChange={(date: Date | undefined) => {
-                  if (date && formData.applicationEndDate) {
-                    const appEndDate = new Date(formData.applicationEndDate);
-                    if (date <= appEndDate) {
-                      toast.error(
-                        "Cohort start date must be after application end date"
-                      );
-                      return;
-                    }
-                  }
                   setFormData((prev) => ({
                     ...prev,
                     startDate: date ? format(date, "yyyy-MM-dd") : "",
                   }));
+                  clearFieldError("startDate");
                 }}
-                placeholder='Pick a date'
-                className='w-full'
+                placeholder="Pick a date"
+                className={cn("w-full", fieldErrorClass(!!fieldErrors.startDate))}
               />
+              <FieldError message={fieldErrors.startDate} />
             </div>
-            <div className='flex-1 space-y-2'>
-              <Label>Cohort End Date</Label>
+            <div className="space-y-2">
+              <Label>
+                Cohort End <span className="text-red-500">*</span>
+              </Label>
               <DatePicker
                 value={
                   formData.endDate ? new Date(formData.endDate) : undefined
                 }
                 onChange={(date: Date | undefined) => {
-                  if (date && formData.startDate) {
-                    const startDate = new Date(formData.startDate);
-                    if (date <= startDate) {
-                      toast.error("Cohort end date must be after start date");
-                      return;
-                    }
-                  }
                   setFormData((prev) => ({
                     ...prev,
                     endDate: date ? format(date, "yyyy-MM-dd") : "",
                   }));
+                  clearFieldError("endDate");
                 }}
-                placeholder='Pick a date'
-                className='w-full'
+                placeholder="Pick a date"
+                className={cn("w-full", fieldErrorClass(!!fieldErrors.endDate))}
               />
+              <FieldError message={fieldErrors.endDate} />
             </div>
           </div>
 
-          <div className='flex flex-col md:flex-row gap-4'>
-            <div className='flex-1 space-y-2'>
-              <Label>Courses</Label>
-              <Input
-                type='text'
-                placeholder='Search courses...'
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className='mb-2'
-              />
-              <div className='border rounded p-2 h-48 overflow-y-auto bg-white'>
-                {allCourses
-                  .filter((course: CourseType) =>
+          <div className="space-y-2">
+            <Label>Courses</Label>
+            <Input
+              type="text"
+              placeholder="Search courses..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <div className="max-h-48 overflow-y-auto rounded-lg border border-[#27156F]/10 bg-gray-50/50 p-3">
+              {coursesLoadError ? (
+                <p className="text-sm text-red-600">
+                  Failed to load courses. Please refresh and try again.
+                </p>
+              ) : allCourses.length === 0 ? (
+                <p className="text-sm text-gray-500">No courses available yet.</p>
+              ) : (
+                allCourses
+                  .filter((course) =>
                     course.title.toLowerCase().includes(search.toLowerCase())
                   )
-                  .map((course: CourseType) => (
+                  .map((course) => (
                     <label
                       key={course._id}
-                      className='flex items-center gap-2 py-1 cursor-pointer'
+                      className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white"
                     >
                       <input
-                        type='checkbox'
+                        type="checkbox"
                         checked={formData.courses.includes(course._id)}
                         onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData((prev) => ({
-                              ...prev,
-                              courses: [...prev.courses, course._id],
-                            }));
-                          } else {
-                            setFormData((prev) => ({
-                              ...prev,
-                              courses: prev.courses.filter(
-                                (id) => id !== course._id
-                              ),
-                            }));
-                          }
+                          setFormData((prev) => ({
+                            ...prev,
+                            courses: e.target.checked
+                              ? [...prev.courses, course._id]
+                              : prev.courses.filter((id) => id !== course._id),
+                          }));
+                          setApiError("");
                         }}
+                        className="rounded border-gray-300"
                       />
-                      <span>{course.title}</span>
+                      <span className="text-sm">{course.title}</span>
                     </label>
-                  ))}
-                {allCourses.length === 0 && (
-                  <span className='text-gray-400'>No courses available</span>
-                )}
-              </div>
+                  ))
+              )}
             </div>
+            {formData.courses.length > 0 && (
+              <p className="text-xs text-gray-500">
+                {formData.courses.length} course
+                {formData.courses.length !== 1 ? "s" : ""} selected
+              </p>
+            )}
           </div>
 
-          <DialogFooter className='w-full flex flex-col md:flex-row gap-2 mt-6'>
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button
-              type='submit'
-              disabled={createCohort.isPending || updateCohort.isPending}
-              className='w-full md:w-auto'
+              variant="outline"
+              type="button"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="border-[#27156F]/20"
             >
-              {createCohort.isPending || updateCohort.isPending
-                ? "Loading..."
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90"
+            >
+              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+              {isSubmitting
+                ? cohortToEdit
+                  ? "Updating..."
+                  : "Creating..."
                 : cohortToEdit
                   ? "Update Cohort"
                   : "Create Cohort"}
-            </Button>
-            <Button
-              variant='destructive'
-              type='button'
-              onClick={() => {
-                toggleModal();
-                setCohortToEdit?.(null);
-                resetForm();
-              }}
-              className='w-full md:w-auto'
-            >
-              Cancel
             </Button>
           </DialogFooter>
         </form>

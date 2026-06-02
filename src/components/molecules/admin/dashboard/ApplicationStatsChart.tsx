@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useMemo, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,8 +12,7 @@ import {
   ArcElement,
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
-import { AlertTriangle, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { AlertTriangle, BarChart3, Search } from "lucide-react";
 import {
   Select,
   SelectTrigger,
@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChartSkeleton } from "./ChartSkeleton";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 ChartJS.register(
   CategoryScale,
@@ -29,7 +30,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 type LocationStats = {
@@ -65,6 +66,10 @@ type ApplicationStatsChartProps = {
   error?: Error;
 };
 
+const MAX_LOCATIONS = 10;
+const BRAND_MALE = "#27156F";
+const BRAND_FEMALE = "#E02B20";
+
 export const ApplicationStatsChart = ({
   data,
   selectedCohort,
@@ -73,26 +78,51 @@ export const ApplicationStatsChart = ({
   error,
 }: ApplicationStatsChartProps) => {
   const [chartType, setChartType] = useState<"location" | "gender">("location");
+  const isMobile = useMediaQuery("(max-width: 639px)");
 
-  // Sort location data by total applications in descending order
-  const sortedLocationData =
-    data?.locationStats?.sort(
-      (a: LocationStats, b: LocationStats) => b.total - a.total
-    ) || [];
+  const sortedLocationData = useMemo(() => {
+    const withData =
+      data?.locationStats
+        ?.filter((d) => d.total > 0)
+        .sort((a, b) => b.total - a.total) ?? [];
+
+    if (withData.length <= MAX_LOCATIONS) return withData;
+
+    const top = withData.slice(0, MAX_LOCATIONS);
+    const rest = withData.slice(MAX_LOCATIONS);
+    const others = rest.reduce(
+      (acc, curr) => ({
+        state: "Others",
+        male: acc.male + curr.male,
+        female: acc.female + curr.female,
+        total: acc.total + curr.total,
+      }),
+      { state: "Others", male: 0, female: 0, total: 0 },
+    );
+
+    return [...top, others];
+  }, [data?.locationStats]);
+
+  const cohortLabel =
+    selectedCohort !== "all"
+      ? data?.cohorts?.find((c) => c.id === selectedCohort)?.name
+      : null;
 
   const locationChartData = {
-    labels: sortedLocationData.map((d: LocationStats) => d.state),
+    labels: sortedLocationData.map((d) => d.state),
     datasets: [
       {
         label: "Male",
-        data: sortedLocationData.map((d: LocationStats) => d.male),
-        backgroundColor: "#3b82f6",
+        data: sortedLocationData.map((d) => d.male),
+        backgroundColor: BRAND_MALE,
+        borderRadius: 4,
         stack: "stack0",
       },
       {
         label: "Female",
-        data: sortedLocationData.map((d: LocationStats) => d.female),
-        backgroundColor: "#ec4899",
+        data: sortedLocationData.map((d) => d.female),
+        backgroundColor: BRAND_FEMALE,
+        borderRadius: 4,
         stack: "stack0",
       },
     ],
@@ -103,7 +133,8 @@ export const ApplicationStatsChart = ({
     datasets: [
       {
         data: [data?.genderStats?.male || 0, data?.genderStats?.female || 0],
-        backgroundColor: ["#3b82f6", "#ec4899"],
+        backgroundColor: [BRAND_MALE, BRAND_FEMALE],
+        borderWidth: 0,
       },
     ],
   };
@@ -114,44 +145,40 @@ export const ApplicationStatsChart = ({
     plugins: {
       legend: {
         position: "top" as const,
+        labels: { usePointStyle: true, padding: 16 },
       },
       tooltip: {
         callbacks: {
-          footer: (items: any[]) => {
+          footer: (items: { raw: number }[]) => {
             const total = items.reduce((sum, item) => sum + item.raw, 0);
             return `Total: ${total}`;
           },
         },
       },
-      title: {
-        display: true,
-        text: `Applications by Location${selectedCohort !== "all" ? ` - ${data?.cohorts?.find((c) => c.id === selectedCohort)?.name}` : ""}`,
-        font: {
-          size: 16,
-          weight: "bold" as const,
-        },
-      },
+      title: { display: false },
     },
     scales: {
       x: {
         stacked: true,
-        grid: {
-          display: false,
-        },
+        grid: { display: false },
         ticks: {
-          maxRotation: 45,
-          minRotation: 45,
+          maxRotation: isMobile ? 65 : 35,
+          minRotation: isMobile ? 45 : 35,
+          font: { size: isMobile ? 9 : 11 },
+          autoSkip: true,
+          maxTicksLimit: isMobile ? 6 : undefined,
         },
       },
       y: {
         stacked: true,
         beginAtZero: true,
-        grid: {
-          color: "rgba(0, 0, 0, 0.1)",
-        },
+        grid: { color: "rgba(39, 21, 111, 0.06)" },
+        ticks: { precision: 0 },
         title: {
           display: true,
-          text: "Number of Applications",
+          text: "Applications",
+          color: "#6b7280",
+          font: { size: 12 },
         },
       },
     },
@@ -162,38 +189,53 @@ export const ApplicationStatsChart = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top" as const,
+        position: "bottom" as const,
+        labels: { usePointStyle: true, padding: 20 },
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
+          label: (context: {
+            label: string;
+            raw: number;
+            dataset: { data: number[] };
+          }) => {
             const value = context.raw;
-            const total = context.dataset.data.reduce(
-              (a: number, b: number) => a + b,
-              0
-            );
-            const percentage = ((value / total) * 100).toFixed(1);
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = total ? ((value / total) * 100).toFixed(1) : "0";
             return `${context.label}: ${value} (${percentage}%)`;
           },
         },
       },
-      title: {
-        display: true,
-        text: `Applications by Gender${selectedCohort !== "all" ? ` - ${data?.cohorts?.find((c) => c.id === selectedCohort)?.name}` : ""}`,
-        font: {
-          size: 16,
-          weight: "bold" as const,
-        },
-      },
+      title: { display: false },
     },
   };
 
+  const hasLocationData = sortedLocationData.length > 0;
+
   return (
-    <div className='w-full p-6 bg-white rounded-lg shadow-lg border border-gray-200'>
-      <div className='flex justify-between mb-4'>
-        <div className='flex gap-4'>
+    <div className='overflow-hidden rounded-2xl border border-[#27156F]/10 bg-white shadow-sm'>
+      <div className='flex flex-col gap-4 border-b border-[#27156F]/10 bg-[#DBEAF6]/30 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5'>
+        <div className='flex flex-wrap items-center gap-3'>
+          <div className='flex size-9 items-center justify-center rounded-lg bg-white shadow-sm'>
+            <BarChart3 className='size-4 text-[#27156F]' />
+          </div>
+          <div>
+            <p className='font-semibold text-[#27156F]'>
+              {chartType === "location"
+                ? "Applications by Location"
+                : "Applications by Gender"}
+            </p>
+            {cohortLabel && (
+              <p className='text-xs text-gray-500 line-clamp-1'>
+                {cohortLabel}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3'>
           <Select value={selectedCohort} onValueChange={onCohortChange}>
-            <SelectTrigger className='w-[200px]'>
+            <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:w-[180px]'>
               <SelectValue placeholder='Select cohort' />
             </SelectTrigger>
             <SelectContent>
@@ -211,40 +253,46 @@ export const ApplicationStatsChart = ({
               setChartType(value)
             }
           >
-            <SelectTrigger className='w-[180px]'>
-              <SelectValue placeholder='Select chart type' />
+            <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:w-[160px]'>
+              <SelectValue placeholder='Chart type' />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='location'>By Location</SelectItem>
               <SelectItem value='gender'>By Gender</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        <div className='text-sm text-gray-600'>
-          Total Applications: {data?.totalApplications || 0}
+          {/* <Badge
+            variant='outline'
+            className='border-[#27156F]/20 bg-white px-3 py-2 text-[#27156F]'
+          >
+            Total: {data?.totalApplications?.toLocaleString() ?? 0}
+          </Badge> */}
         </div>
       </div>
-      <div className='relative h-[400px]'>
+
+      <div className='relative h-[260px] p-3 sm:h-[340px] sm:p-5 lg:h-[380px]'>
         {error ? (
-          <div className='flex flex-col items-center justify-center h-full gap-2 text-red-500'>
-            <AlertTriangle className='w-8 h-8' />
-            <p>Failed to load data</p>
+          <div className='flex h-full flex-col items-center justify-center gap-2 text-[#E02B20]'>
+            <AlertTriangle className='size-8' />
+            <p className='font-medium'>Failed to load data</p>
             <p className='text-sm text-gray-500'>{error.message}</p>
           </div>
         ) : isFetching ? (
           <ChartSkeleton />
-        ) : !data?.locationStats?.length ? (
-          <div className='flex flex-col items-center justify-center h-full gap-2 text-gray-500'>
-            <Search className='w-8 h-8' />
-            <p>No application data available</p>
-            <p className='text-sm'>
-              There are no applications with data to display
+        ) : !hasLocationData ? (
+          <div className='flex h-full flex-col items-center justify-center gap-2 text-gray-500'>
+            <Search className='size-8 text-gray-300' />
+            <p className='font-medium'>No application data yet</p>
+            <p className='text-sm text-gray-400'>
+              Data will appear when applicants register
             </p>
           </div>
         ) : chartType === "location" ? (
           <Bar data={locationChartData} options={locationChartOptions} />
         ) : (
-          <Pie data={genderChartData} options={genderChartOptions} />
+          <div className='mx-auto flex h-full max-w-sm items-center justify-center'>
+            <Pie data={genderChartData} options={genderChartOptions} />
+          </div>
         )}
       </div>
     </div>

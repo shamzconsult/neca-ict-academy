@@ -4,17 +4,22 @@ import { CourseType } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { BsPlayBtn } from "react-icons/bs";
 import { FiBarChart } from "react-icons/fi";
 import { MdAccessTime } from "react-icons/md";
-import { toast } from "sonner";
 import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 import EmptyState from "./EmptyState";
 import { cn } from "@/lib/utils";
-import { Pencil, ExternalLink, MoreVertical } from "lucide-react";
+import {
+  ArrowRight,
+  Award,
+  ExternalLink,
+  MoreVertical,
+  Pencil,
+  Users,
+} from "lucide-react";
 import { Button } from "../ui/button";
-import { useQueryClient } from "@tanstack/react-query";
+import { Badge } from "../ui/badge";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,23 +27,85 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-// Skeleton card component
-const SkeletonCard = () => (
-  <div className='bg-white border border-[#C4C4C480] rounded-xl shadow-lg overflow-hidden p-4 min-w-0 w-full max-w-full mx-auto animate-pulse'>
-    <div className='rounded-md bg-gray-200 h-[220px] sm:h-[250px] lg:h-[270px] w-full mb-4' />
-    <div className='h-6 bg-gray-200 rounded w-2/3 mb-2' />
-    <div className='h-4 bg-gray-100 rounded w-1/2 mb-2' />
-    <div className='h-4 bg-gray-100 rounded w-3/4 mb-4' />
-    <div className='flex gap-2 mb-4'>
-      <div className='h-6 w-20 bg-gray-100 rounded' />
-      <div className='h-6 w-20 bg-gray-100 rounded' />
-      <div className='h-6 w-20 bg-gray-100 rounded' />
+const SkeletonCard = ({
+  showExtendedDetails = true,
+  admin = false,
+}: {
+  showExtendedDetails?: boolean;
+  admin?: boolean;
+}) => (
+  <div className="flex min-w-0 w-full max-w-full flex-col overflow-hidden rounded-2xl border border-[#27156F]/10 bg-white shadow-sm animate-pulse">
+    {/* Cover image */}
+    <div
+      className={cn(
+        "relative w-full overflow-hidden bg-gray-200",
+        showExtendedDetails ? "aspect-[16/10]" : "aspect-[16/9]"
+      )}
+    >
+      <div className="absolute inset-0 bg-gradient-to-t from-[#27156F]/20 via-transparent to-transparent" />
+
+      {showExtendedDetails && (
+        <div className="absolute left-3 top-3 h-6 w-20 rounded-full bg-white/80" />
+      )}
+
+      {admin && (
+        <div className="absolute right-2 top-2 flex items-center gap-1.5">
+          <div className="h-6 w-24 rounded-full bg-white/80" />
+          <div className="size-8 rounded-full bg-white/80" />
+        </div>
+      )}
     </div>
-    <div className='h-4 bg-gray-100 rounded w-1/3 mb-2' />
-    <div className='flex justify-between mt-5'>
-      <div className='h-8 w-20 bg-gray-100 rounded' />
-      <div className='h-8 w-20 bg-gray-100 rounded' />
+
+    {/* Content */}
+    <div className="flex flex-1 flex-col gap-4 p-5">
+      <div className="space-y-2">
+        <div className="h-6 w-4/5 rounded-md bg-gray-200" />
+        <div className="h-5 w-3/5 rounded-md bg-gray-200" />
+        <div className="space-y-1.5 pt-1">
+          <div className="h-3 w-full rounded bg-gray-100" />
+          <div className="h-3 w-full rounded bg-gray-100" />
+          <div className="h-3 w-2/3 rounded bg-gray-100" />
+        </div>
+      </div>
+
+      {showExtendedDetails && (
+        <div className="grid grid-cols-3 divide-x divide-[#27156F]/10 rounded-xl bg-[#DBEAF6]/30">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex flex-col items-center gap-1.5 px-2 py-3">
+              <div className="size-4 rounded bg-gray-200" />
+              <div className="h-2 w-10 rounded bg-gray-100" />
+              <div className="h-4 w-8 rounded bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-auto flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="h-6 w-24 rounded-full bg-gray-100" />
+          <div className="h-6 w-16 rounded-full bg-gray-100" />
+        </div>
+        <div className="h-9 w-32 rounded-full bg-gray-200" />
+      </div>
     </div>
+  </div>
+);
+
+const CourseStat = ({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) => (
+  <div className="flex flex-col items-center gap-1 px-2 py-2 text-center">
+    <span className="text-[#27156F]/70">{icon}</span>
+    <span className="text-[10px] font-medium uppercase tracking-wide text-gray-500">
+      {label}
+    </span>
+    <span className="text-sm font-semibold text-[#27156F]">{value}</span>
   </div>
 );
 
@@ -70,33 +137,8 @@ export const CourseCard = ({
   const pathname = usePathname();
   const isCoursesPath = pathname === "/courses" || pathname === "/";
   const admin = pathname === "/admin/courses";
+  const showExtendedDetails = isCoursesPath || admin;
   const CardWrapper = admin ? "div" : Link;
-  const queryClient = useQueryClient();
-
-  const handleDelete = async (slug: string, event: React.MouseEvent) => {
-    event.stopPropagation();
-
-    if (!window.confirm("Are you sure you want to delete this course?")) return;
-
-    try {
-      const res = await fetch(`/api/courses/${slug}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        console.error("Failed to delete course");
-        toast.error("Failed to delete the course.");
-        return;
-      }
-
-      // Invalidate the courses query so the UI updates
-      queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course deleted successfully");
-    } catch (error) {
-      console.error("Error deleting course: ", error);
-      toast.error("Something went wrong.");
-    }
-  };
 
   const handleEdit = (course: CourseType) => {
     if (setCourseToEdit && setFormData && setShowModal) {
@@ -117,21 +159,22 @@ export const CourseCard = ({
     }
   };
 
-  // Responsive grid classes
-  const gridClass =
-    "grid gap-8 gap-y-8 min-w-0 " +
-    (admin
-      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-      : "grid-cols-1 sm:grid-cols-2");
+  const gridClass = cn(
+    "grid min-w-0 gap-6 lg:gap-8",
+    admin ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"
+  );
 
   if (loading) {
-    // Show 3 skeletons on mobile, 6 on sm, 9 on lg for admin; 2/4/6 for public
     const skeletonCount = admin ? 9 : 6;
     return (
       <div className={cn("max-w-6xl mx-auto mt-8", admin && "max-w-auto")}>
         <div className={gridClass}>
           {Array.from({ length: skeletonCount }).map((_, i) => (
-            <SkeletonCard key={i} />
+            <SkeletonCard
+              key={i}
+              showExtendedDetails={showExtendedDetails}
+              admin={admin}
+            />
           ))}
         </div>
       </div>
@@ -146,164 +189,153 @@ export const CourseCard = ({
             <CardWrapper
               href={`/courses/${course.slug}`}
               key={course._id}
-              className={
-                "bg-white border border-[#C4C4C480] rounded-xl shadow-lg overflow-hidden p-4 text-left min-w-0 w-full max-w-full mx-auto " +
-                (admin ? "hover:bg-white" : "hover:bg-[#DBEAF6]") +
-                (isCoursesPath || admin ? " hover:cursor-pointer" : "")
-              }
-            >
-              {admin && (
-                <div className='mb-4 flex justify-between items-center'>
-                  <span className='text-xs text-gray-500'>
-                    Enrolled: {course.totalEnrolled ?? 0}
-                  </span>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant='ghost'
-                        size='icon'
-                        className='h-8 w-8 p-0'
-                      >
-                        <MoreVertical className='w-5 h-5' />
-                        <span className='sr-only'>Open menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='start'>
-                      <DropdownMenuItem asChild>
-                        <Link
-                          href={`/courses/${course.slug}`}
-                          target='_blank'
-                          className='flex items-center gap-2'
-                          aria-label='Open course'
-                        >
-                          <ExternalLink className='w-4 h-4' /> Open
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleEdit(course)}
-                        className='flex items-center gap-2'
-                      >
-                        <Pencil className='w-4 h-4' /> Update
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+              className={cn(
+                "group flex min-w-0 w-full max-w-full flex-col overflow-hidden rounded-2xl border border-[#27156F]/10 bg-white text-left shadow-sm transition-all duration-300",
+                !admin && "hover:-translate-y-1 hover:border-[#27156F]/20 hover:shadow-xl",
+                (isCoursesPath || admin) && !admin && "hover:bg-white",
+                isCoursesPath || admin ? "cursor-pointer" : ""
               )}
+            >
+              {/* Cover image */}
               <div
-                className={
-                  "relative w-full min-w-0 " +
-                  (isCoursesPath || admin
-                    ? "h-[220px] sm:h-[250px] lg:h-[270px]"
-                    : "h-[220px] sm:h-[250px] lg:h-[189px]")
-                }
+                className={cn(
+                  "relative w-full min-w-0 overflow-hidden",
+                  showExtendedDetails ? "aspect-[16/10]" : "aspect-[16/9]"
+                )}
               >
                 <Image
                   src={course.coverImage}
                   alt={course.title}
                   fill
-                  className='rounded-md object-cover'
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#27156F]/60 via-transparent to-transparent" />
 
-              <h3 className='text-lg font-medium text-[#27156F] mt-4'>
-                {course.title}
-              </h3>
-              <div>
-                {(isCoursesPath || admin) && (
-                  <p className='mt-2 text-sm font-semibold'>About The Course</p>
+                {showExtendedDetails && (
+                  <Badge className="absolute left-3 top-3 border-0 bg-white/95 text-[#27156F] shadow-sm backdrop-blur-sm">
+                    {course.skillLevel}
+                  </Badge>
                 )}
-                <p
-                  className={`mt-1 ${
-                    isCoursesPath ? "text-[12px]" : " text-sm"
-                  } break-words overflow-hidden text-ellipsis`}
-                >
-                  {course.description}
-                </p>
-                <div>
-                  {(isCoursesPath || admin) && (
-                    <div className='text-sm mt-3'>
-                      <h3 className='mb-2 text-sm font-semibold'>
-                        Course Details
-                      </h3>
-                      <div className='grid grid-cols-3 gap-3 text-xs'>
-                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-medium'>Lesson</p>
-                          <div className='flex gap-2 items-center'>
-                            <span>
-                              <BsPlayBtn />
-                            </span>
-                            <span className='text-nowrap'>{course.lesson}</span>
-                          </div>
-                        </div>
-                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-medium'>Duration</p>
-                          <div className='flex gap-2 items-center '>
-                            <span>
-                              <MdAccessTime />
-                            </span>
-                            <span className='text-nowrap'>
-                              {course.duration}
-                            </span>
-                          </div>
-                        </div>
-                        <div className='flex flex-col justify-center items-center px-4 py-1.5 border border-[#7272721A] rounded-lg'>
-                          <p className='font-medium'>Skill Level</p>
-                          <div className='flex  gap-2 items-center '>
-                            <span>
-                              <FiBarChart />
-                            </span>
-                            <span className='text-nowrap'>
-                              {course.skillLevel}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
-              {/* <div className='mt-5'>
-                {(isCoursesPath || admin) && (
-                  <p>
-                    <span className='font-bold'>{course.rating}</span>⭐{" "}
-                    <span>({course.review})</span>
-                  </p>
-                )}
-              </div> */}
-              <div className='flex flex-col lg:flex-row justify-between lg:items-end mt-3'>
-                {/* {(isCoursesPath || admin) && ( */}
-                <div className='flex items-center gap-2 text-xs'>
-                  {course.hasCertificate && (
-                    <div className='px-1 bg-gray-100 text-gray-700 rounded font-semibold'>
-                      Certificate
-                    </div>
-                  )}
-                  <div className='px-1 bg-gray-100 text-gray-700 rounded font-semibold'>
-                    {course.type}
+                {admin && (
+                  <div className="absolute right-2 top-2 flex items-center gap-1">
+                    <Badge
+                      variant="secondary"
+                      className="border-0 bg-white/95 text-gray-700 shadow-sm backdrop-blur-sm"
+                    >
+                      <Users className="size-3" />
+                      {course.totalEnrolled ?? 0} enrolled
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="size-8 rounded-full bg-white/95 shadow-sm backdrop-blur-sm hover:bg-white"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <MoreVertical className="size-4" />
+                          <span className="sr-only">Open menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link
+                            href={`/courses/${course.slug}`}
+                            target="_blank"
+                            className="flex items-center gap-2"
+                            aria-label="Open course"
+                          >
+                            <ExternalLink className="size-4" /> Open
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleEdit(course)}
+                          className="flex items-center gap-2"
+                        >
+                          <Pencil className="size-4" /> Update
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                </div>
-                {/* )} */}
-
-                {admin ? (
-                  <Link
-                    href={`/courses/${course.slug}`}
-                    target='_blank'
-                    className='text-[#E02B20] text-sm mt-3 hover:underline-offset-4 hover:underline'
-                  >
-                    Learn More →
-                  </Link>
-                ) : (
-                  <p className='text-[#E02B20] text-sm mt-3 hover:underline-offset-4 hover:underline'>
-                    Learn More →
-                  </p>
                 )}
+              </div>
+
+              {/* Content */}
+              <div className="flex flex-1 flex-col gap-4 p-5">
+                <div className="space-y-2">
+                  <h3 className="text-lg font-bold leading-snug text-[#27156F] line-clamp-2 sm:text-xl">
+                    {course.title}
+                  </h3>
+                  <p
+                    className={cn(
+                      "leading-relaxed text-gray-600 line-clamp-3",
+                      isCoursesPath ? "text-xs sm:text-sm" : "text-sm"
+                    )}
+                  >
+                    {course.description}
+                  </p>
+                </div>
+
+                {showExtendedDetails && (
+                  <div className="grid grid-cols-3 divide-x divide-[#27156F]/10 rounded-xl bg-[#DBEAF6]/50">
+                    <CourseStat
+                      icon={<BsPlayBtn className="size-4" />}
+                      label="Lessons"
+                      value={course.lesson}
+                    />
+                    <CourseStat
+                      icon={<MdAccessTime className="size-4" />}
+                      label="Duration"
+                      value={course.duration}
+                    />
+                    <CourseStat
+                      icon={<FiBarChart className="size-4" />}
+                      label="Level"
+                      value={course.skillLevel}
+                    />
+                  </div>
+                )}
+
+                <div className="mt-auto flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {course.hasCertificate && (
+                      <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
+                        <Award className="size-3" />
+                        Certificate
+                      </Badge>
+                    )}
+                    <Badge
+                      variant="outline"
+                      className="border-[#27156F]/20 bg-[#27156F]/5 text-[#27156F]"
+                    >
+                      {course.type}
+                    </Badge>
+                  </div>
+
+                  {admin ? (
+                    <Link
+                      href={`/courses/${course.slug}`}
+                      target="_blank"
+                      className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c9251c]"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Learn More
+                      <ArrowRight className="size-4" />
+                    </Link>
+                  ) : (
+                    <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-[#c9251c]">
+                      Learn More
+                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+                    </span>
+                  )}
+                </div>
               </div>
             </CardWrapper>
           ))}
         </div>
       ) : (
-        <EmptyState title='No Course Found' message='' />
+        <EmptyState title="No Course Found" message="" />
       )}
     </div>
   );

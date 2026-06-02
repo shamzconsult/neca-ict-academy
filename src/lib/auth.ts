@@ -36,7 +36,8 @@ export const authOptions: NextAuthOptions = {
 
           return {
             id: user._id.toString(),
-            name: `${user.surname} ${user.otherNames}`,
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             role: user.role,
             sessionVersion: user.sessionVersion || 0,

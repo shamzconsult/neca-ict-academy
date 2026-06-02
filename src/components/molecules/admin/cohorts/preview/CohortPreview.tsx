@@ -8,18 +8,31 @@ import {
   useSearchParams,
   useParams,
 } from "next/navigation";
-import { useDebounce } from "../../../../../../hooks/useDebounce";
-import { useQuery } from "@tanstack/react-query";
-
-import { FaSearch } from "react-icons/fa";
-import { MdOutlineArrowCircleDown } from "react-icons/md";
-
-import { Table, TableBody, TableHead } from "@/components/atom/Table/Table";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import {
+  CheckCircle2,
+  Clock,
+  Download,
+  GraduationCap,
+  Search,
+  Users,
+  XCircle,
+} from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/atom/Table/Table";
 import EmptyState from "@/components/atom/EmptyState";
 import { ApplicantTr } from "./applicant-tr";
+import { CohortDetailsTable } from "./CohortDetailsTable";
 import { Pagination } from "@/components/atom/Pagination";
 import { states, statusOptions } from "@/const";
-
 import {
   Select,
   SelectTrigger,
@@ -28,56 +41,134 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
-
-import { EnrollmentsType } from "@/types";
+import { Input } from "@/components/ui/input";
+import { EnrollmentsType, CohortType, EnrollmentType } from "@/types";
 import { ApplicantInfoModal } from "./applicant-info-modal";
+import { cn } from "@/lib/utils";
 
 const LIMIT = 10;
 
-const TableSkeleton = ({
-  rows = 15,
-  columns = 7,
-}: {
-  rows?: number;
-  columns?: number;
-}) => (
-  <div className='overflow-x-auto'>
-    <table className='w-full table-auto bg-white rounded-b-lg'>
-      <thead>
-        <tr>
-          {Array.from({ length: columns }).map((_, idx) => (
-            <th key={idx} className='p-4 border-gray-200 bg-gray-50'>
-              <div className='h-4 w-24 bg-gray-200 rounded animate-pulse' />
-            </th>
-          ))}
-        </tr>
-      </thead>
+const APPLICANT_TABLE_HEADERS = [
+  "Applicants",
+  "Location",
+  "Date",
+  "Level",
+  "Status",
+  "Review",
+] as const;
+
+const STAT_ITEMS = [
+  {
+    key: "total",
+    label: "Total",
+    icon: Users,
+    color: "text-[#27156F]",
+    bg: "bg-[#27156F]/10",
+  },
+  {
+    key: "pending",
+    label: "Pending",
+    icon: Clock,
+    color: "text-amber-600",
+    bg: "bg-amber-50",
+  },
+  {
+    key: "declined",
+    label: "Declined",
+    icon: XCircle,
+    color: "text-[#E02B20]",
+    bg: "bg-red-50",
+  },
+  {
+    key: "admitted",
+    label: "Admitted",
+    icon: CheckCircle2,
+    color: "text-emerald-600",
+    bg: "bg-emerald-50",
+  },
+  {
+    key: "graduated",
+    label: "Graduated",
+    icon: GraduationCap,
+    color: "text-violet-600",
+    bg: "bg-violet-50",
+  },
+] as const;
+
+const TableSkeleton = () => (
+  <TableContainer className='rounded-none border-0 shadow-none'>
+    <div className='border-b border-[#27156F]/10 px-4 py-3'>
+      <div className='h-4 w-48 animate-pulse rounded bg-gray-200' />
+    </div>
+    <table className='w-full min-w-[800px]'>
       <tbody>
-        {Array.from({ length: rows }).map((_, rowIdx) => (
-          <tr key={rowIdx}>
-            {Array.from({ length: columns }).map((_, colIdx) => (
-              <td key={colIdx} className='p-4 border-t border-gray-100'>
-                <div className='h-4 w-full bg-gray-100 rounded animate-pulse' />
+        {Array.from({ length: 8 }).map((_, rowIdx) => (
+          <tr key={rowIdx} className='border-b border-[#27156F]/5'>
+            {APPLICANT_TABLE_HEADERS.map((_, colIdx) => (
+              <td key={colIdx} className='px-4 py-3.5'>
+                <div className='h-4 animate-pulse rounded bg-gray-100' />
               </td>
             ))}
           </tr>
         ))}
       </tbody>
     </table>
-  </div>
+  </TableContainer>
 );
 
 const StatsSkeleton = () => (
-  <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6'>
-    {Array.from({ length: 5 }).map((_, i) => (
+  <div className='mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5'>
+    {STAT_ITEMS.map((item) => (
       <div
-        key={i}
-        className='p-4 bg-gray-100 rounded shadow animate-pulse h-20'
-      />
+        key={item.key}
+        className='flex animate-pulse items-start gap-3 rounded-2xl border border-[#27156F]/10 bg-white p-4'
+      >
+        <div className='size-10 rounded-xl bg-gray-200' />
+        <div className='flex-1 space-y-2'>
+          <div className='h-7 w-12 rounded bg-gray-200' />
+          <div className='h-3 w-16 rounded bg-gray-100' />
+        </div>
+      </div>
     ))}
   </div>
 );
+
+function CohortPreviewHeader({ cohortName }: { cohortName?: string }) {
+  return (
+    <header className='mb-6 sm:mb-8'>
+      <nav aria-label='Breadcrumb'>
+        <ol className='flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm leading-snug sm:text-base'>
+          <li className='shrink-0'>
+            <Link
+              href='/admin/cohorts'
+              className='font-medium text-gray-500 transition-colors hover:text-[#27156F]'
+            >
+              Cohorts
+            </Link>
+          </li>
+          <li aria-hidden='true' className='shrink-0 text-gray-300'>
+            /
+          </li>
+          <li className='min-w-0 flex-1'>
+            {cohortName ? (
+              <span
+                className='font-medium opacity-90 text-[#27156F] line-clamp-2 sm:line-clamp-3'
+                aria-current='page'
+              >
+                {cohortName}
+              </span>
+            ) : (
+              <span
+                className='block h-6 w-full max-w-lg animate-pulse rounded-md bg-gray-100'
+                aria-hidden
+              />
+            )}
+          </li>
+        </ol>
+      </nav>
+    </header>
+  );
+}
 
 interface ApiResponse {
   success: boolean;
@@ -86,7 +177,9 @@ interface ApiResponse {
     slug: string;
     startDate: string;
     endDate: string;
-    status: string;
+    applicationStartDate?: string;
+    applicationEndDate?: string;
+    active?: boolean;
   };
   data: EnrollmentsType;
   pagination: {
@@ -106,18 +199,21 @@ export const CohortPreview = () => {
 
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") ?? ""
+    searchParams.get("search") ?? "",
   );
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [status, setStatus] = useState(searchParams.get("status") ?? "all");
   const [location, setLocation] = useState(
-    searchParams.get("location") ?? "all"
+    searchParams.get("location") ?? "all",
   );
-  const [storedCohortName, setStoredCohortName] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [navToLastOnLoad, setNavToLastOnLoad] = useState(false);
+  const [isCrossPageNav, setIsCrossPageNav] = useState(false);
+  const [stickyEnrollment, setStickyEnrollment] =
+    useState<EnrollmentType | null>(null);
+  const queryClient = useQueryClient();
 
-  // Build query string for API
   const queryParams = {
     search: debouncedSearchTerm,
     status: status !== "all" ? status : "",
@@ -130,8 +226,18 @@ export const CohortPreview = () => {
     .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
     .join("&");
 
-  // React Query fetch
-  const { data, isLoading } = useQuery<ApiResponse, Error>({
+  const { data: cohortDetails, isLoading: cohortDetailsLoading } =
+    useQuery<CohortType>({
+      queryKey: ["cohort", slug],
+      queryFn: async () => {
+        const res = await fetch(`/api/cohorts/${slug}`);
+        if (!res.ok) throw new Error("Cohort not found");
+        return res.json();
+      },
+      enabled: !!slug,
+    });
+
+  const { data, isLoading, isFetching } = useQuery<ApiResponse, Error>({
     queryKey: [
       "cohort-applicants",
       slug,
@@ -144,329 +250,391 @@ export const CohortPreview = () => {
       if (!slug) throw new Error("No slug provided");
       const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
       if (!res.ok) throw new Error("Network response was not ok");
-      const data = await res.json();
-      console.log("[Frontend] Pagination data:", {
-        total: data?.pagination?.total,
-        currentPage: data?.pagination?.page,
-        totalPages: data?.pagination?.totalPages,
-        filteredCount: data?.data?.length,
-        queryParams: queryParams,
-      });
-      return data;
+      return res.json();
     },
     enabled: !!slug,
   });
 
-  // Fetch stats for this cohort
   const { data: statsData, isLoading: statsLoading } = useQuery<
     { stats: Record<string, number> },
     Error
   >({
     queryKey: ["cohort-applicants-stats", slug],
     queryFn: async () => {
-      if (!slug)
-        return {
-          stats: {
-            total: 0,
-            admitted: 0,
-            pending: 0,
-            declined: 0,
-            graduated: 0,
-          },
-        };
       const res = await fetch(`/api/cohorts/${slug}/applicants/stats`);
       if (!res.ok) throw new Error("Failed to fetch stats");
-      const data = await res.json();
-      console.log("[Frontend] Stats data:", {
-        stats: data?.stats,
-        slug,
-        timestamp: new Date().toISOString(),
-      });
-      return data;
+      return res.json();
     },
     enabled: !!slug,
   });
 
-  // Add effect to compare stats and pagination data
   useEffect(() => {
-    if (
-      data?.pagination?.total !== undefined &&
-      statsData?.stats?.total !== undefined
-    ) {
-      console.log("[Frontend] Comparing totals:", {
-        paginationTotal: data.pagination.total,
-        statsTotal: statsData.stats.total,
-        difference: data.pagination.total - statsData.stats.total,
-        currentFilters: {
-          search: searchTerm,
-          status,
-          location,
-          page,
-        },
-      });
-    }
-  }, [
-    data?.pagination?.total,
-    statsData?.stats?.total,
-    searchTerm,
-    status,
-    location,
-    page,
-  ]);
-
-  // Update router for deep-linking
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (debouncedSearchTerm) params.set("search", debouncedSearchTerm);
-    if (status && status !== "all") params.set("status", status);
-    if (location && location !== "all") params.set("location", location);
-    if (page > 1) params.set("page", String(page));
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    const urlParams = new URLSearchParams();
+    if (debouncedSearchTerm) urlParams.set("search", debouncedSearchTerm);
+    if (status && status !== "all") urlParams.set("status", status);
+    if (location && location !== "all") urlParams.set("location", location);
+    if (page > 1) urlParams.set("page", String(page));
+    router.push(`${pathname}?${urlParams.toString()}`, { scroll: false });
   }, [debouncedSearchTerm, status, location, page, pathname, router]);
 
-  // Store cohort name when we first get it
-  useEffect(() => {
-    if (data?.cohort?.name && !storedCohortName) {
-      setStoredCohortName(data.cohort.name);
-    }
-  }, [data?.cohort?.name, storedCohortName]);
-
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+    setSearchTerm(e.target.value);
     setPage(1);
   };
 
+  const filteredEnrollments = data?.data || [];
+  const totalPages = data?.pagination?.totalPages || 1;
+  const totalApplicants = data?.pagination?.total ?? filteredEnrollments.length;
+  const globalPosition = navToLastOnLoad
+    ? Math.min(page * LIMIT, totalApplicants)
+    : (page - 1) * LIMIT + currentIndex + 1;
+  const canGoPrev = page > 1 || currentIndex > 0;
+  const canGoNext =
+    page < totalPages || currentIndex < filteredEnrollments.length - 1;
+  const isModalNavigating = navToLastOnLoad || isCrossPageNav;
+  const currentEnrollment = filteredEnrollments[currentIndex] ?? null;
+  const modalEnrollment = isModalNavigating
+    ? stickyEnrollment
+    : currentEnrollment;
+
+  const fetchApplicantsPage = async (targetPage: number) => {
+    const params = new URLSearchParams();
+    if (debouncedSearchTerm) params.set("search", debouncedSearchTerm);
+    if (status !== "all") params.set("status", status);
+    if (location !== "all") params.set("location", location);
+    params.set("page", String(targetPage));
+    params.set("limit", String(LIMIT));
+    const res = await fetch(`/api/cohorts/${slug}/applicants?${params}`);
+    if (!res.ok) throw new Error("Network response was not ok");
+    return res.json() as Promise<ApiResponse>;
+  };
+
+  useEffect(() => {
+    if (!isModalNavigating && currentEnrollment) {
+      setStickyEnrollment(currentEnrollment);
+    }
+  }, [isModalNavigating, currentEnrollment]);
+
+  useEffect(() => {
+    if (!modalOpen) {
+      setStickyEnrollment(null);
+    }
+  }, [modalOpen]);
+
+  useEffect(() => {
+    if (!isCrossPageNav && !navToLastOnLoad) return;
+    if (isFetching) return;
+
+    if (navToLastOnLoad && filteredEnrollments.length > 0) {
+      setCurrentIndex(filteredEnrollments.length - 1);
+      setNavToLastOnLoad(false);
+    }
+    setIsCrossPageNav(false);
+  }, [isCrossPageNav, navToLastOnLoad, isFetching, filteredEnrollments.length]);
+
+  useEffect(() => {
+    setModalOpen(false);
+    setCurrentIndex(0);
+    setNavToLastOnLoad(false);
+    setIsCrossPageNav(false);
+    setStickyEnrollment(null);
+  }, [debouncedSearchTerm, status, location]);
+
+  useEffect(() => {
+    if (!modalOpen || !slug) return;
+
+    const prefetchPage = async (targetPage: number) => {
+      if (targetPage < 1 || targetPage > totalPages) return;
+      await queryClient.prefetchQuery({
+        queryKey: [
+          "cohort-applicants",
+          slug,
+          debouncedSearchTerm,
+          status,
+          location,
+          targetPage,
+        ],
+        queryFn: () => fetchApplicantsPage(targetPage),
+      });
+    };
+
+    if (currentIndex >= filteredEnrollments.length - 2 && page < totalPages) {
+      void prefetchPage(page + 1);
+    }
+
+    if (currentIndex <= 1 && page > 1) {
+      void prefetchPage(page - 1);
+    }
+  }, [
+    modalOpen,
+    currentIndex,
+    page,
+    totalPages,
+    slug,
+    debouncedSearchTerm,
+    status,
+    location,
+    filteredEnrollments.length,
+    queryClient,
+  ]);
+
   const handleRowClick = (idx: number) => {
+    const enrollment = filteredEnrollments[idx];
     setCurrentIndex(idx);
+    setStickyEnrollment(enrollment ?? null);
+    setNavToLastOnLoad(false);
+    setIsCrossPageNav(false);
     setModalOpen(true);
   };
 
+  const handlePageChange = (nextPage: number) => {
+    setModalOpen(false);
+    setCurrentIndex(0);
+    setNavToLastOnLoad(false);
+    setIsCrossPageNav(false);
+    setStickyEnrollment(null);
+    setPage(nextPage);
+  };
+
   const handleNavigate = (direction: "next" | "prev") => {
-    if (direction === "next" && currentIndex < filteredEnrollments.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else if (direction === "prev" && currentIndex > 0) {
+    if (direction === "next") {
+      if (currentIndex < filteredEnrollments.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+      } else if (page < totalPages) {
+        const leaving = filteredEnrollments[currentIndex];
+        if (leaving) setStickyEnrollment(leaving);
+        setIsCrossPageNav(true);
+        setPage(page + 1);
+        setCurrentIndex(0);
+      }
+      return;
+    }
+
+    if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+    } else if (page > 1) {
+      const leaving = filteredEnrollments[currentIndex];
+      if (leaving) setStickyEnrollment(leaving);
+      setIsCrossPageNav(true);
+      setNavToLastOnLoad(true);
+      setPage(page - 1);
     }
   };
 
-  if (!isLoading && (!data || !slug)) {
+  const handleDownload = () => {
+    const downloadParams = new URLSearchParams();
+    if (searchTerm) downloadParams.set("search", searchTerm);
+    if (status && status !== "all") downloadParams.set("status", status);
+    if (location && location !== "all")
+      downloadParams.set("location", location);
+    downloadParams.set("download", "1");
+    window.open(
+      `/api/cohorts/${slug}/applicants?${downloadParams.toString()}`,
+      "_blank",
+    );
+  };
+
+  if (!isLoading && !cohortDetailsLoading && (!data || !slug)) {
     notFound();
   }
 
-  const cohortName = data?.cohort?.name;
-  const filteredEnrollments = data?.data || [];
-  const totalPages = data?.pagination?.totalPages || 1;
+  const cohortName = cohortDetails?.name || data?.cohort?.name;
+  const hasFilters = !!searchTerm || status !== "all" || location !== "all";
 
-  const showSkeleton = isLoading;
   const showTable = !isLoading && filteredEnrollments.length > 0;
   const showEmptyState = !isLoading && filteredEnrollments.length === 0;
 
   return (
     <>
-      <AdminSectionHeader
-        title={
-          storedCohortName || (
-            <div className='h-8 w-64 bg-gray-100 rounded animate-pulse' />
-          )
-        }
-      />
-      {/* Stats Bar */}
+      <CohortPreviewHeader cohortName={cohortName} />
+
       {statsLoading ? (
         <StatsSkeleton />
-      ) : statsData && statsData.stats ? (
-        <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6'>
-          <div className='p-4 bg-white rounded shadow border text-center'>
-            <div className='text-xs text-gray-500 mb-1'>Total</div>
-            <div className='text-2xl font-bold text-gray-800'>
-              {statsData.stats.total}
+      ) : statsData?.stats ? (
+        <div className='mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5'>
+          {STAT_ITEMS.map(({ key, label, icon: Icon, color, bg }) => (
+            <div
+              key={key}
+              className='flex items-start gap-3 rounded-2xl border border-[#27156F]/10 bg-white p-4 shadow-sm'
+            >
+              <div
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-xl",
+                  bg,
+                )}
+              >
+                <Icon className={cn("size-5", color)} />
+              </div>
+              <div>
+                <p className={cn("text-2xl font-bold tabular-nums", color)}>
+                  {statsData.stats[key] ?? 0}
+                </p>
+                <p className='text-xs text-gray-500'>{label}</p>
+              </div>
             </div>
-          </div>
-          <div className='p-4 bg-white rounded shadow border text-center'>
-            <div className='text-xs text-gray-500 mb-1'>Admitted</div>
-            <div className='text-2xl font-bold text-green-600'>
-              {statsData.stats.admitted}
-            </div>
-          </div>
-          <div className='p-4 bg-white rounded shadow border text-center'>
-            <div className='text-xs text-gray-500 mb-1'>Pending</div>
-            <div className='text-2xl font-bold text-yellow-500'>
-              {statsData.stats.pending}
-            </div>
-          </div>
-          <div className='p-4 bg-white rounded shadow border text-center'>
-            <div className='text-xs text-gray-500 mb-1'>Declined</div>
-            <div className='text-2xl font-bold text-red-500'>
-              {statsData.stats.declined}
-            </div>
-          </div>
-          <div className='p-4 bg-white rounded shadow border text-center'>
-            <div className='text-xs text-gray-500 mb-1'>Graduated</div>
-            <div className='text-2xl font-bold text-blue-600'>
-              {statsData.stats.graduated}
-            </div>
-          </div>
+          ))}
         </div>
       ) : null}
-      <section className='border border-gray-200 rounded-lg bg-white shadow-sm w-full'>
-        <div className='flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-gray-50 rounded-t-lg'>
-          <div className='relative w-full md:w-[70%]'>
-            <FaSearch className='absolute left-3 top-3 text-gray-400' />
-            <input
-              type='text'
-              placeholder='Search applicants...'
-              value={searchTerm}
-              onChange={handleSearchTerm}
-              className='pl-10 pr-4 py-2 border w-full border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white'
-            />
-          </div>
-          <div className='flex gap-2'>
-            <Select
-              value={status}
-              onValueChange={(value) => {
-                setStatus(value);
-                setPage(1);
-              }}
-              disabled={isLoading}
-            >
-              <SelectTrigger className='min-w-[120px]'>
-                <SelectValue placeholder='All Status' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All Status</SelectItem>
-                {statusOptions.map((status, index) => (
-                  <SelectItem value={status} key={index} className='capitalize'>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={location}
-              onValueChange={(value) => {
-                setLocation(value);
-                setPage(1);
-              }}
-              disabled={isLoading}
-            >
-              <SelectTrigger className='min-w-[120px]'>
-                <SelectValue placeholder='All Locations' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>All Locations</SelectItem>
-                {states.map((loc, index) => (
-                  <SelectItem value={loc} key={index}>
-                    {loc}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              className='border text-nowrap border-gray-200 cursor-pointer rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
-              onClick={() => {
-                const params = new URLSearchParams();
-                if (searchTerm) params.set("search", searchTerm);
-                if (status && status !== "all") params.set("status", status);
-                if (location && location !== "all")
-                  params.set("location", location);
-                params.set("download", "1");
-                window.open(
-                  `/api/cohorts/${slug}/applicants?${params.toString()}`,
-                  "_blank"
-                );
-              }}
-              disabled={isLoading || filteredEnrollments.length === 0}
-            >
-              <MdOutlineArrowCircleDown />
-              Download Data
-            </Button>
-          </div>
+
+      <CohortDetailsTable
+        cohort={cohortDetails ?? data?.cohort}
+        isLoading={cohortDetailsLoading && !cohortDetails}
+      />
+
+      <section className='space-y-4'>
+        <div className='flex items-center justify-between gap-4'>
+          <h2 className='text-lg font-bold text-[#27156F]'>Applicants</h2>
+          {!isLoading && data?.pagination?.total !== undefined && (
+            <span className='text-sm text-gray-500'>
+              {data.pagination.total} total
+            </span>
+          )}
         </div>
-        {showTable && (
-          <div className='overflow-x-auto'>
-            <div className='px-4 py-2 text-sm text-gray-600 border-b'>
-              Showing {filteredEnrollments.length} of{" "}
-              {data?.pagination?.total || 0} applicants
-              {(searchTerm || status !== "all" || location !== "all") && (
-                <span className='ml-1'>
-                  {searchTerm && ` matching "${searchTerm}"`}
-                  {status !== "all" && ` with status "${status}"`}
-                  {location !== "all" && ` from "${location}"`}
-                </span>
-              )}
+
+        <TableContainer>
+          <div className='flex flex-col gap-4 border-b border-[#27156F]/10 bg-[#DBEAF6]/20 p-4 lg:flex-row lg:items-center lg:justify-between'>
+            <div className='relative w-full lg:max-w-md'>
+              <Search className='absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400' />
+              <Input
+                type='search'
+                placeholder='Search by name, email, or phone...'
+                value={searchTerm}
+                onChange={handleSearchTerm}
+                className='border-[#27156F]/15 bg-white pl-9'
+                disabled={isLoading}
+              />
             </div>
-            <Table className='w-full table-auto bg-white rounded-lg overflow-hidden'>
-              <TableHead>
-                <tr className='border-b border-gray-200 bg-gray-50'>
-                  {[
-                    "Applicants",
-                    "Location",
-                    "Date",
-                    "Course",
-                    "Level",
-                    "Status",
-                    "Action",
-                  ].map((header) => (
-                    <th
-                      key={header}
-                      className='p-4 text-left font-semibold text-gray-700'
-                    >
-                      {header}
-                    </th>
+            <div className='grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-2'>
+              <Select
+                value={status}
+                onValueChange={(value) => {
+                  setStatus(value);
+                  setPage(1);
+                }}
+                disabled={isLoading}
+              >
+                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[130px] sm:w-auto'>
+                  <SelectValue placeholder='All Status' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All Status</SelectItem>
+                  {statusOptions.map((s) => (
+                    <SelectItem value={s} key={s} className='capitalize'>
+                      {s}
+                    </SelectItem>
                   ))}
-                </tr>
-              </TableHead>
-              <TableBody>
-                {filteredEnrollments.length > 0 &&
-                  filteredEnrollments.map((enrollment, idx) => (
+                </SelectContent>
+              </Select>
+              <Select
+                value={location}
+                onValueChange={(value) => {
+                  setLocation(value);
+                  setPage(1);
+                }}
+                disabled={isLoading}
+              >
+                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[140px] sm:w-auto'>
+                  <SelectValue placeholder='All Locations' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All Locations</SelectItem>
+                  {states.map((loc) => (
+                    <SelectItem value={loc} key={loc}>
+                      {loc}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant='outline'
+                className='w-full gap-2 border-[#27156F]/20 bg-white sm:w-auto'
+                onClick={handleDownload}
+                disabled={isLoading || filteredEnrollments.length === 0}
+              >
+                <Download className='size-4' />
+                Download
+              </Button>
+            </div>
+          </div>
+
+          {showTable && (
+            <>
+              <div className='border-b border-[#27156F]/10 bg-gray-50/80 px-4 py-2.5 text-sm text-gray-600'>
+                Showing {filteredEnrollments.length} of{" "}
+                {data?.pagination?.total ?? 0} applicants
+                {hasFilters && (
+                  <span className='ml-1 text-gray-500'>(filtered)</span>
+                )}
+              </div>
+              <Table className='min-w-[800px]'>
+                <TableHead>
+                  <TableRow className='hover:bg-transparent border-b border-[#27156F]/10'>
+                    {APPLICANT_TABLE_HEADERS.map((header) => (
+                      <TableHeader
+                        key={header}
+                        align={
+                          header === "Status" || header === "Review"
+                            ? "center"
+                            : "left"
+                        }
+                      >
+                        {header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredEnrollments.map((enrollment, idx) => (
                     <ApplicantTr
                       key={enrollment._id}
                       enrollment={enrollment}
                       onInfoClick={() => handleRowClick(idx)}
+                      showCourse={false}
                     />
                   ))}
-              </TableBody>
-            </Table>
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
-            )}
-          </div>
-        )}
-        {showSkeleton && <TableSkeleton />}
-        {showEmptyState && (
-          <EmptyState
-            className='min-h-[500px]'
-            title={
-              searchTerm && status !== "all"
-                ? `No applicants yet in "${cohortName}"`
-                : "No record found"
-            }
-            message={
-              searchTerm && status !== "all"
-                ? `No applicants match the search "${searchTerm}" and status "${status}"`
-                : searchTerm
-                  ? `No applicants match the search "${searchTerm}"`
-                  : status !== "all"
-                    ? `No applicants with status "${status}"`
-                    : location !== "all"
-                      ? `No applicants from "${location}"`
-                      : "Applicants will appear here when they register for this cohort"
-            }
-            size='lg'
-          />
-        )}
+                </TableBody>
+              </Table>
+              {totalPages > 1 && (
+                <div className='border-t border-[#27156F]/10 px-4 py-3'>
+                  <Pagination
+                    currentPage={page}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {isLoading && <TableSkeleton />}
+
+          {showEmptyState && (
+            <EmptyState
+              className='min-h-[320px] border-0 shadow-none'
+              title={
+                hasFilters ? "No matching applicants" : "No applicants yet"
+              }
+              message={
+                hasFilters
+                  ? "Try adjusting your search or filters."
+                  : "Applicants will appear here when they register for this cohort."
+              }
+              size='lg'
+            />
+          )}
+        </TableContainer>
       </section>
-      {filteredEnrollments.length > 0 && (
+
+      {modalOpen && modalEnrollment && (
         <ApplicantInfoModal
           isOpen={modalOpen}
           onOpenChange={setModalOpen}
-          enrollment={filteredEnrollments[currentIndex]}
-          currentIndex={currentIndex}
-          totalEnrollments={filteredEnrollments.length}
+          enrollment={modalEnrollment}
+          globalPosition={globalPosition}
+          totalApplicants={totalApplicants}
+          canGoPrev={canGoPrev}
+          canGoNext={canGoNext}
+          isNavigating={isModalNavigating}
           onNavigate={handleNavigate}
         />
       )}

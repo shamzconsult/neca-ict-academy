@@ -30,7 +30,10 @@ export const GET = async (req: Request) => {
       );
     }
 
-    const cohort = await Cohort.findOne({ slug });
+    const cohort = await Cohort.findOne({ slug }).populate(
+      "courses",
+      "title slug"
+    );
 
     if (!cohort) {
       return NextResponse.json(

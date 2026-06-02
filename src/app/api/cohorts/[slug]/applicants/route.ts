@@ -147,7 +147,11 @@ export async function GET(
         slug: cohort.slug,
         startDate: cohort.startDate,
         endDate: cohort.endDate,
-        status: cohort.status,
+        applicationStartDate: cohort.applicationStartDate,
+        applicationEndDate: cohort.applicationEndDate,
+        active: cohort.active,
+        courses: cohort.courses,
+        createdAt: cohort.createdAt,
       },
       data: enrichedApplicants,
       pagination: {

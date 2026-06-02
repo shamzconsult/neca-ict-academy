@@ -6,19 +6,17 @@ import EmptyState from "@/components/atom/EmptyState";
 import { cohortTableHead } from "@/const";
 import { CohortsProps, CohortType } from "@/types";
 import React, { useState } from "react";
-import { HiOutlinePlusCircle } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, PlusCircle } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   const [showModal, setShowModal] = useState(false);
   const [cohortsData, setCohortsData] = useState<CohortType[]>(
-    initialCohorts || []
+    initialCohorts || [],
   );
   const [cohortToEdit, setCohortToEdit] = useState<CohortType | null>(null);
-  const [isEditToggle, setIsEditToggle] = useState<number | null>(null);
   const [, setFormData] = useState({
     name: "",
     startDate: "",
@@ -29,14 +27,6 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
 
   const toggleModal = () => {
     setShowModal(!showModal);
-  };
-
-  const handleEditToggle = (id: number | null) => {
-    if (id === isEditToggle) {
-      setIsEditToggle(null);
-      return;
-    }
-    setIsEditToggle(id);
   };
 
   const checkAllCohortStatus = () => {
@@ -60,40 +50,38 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
   return (
     <>
       <AdminSectionHeader
-        title='Cohort Overview'
+        title='Cohorts'
         cta={
           <>
             <Button
               onClick={checkAllCohortStatus}
-              className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors'
+              className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
             >
-              <HiOutlinePlusCircle /> Create Cohort
+              <PlusCircle className='size-4' />
+              Create Cohort
             </Button>
 
             <Button
               variant='outline'
               asChild
-              className='flex items-center gap-2 transition-colors'
+              className='gap-2 border-[#27156F]/20'
             >
               <Link href='/enroll' target='_blank'>
-                <ExternalLink />
+                <ExternalLink className='size-4' />
                 Go to Enroll Portal
               </Link>
             </Button>
           </>
         }
       />
-      <hr className='border-gray-200 mb-4' />
+      {/* <hr className='border-gray-200 mb-4' /> */}
       {cohortsData?.length > 0 ? (
-        <div className='overflow-x-auto border border-[#C4C4C4] rounded-lg'>
-          <CohortTable
-            tableHead={cohortTableHead}
-            handleEdit={handleEdit}
-            tableData={cohortsData}
-            action={true}
-            handleEditToggle={handleEditToggle}
-          />
-        </div>
+        <CohortTable
+          tableHead={cohortTableHead}
+          handleEdit={handleEdit}
+          tableData={cohortsData}
+          action={true}
+        />
       ) : (
         <EmptyState
           title='No Cohort Created yet'

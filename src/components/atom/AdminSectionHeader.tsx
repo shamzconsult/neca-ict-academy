@@ -1,35 +1,30 @@
-import { Separator } from "@/components/ui/separator";
-import { useSidebar } from "@/contexts/SidebarContext";
-import { PanelLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 
 export function AdminSectionHeader({
   title,
   cta,
+  className,
 }: {
   title: string | ReactNode;
   cta?: ReactNode;
+  className?: string;
 }) {
-  const { sidebarCollapsed, toggleSidebar } = useSidebar();
   return (
-    <header className="flex flex-col gap-2 md:flex-row md:items-center justify-between mb-8">
-      <div className="flex gap-2 items-center">
-        <div className="hidden lg:flex justify-start">
-          <button
-            onClick={toggleSidebar}
-            className="p-2 rounded hover:bg-gray-100 transition"
-            aria-label="Toggle sidebar"
-          >
-            <PanelLeft size={20} />
-          </button>
+    <header
+      className={cn(
+        "mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-start md:justify-between",
+        className,
+      )}
+    >
+      <h1 className='text-xl font-bold leading-tight text-[#27156F] sm:text-2xl'>
+        {title}
+      </h1>
+      {cta && (
+        <div className='flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center [&_a]:w-full sm:[&_a]:w-auto [&_button]:w-full sm:[&_button]:w-auto'>
+          {cta}
         </div>
-        <Separator
-          orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4 hidden lg:flex"
-        />
-        <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-      </div>
-      {cta && <div className="flex gap-3">{cta}</div>}
+      )}
     </header>
   );
 }

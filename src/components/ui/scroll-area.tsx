@@ -55,4 +55,30 @@ function ScrollBar({
   )
 }
 
-export { ScrollArea, ScrollBar }
+function HorizontalScrollArea({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+  return (
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area-horizontal"
+      className={cn("group relative w-full min-w-0 overflow-hidden", className)}
+      {...props}
+    >
+      <ScrollAreaPrimitive.Viewport
+        data-slot="scroll-area-viewport"
+        className="size-full max-w-full rounded-[inherit] outline-none focus-visible:outline-1"
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar
+        orientation="horizontal"
+        className="opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+      />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+}
+
+export { ScrollArea, ScrollBar, HorizontalScrollArea }

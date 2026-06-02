@@ -9,11 +9,16 @@ import {
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { VisuallyHidden } from "../visually-hidden";
+import Link from "next/link";
 
 const AD_IMAGES = [
   {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1769585637/NECA_Academy_-_Free_AI_course_f1jo57.jpg",
+    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1780417489/enrollment/course/xtjtebrod69yvlsbkbut.png",
     active: true,
+  },
+  {
+    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1769585637/NECA_Academy_-_Free_AI_course_f1jo57.jpg",
+    active: false,
   },
   {
     url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
@@ -57,7 +62,7 @@ export const AdvertOverlay: React.FC = () => {
     if (!container) return;
     setCanScrollLeft(container.scrollLeft > 0);
     setCanScrollRight(
-      container.scrollLeft < container.scrollWidth - container.clientWidth - 1
+      container.scrollLeft < container.scrollWidth - container.clientWidth - 1,
     );
   };
 
@@ -106,11 +111,11 @@ export const AdvertOverlay: React.FC = () => {
   // Only auto-scroll if the current image has active: true
   const currentImage = AD_IMAGES[activeIdx];
   const shouldAutoScroll = currentImage?.active && !isHovered;
-
+  console.log(currentImage?.active);
   // Get indices of all active images for cycling
-  const activeIndices = AD_IMAGES.map((img, idx) => (img.active ? idx : -1)).filter(
-    (idx) => idx !== -1
-  );
+  const activeIndices = AD_IMAGES.map((img, idx) =>
+    img.active ? idx : -1,
+  ).filter((idx) => idx !== -1);
 
   // Find the next active image index
   const getNextActiveIdx = (currentIdx: number) => {
@@ -143,6 +148,29 @@ export const AdvertOverlay: React.FC = () => {
 
   if (!open) return null;
 
+  const sharedWrapperProps = {
+    className: "relative" as const,
+    onMouseEnter: () => setIsHovered(true),
+    onMouseLeave: () => setIsHovered(false),
+  };
+
+  const advertImage = (
+    <>
+      <img
+        src={AD_IMAGES[activeIdx].url}
+        alt={`Advert ${activeIdx + 1}`}
+        className={`rounded-lg shadow-2xl sm:h-[80vh] sm:max-h-[80vh] object-contain transition-opacity duration-600 ${
+          isTransitioning ? "opacity-0" : "opacity-100"
+        }`}
+      />
+      {!currentImage?.active && (
+        <div className='absolute top-4 left-4 bg-red-600/70 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm'>
+          Past Event
+        </div>
+      )}
+    </>
+  );
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogTitle asChild>
@@ -171,25 +199,13 @@ export const AdvertOverlay: React.FC = () => {
           </button>
         </DialogClose>
         <div className='flex flex-col items-center justify-center'>
-          <div
-            className='relative'
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <img
-              src={AD_IMAGES[activeIdx].url}
-              alt={`Advert ${activeIdx + 1}`}
-              className={`rounded-lg shadow-2xl sm:h-[80vh] sm:max-h-[80vh] object-contain transition-opacity duration-600 ${
-                isTransitioning ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            {/* Past Event overlay for inactive images */}
-            {!currentImage?.active && (
-              <div className='absolute top-4 left-4 bg-red-600/70 text-white px-3 py-1.5 rounded-full text-sm font-medium backdrop-blur-sm'>
-                Past Event
-              </div>
-            )}
-          </div>
+          {currentImage?.active ? (
+            <Link href='/enroll' {...sharedWrapperProps}>
+              {advertImage}
+            </Link>
+          ) : (
+            <div {...sharedWrapperProps}>{advertImage}</div>
+          )}
           <div className='mt-4 flex items-center gap-2'>
             {/* Left Arrow */}
             <button
@@ -205,7 +221,7 @@ export const AdvertOverlay: React.FC = () => {
               <ChevronLeft className='w-5 h-5 text-gray-700' />
             </button>
 
-            <div 
+            <div
               ref={scrollContainerRef}
               onScroll={updateScrollButtons}
               className='flex gap-3 px-2 py-1 overflow-x-auto no-scrollbar'
@@ -236,7 +252,9 @@ export const AdvertOverlay: React.FC = () => {
                   />
                   {!image.active && (
                     <div className='absolute inset-0 bg-black/30 rounded flex items-center justify-center'>
-                      <span className='text-white text-[8px] font-medium'>Past</span>
+                      <span className='text-white text-[8px] font-medium'>
+                        Past
+                      </span>
                     </div>
                   )}
                 </button>

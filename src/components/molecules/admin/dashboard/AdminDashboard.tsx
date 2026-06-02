@@ -4,15 +4,24 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
 import { CohortType } from "@/types";
-import { HiOutlinePlusCircle } from "react-icons/hi";
 import { CohortForm } from "@/components/atom/CohortForm";
 import Link from "next/link";
 import EmptyState from "@/components/atom/EmptyState";
 import CohortTable from "@/components/atom/Table/CohortTable";
 import { adminCohortTableHead } from "@/const";
 import { Button } from "@/components/ui/button";
-import { ExternalLink } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  ExternalLink,
+  GraduationCap,
+  PlusCircle,
+  Users,
+  XCircle,
+} from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
+import { cn } from "@/lib/utils";
 
 type LocationStats = {
   state: string;
@@ -35,36 +44,119 @@ type Cohort = {
 interface DashboardStat {
   name: string;
   value: number;
-  color?: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: string;
+  iconBg: string;
+  iconColor: string;
 }
 
 interface AdminDashboardProps {
   cohortsData: CohortType[];
 }
 
-const StatCard = ({ stat }: { stat: DashboardStat }) => (
-  <div
-    className={`p-6 bg-white rounded-lg shadow-md border border-gray-200 ${stat.color ? "bg-opacity-5" : ""}`}
-  >
-    <p className={`text-3xl font-bold ${stat.color || "text-gray-900"}`}>
-      {stat.value}
-    </p>
-    <p className='text-sm text-gray-500'>{stat.name}</p>
-  </div>
-);
+const STAT_CONFIG = [
+  {
+    name: "Total Applicants",
+    key: "totalApplications" as const,
+    icon: Users,
+    accent: "border-l-[#27156F]",
+    iconBg: "bg-[#27156F]/10",
+    iconColor: "text-[#27156F]",
+  },
+  {
+    name: "Total Pending",
+    key: "pending" as const,
+    icon: Clock,
+    accent: "border-l-amber-500",
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-600",
+  },
+  {
+    name: "Total Declined",
+    key: "declined" as const,
+    icon: XCircle,
+    accent: "border-l-[#E02B20]",
+    iconBg: "bg-red-50",
+    iconColor: "text-[#E02B20]",
+  },
+  {
+    name: "Total Admitted",
+    key: "admitted" as const,
+    icon: CheckCircle2,
+    accent: "border-l-emerald-500",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
+  },
+  {
+    name: "Total Graduated",
+    key: "graduated" as const,
+    icon: GraduationCap,
+    accent: "border-l-violet-500",
+    iconBg: "bg-violet-50",
+    iconColor: "text-violet-600",
+  },
+] as const;
+
+const StatCard = ({ stat }: { stat: DashboardStat }) => {
+  const Icon = stat.icon;
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-3 rounded-2xl border border-[#27156F]/10 bg-white p-4 shadow-sm transition-shadow hover:shadow-md border-l-4 sm:gap-4 sm:p-5",
+        stat.accent
+      )}
+    >
+      <div
+        className={cn(
+          "flex size-11 shrink-0 items-center justify-center rounded-xl",
+          stat.iconBg
+        )}
+      >
+        <Icon className={cn("size-5", stat.iconColor)} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-2xl font-bold tabular-nums text-[#27156F] sm:text-3xl">
+          {stat.value.toLocaleString()}
+        </p>
+        <p className="mt-0.5 text-sm text-gray-500">{stat.name}</p>
+      </div>
+    </div>
+  );
+};
 
 const StatsSkeleton = () => (
-  <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8'>
-    {[...Array(5)].map((_, i) => (
+  <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+    {STAT_CONFIG.map((_, i) => (
       <div
         key={i}
-        className='p-6 bg-white rounded-lg shadow-md border border-gray-200'
+        className="flex animate-pulse items-start gap-4 rounded-2xl border border-[#27156F]/10 bg-white p-5 shadow-sm"
       >
-        <div className='h-8 w-16 bg-gray-200 rounded animate-pulse mb-2' />
-        <div className='h-4 w-24 bg-gray-200 rounded animate-pulse' />
+        <div className="size-11 shrink-0 rounded-xl bg-gray-200" />
+        <div className="flex-1 space-y-2">
+          <div className="h-8 w-16 rounded bg-gray-200" />
+          <div className="h-4 w-24 rounded bg-gray-100" />
+        </div>
       </div>
     ))}
   </div>
+);
+
+const DashboardSection = ({
+  title,
+  action,
+  children,
+}: {
+  title: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <section className="mb-8">
+    <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <h2 className="text-lg font-bold text-[#27156F] sm:text-xl">{title}</h2>
+      {action}
+    </div>
+    {children}
+  </section>
 );
 
 export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
@@ -74,7 +166,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   );
   const [selectedCohort, setSelectedCohort] = useState<string>("all");
 
-  const { data: statsData, isFetching } = useQuery<{
+  const { data: statsData, isLoading, isFetching } = useQuery<{
     success: boolean;
     data: {
       locationStats: LocationStats[];
@@ -95,62 +187,40 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
     },
   });
 
-  // Transform stats data for dashboard cards
   const dashboardStats: DashboardStat[] = statsData?.data
-    ? [
-        {
-          name: "Total Applicants",
-          value: statsData.data.totalApplications,
-          color: "text-blue-600",
-        },
-        {
-          name: "Total Pending",
-          value: statsData.data.statusStats.pending || 0,
-          color: "text-yellow-600",
-        },
-        {
-          name: "Total Declined",
-          value: statsData.data.statusStats.declined || 0,
-          color: "text-red-600",
-        },
-        {
-          name: "Total Admitted",
-          value: statsData.data.statusStats.admitted || 0,
-          color: "text-green-600",
-        },
-        {
-          name: "Total Graduated",
-          value: statsData.data.statusStats.graduated || 0,
-          color: "text-purple-600",
-        },
-      ]
+    ? STAT_CONFIG.map((config) => ({
+        name: config.name,
+        value:
+          config.key === "totalApplications"
+            ? statsData.data.totalApplications
+            : statsData.data.statusStats[config.key] || 0,
+        icon: config.icon,
+        accent: config.accent,
+        iconBg: config.iconBg,
+        iconColor: config.iconColor,
+      }))
     : [];
 
   const firstFiveCohorts = localCohorts.slice(0, 5);
 
-  const checkAllCohortStatus = () => {
-    setShowModal(!showModal);
-  };
+  const toggleModal = () => setShowModal((prev) => !prev);
 
   return (
     <>
       <AdminSectionHeader
-        title='Overview'
+        title="Overview"
         cta={
           <>
             <Button
-              onClick={checkAllCohortStatus}
-              className='flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 transition-colors'
+              onClick={toggleModal}
+              className="gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90"
             >
-              <HiOutlinePlusCircle /> Create Cohort
+              <PlusCircle className="size-4" />
+              Create Cohort
             </Button>
-            <Button
-              variant='outline'
-              asChild
-              className='flex items-center gap-2 transition-colors'
-            >
-              <Link href='/enroll' target='_blank'>
-                <ExternalLink />
+            <Button variant="outline" asChild className="gap-2 border-[#27156F]/20">
+              <Link href="/enroll" target="_blank">
+                <ExternalLink className="size-4" />
                 Go to Enroll Portal
               </Link>
             </Button>
@@ -158,58 +228,54 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
         }
       />
 
-      {/* Stats cards */}
-      {!statsData ? (
+      {!statsData && isLoading ? (
         <StatsSkeleton />
-      ) : (
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8'>
-          {dashboardStats.map((stat, index) => (
-            <StatCard key={index} stat={stat} />
+      ) : statsData ? (
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+          {dashboardStats.map((stat) => (
+            <StatCard key={stat.name} stat={stat} />
           ))}
         </div>
-      )}
+      ) : null}
 
-      {/* Application stats chart */}
-      <section className='mb-8'>
-        <h2 className='text-xl font-semibold text-gray-800 mb-4'>
-          Application Statistics
-        </h2>
+      <DashboardSection title="Application Statistics">
         <ApplicationStatsChart
           data={statsData?.data}
           selectedCohort={selectedCohort}
           onCohortChange={setSelectedCohort}
-          isFetching={isFetching}
+          isFetching={isFetching && !isLoading}
         />
-      </section>
+      </DashboardSection>
 
-      {/* Cohorts table */}
-      <section className='mb-8'>
-        <div className='flex justify-between items-center mb-4'>
-          <h2 className='text-xl font-semibold text-gray-800'>Cohorts</h2>
-          <Link href='/admin/cohorts' className='text-blue-600 hover:underline'>
-            View All Cohorts
+      <DashboardSection
+        title="Recent Cohorts"
+        action={
+          <Link
+            href="/admin/cohorts"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-[#27156F] transition-colors hover:text-[#E02B20]"
+          >
+            View all
+            <ArrowRight className="size-4" />
           </Link>
-        </div>
-        <div className='bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden'>
-          {localCohorts?.length > 0 ? (
-            <CohortTable
-              tableHead={adminCohortTableHead}
-              tableData={firstFiveCohorts}
-              action={false}
-            />
-          ) : (
-            <EmptyState
-              title='No Cohort Created yet'
-              message='Click on the create Cohort button to start'
-            />
-          )}
-        </div>
-      </section>
+        }
+      >
+        {localCohorts.length > 0 ? (
+          <CohortTable
+            tableHead={adminCohortTableHead}
+            tableData={firstFiveCohorts}
+            action={false}
+          />
+        ) : (
+          <EmptyState
+            title="No cohort created yet"
+            message="Click Create Cohort to get started"
+          />
+        )}
+      </DashboardSection>
 
-      {/* Cohort creation modal */}
       {showModal && (
         <CohortForm
-          toggleModal={checkAllCohortStatus}
+          toggleModal={toggleModal}
           setCohortsData={setLocalCohorts}
         />
       )}

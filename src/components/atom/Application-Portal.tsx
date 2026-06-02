@@ -1,14 +1,34 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { SubHeading } from "@/components/atom/headers/SubHeading";
 import Link from "next/link";
 import { CheckStatusModal } from "./CheckStatusModal";
 import { ApplicationReview } from "./ApplicationReview";
 import SuccessModal from "./SuccessPage";
 import { FileUploader } from "@/components/atom/FileUploader";
-import { MdArrowDropDown, MdImage, MdDescription } from "react-icons/md";
+import { FieldError } from "@/components/atom/form/FormFeedback";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import {
+  FileText,
+  ImageIcon,
+  Loader2,
+  Mail,
+  MailSearch,
+  Phone,
+} from "lucide-react";
+import { CohortGallery } from "./CohortGallery";
 import {
   genderOptions,
   levelOptionsMap,
@@ -43,6 +63,276 @@ type ApplicationFormProps = Array<{
   courses?: Array<{ _id: string; title: string }>;
 }>;
 
+const selectTriggerClassName =
+  "h-11 w-full border-[#27156F]/15 bg-white text-[#27156F] shadow-xs focus-visible:border-[#27156F]/40 focus-visible:ring-[#27156F]/20 disabled:opacity-50";
+
+const inputClassName =
+  "h-11 border-[#27156F]/15 bg-white text-[#27156F] placeholder:text-gray-400 focus-visible:border-[#27156F]/40 focus-visible:ring-[#27156F]/20";
+
+function FormSelect({
+  id,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  options,
+}: {
+  id?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  disabled?: boolean;
+  options: ReadonlyArray<{ value: string; label: string }>;
+}) {
+  return (
+    <Select
+      value={value || undefined}
+      onValueChange={onChange}
+      disabled={disabled}
+    >
+      <SelectTrigger id={id} className={selectTriggerClassName}>
+        <SelectValue placeholder={placeholder} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+function FormSection({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 sm:p-6'>
+      <div className='mb-5 border-b border-[#27156F]/10 pb-4 text-left'>
+        <h3 className='text-base font-bold text-[#27156F] sm:text-lg'>
+          {title}
+        </h3>
+        {description && (
+          <p className='mt-1 text-sm text-gray-600'>{description}</p>
+        )}
+      </div>
+      <div className='space-y-5'>{children}</div>
+    </section>
+  );
+}
+
+function FormField({
+  label,
+  htmlFor,
+  error,
+  required,
+  children,
+  className,
+}: {
+  label: string;
+  htmlFor?: string;
+  error?: string;
+  required?: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("space-y-1.5 text-left", className)}>
+      <Label htmlFor={htmlFor} className='text-[#27156F]'>
+        {label}
+        {required && <span className='text-[#E02B20]'> *</span>}
+      </Label>
+      {children}
+      <FieldError message={error} />
+    </div>
+  );
+}
+
+const TIMELINE_STEPS = [
+  {
+    step: 1,
+    label: "Application",
+    description: "Submit your form and documents",
+  },
+  {
+    step: 2,
+    label: "Interview",
+    description: "Shortlisted candidates are invited",
+  },
+  {
+    step: 3,
+    label: "Selection",
+    description: "Final cohort placement confirmed",
+  },
+] as const;
+
+function ApplicationTimeline({
+  variant = "vertical",
+}: {
+  variant?: "vertical" | "horizontal";
+}) {
+  const activeStep = 1;
+
+  if (variant === "horizontal") {
+    return (
+      <div className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-4 sm:p-5'>
+        <p className='mb-5 text-sm font-semibold text-[#27156F]'>
+          Application timeline
+        </p>
+        <div className='relative flex items-start justify-between'>
+          <span
+            className='absolute left-[calc(16.67%-8px)] right-[calc(16.67%-8px)] top-4 h-0.5 bg-[#27156F]/10'
+            aria-hidden
+          />
+          {TIMELINE_STEPS.map((item) => {
+            const isActive = item.step === activeStep;
+            const isComplete = item.step < activeStep;
+
+            return (
+              <div
+                key={item.step}
+                className='relative z-10 flex w-1/3 flex-col items-center text-center'
+              >
+                <span
+                  className={cn(
+                    "flex size-8 items-center justify-center rounded-full text-xs font-bold",
+                    isActive &&
+                      "bg-[#27156F] text-white shadow-sm ring-4 ring-[#27156F]/15",
+                    isComplete && "bg-[#27156F] text-white",
+                    !isActive &&
+                      !isComplete &&
+                      "border-2 border-[#27156F]/15 bg-white text-[#27156F]/40",
+                  )}
+                >
+                  {item.step}
+                </span>
+                <p
+                  className={cn(
+                    "mt-2 text-xs font-semibold sm:text-sm",
+                    isActive ? "text-[#27156F]" : "text-gray-500",
+                  )}
+                >
+                  {item.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 sm:p-6'>
+      <h2 className='text-lg font-bold text-[#27156F]'>Application timeline</h2>
+      <p className='mt-1 text-sm text-gray-600'>
+        Three steps from application to final selection.
+      </p>
+      <ol className='mt-5 space-y-0'>
+        {TIMELINE_STEPS.map((item, index) => {
+          const isActive = item.step === activeStep;
+          const isComplete = item.step < activeStep;
+          const isLast = index === TIMELINE_STEPS.length - 1;
+
+          return (
+            <li key={item.step} className='flex gap-4'>
+              <div className='flex flex-col items-center'>
+                <span
+                  className={cn(
+                    "flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-bold",
+                    isActive &&
+                      "bg-[#27156F] text-white shadow-sm ring-4 ring-[#27156F]/15",
+                    isComplete && "bg-[#27156F] text-white",
+                    !isActive &&
+                      !isComplete &&
+                      "border-2 border-[#27156F]/15 bg-white text-[#27156F]/40",
+                  )}
+                >
+                  {item.step}
+                </span>
+                {!isLast && (
+                  <span
+                    className={cn(
+                      "my-1 w-0.5 min-h-8 flex-1 rounded-full",
+                      isComplete || isActive
+                        ? "bg-gradient-to-b from-[#27156F]/40 to-[#27156F]/10"
+                        : "bg-[#27156F]/10",
+                    )}
+                    aria-hidden
+                  />
+                )}
+              </div>
+              <div className={cn("pb-5", isLast && "pb-0")}>
+                <p
+                  className={cn(
+                    "font-semibold",
+                    isActive ? "text-[#27156F]" : "text-gray-600",
+                  )}
+                >
+                  {item.label}
+                </p>
+                <p className='mt-0.5 text-sm text-gray-500'>
+                  {item.description}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
+function EnquiryContact() {
+  return (
+    <section className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 text-left sm:p-6'>
+      <h2 className='text-lg font-bold text-[#27156F]'>Need help?</h2>
+      <p className='mt-1 text-sm text-gray-600'>
+        For enquiries about your application, get in touch with us.
+      </p>
+      <div className='mt-4 space-y-3'>
+        <a
+          href='mailto:contact@necaictacademy.org'
+          className='flex items-center gap-2.5 text-sm text-[#27156F] transition-colors hover:text-[#27156F]/80 hover:underline'
+        >
+          <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm'>
+            <Mail className='size-4' />
+          </span>
+          contact@necaictacademy.org
+        </a>
+        <a
+          href='tel:+2348099387853'
+          className='flex items-center gap-2.5 text-sm text-[#27156F] transition-colors hover:text-[#27156F]/80 hover:underline'
+        >
+          <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm'>
+            <Phone className='size-4' />
+          </span>
+          +234 809 938 7853
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function PortalInfoColumn({ variant }: { variant: "sidebar" | "mobile" }) {
+  return (
+    <div className='min-w-0 space-y-6'>
+      <CohortGallery variant={variant === "sidebar" ? "sidebar" : "compact"} />
+      <ApplicationTimeline
+        variant={variant === "sidebar" ? "vertical" : "horizontal"}
+      />
+      <EnquiryContact />
+    </div>
+  );
+}
+
 const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const searchParams = useSearchParams();
   const course = searchParams.get("course");
@@ -53,6 +343,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
     control,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     defaultValues: {
@@ -86,7 +377,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   const [statusError, setStatusError] = useState("");
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [applicantStatus, setApplicantStatus] = useState<any>(null);
-  const [selectedCohort, setSelectedCohort] = useState<string>("");
+  const selectedCohort = watch("cohort");
   const [cohortCourses, setCohortCourses] = useState<
     { _id: string; title: string }[]
   >([]);
@@ -114,7 +405,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
           if (value)
             formDataToSend.append(
               key === "profileImage" ? "profilePicture" : key,
-              value as File
+              value as File,
             );
         } else {
           formDataToSend.append(key, value as string);
@@ -191,9 +482,9 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
   };
 
   return (
-    <div className='relative min-h-screen bg-white overflow-hidden'>
+    <div className='relative min-h-screen bg-white'>
       {/* Background Elements */}
-      <div className='fixed top-0 left-0 w-[8%] h-[73%] z-40 transform rotate-[-0.47deg] origin-top-left'>
+      <div className='pointer-events-none fixed top-0 left-0 z-0 h-[73%] w-[8%] origin-top-left rotate-[-0.47deg] transform'>
         <Image
           src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve,e_sharpen/v1742225179/Rectangle_4384_onnutg.png'
           alt='Background Left'
@@ -203,508 +494,486 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
           priority
         />
       </div>
-      <div className='hidden lg:block absolute bottom-0 right-0 w-[366px] h-[366px] z-[5]'>
+      <div className='pointer-events-none absolute bottom-0 right-0 z-[5] hidden h-[366px] w-[366px] lg:block'>
         <img
           src='https://cdn.hashnode.com/res/hashnode/image/upload/v1747112476016/86e16667-5b96-461a-845f-0f6e896b0fb5.png'
           alt='Background Right'
           className='opacity-[20%]'
         />
       </div>
-      <div className='h-screen overflow-hidden'>
-        {/* Fixed Header */}
-        <header className='fixed top-0 left-0 right-0 bg-white z-30'>
-          <div className='py-4 px-[8%]'>
-            <div className='flex flex-col gap-5 md:flex-row justify-between items-center'>
-              <Link href='/' className='w-36 lg:w-48 relative'>
-                <Image
-                  src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png'
-                  alt='NECA ICT ACADEMY Logo'
-                  width={144}
-                  height={72}
-                  className='object-contain w-full h-full cursor-pointer'
-                />
-              </Link>
-              <div>
-                <h3 className='text-lg'>
-                  Already applied?{" "}
-                  <Link
-                    href='#'
-                    className='underline text-[#27156F] hover:text-[#1a0e4d] transition-colors ml-1'
-                    onClick={toggleModal}
-                  >
-                    Check Status
-                  </Link>
-                </h3>
+
+      {/* Fixed Header */}
+      <header className='fixed top-0 left-0 right-0 z-30 border-b border-[#27156F]/10 bg-white/95 backdrop-blur-sm'>
+        <div className='px-[8%] py-3 sm:py-4'>
+          <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
+            <Link href='/' className='relative w-36 shrink-0 lg:w-44'>
+              <Image
+                src='https://res.cloudinary.com/daqmbfctv/image/upload/e_improve/v1742551380/WhatsApp_Image_2025-03-20_at_22.40.25_5d4664d3_ly2n2x.png'
+                alt='NECA ICT ACADEMY Logo'
+                width={144}
+                height={72}
+                className='h-full w-full cursor-pointer object-contain'
+              />
+            </Link>
+            <div className='flex w-full items-center justify-center gap-3 rounded-xl border border-[#27156F]/10 bg-[#DBEAF6]/30 px-3 py-2 sm:w-auto sm:justify-end sm:px-4 sm:py-2.5'>
+              <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-white shadow-sm'>
+                <MailSearch className='size-4 text-[#27156F]' />
               </div>
+              <p className='text-sm text-gray-600'>Already applied?</p>
+              <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='shrink-0 border-[#27156F]/20 bg-white text-[#27156F] hover:bg-[#27156F]/5'
+                onClick={toggleModal}
+              >
+                Check status
+              </Button>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        {/* Main Content */}
-        {cohorts.length > 0 ? (
-          <div className='flex h-[calc(100vh-88px)] mt-[88px]'>
-            {/* Static Left Side */}
-            <div className='hidden lg:block w-1/2 fixed left-0 top-[88px] bottom-0 bg-white p-8'>
-              <div className='h-full flex flex-col justify-between pl-[15%]'>
-                {/* Image Section */}
-                <div className='relative aspect-[4/3] w-full flex items-center justify-center'>
-                  <div className='absolute bg-[#f8fbf9] rounded-full w-3/4 h-full ml-20 z-0' />
-                  <img
-                    src='https://res.cloudinary.com/dtryuudiy/image/upload/v1746617511/Online_education_and_virtual_learning_g0fzok_tcay9v.png'
-                    alt='Online Education Image'
-                    className='object-contain relative z-10'
-                  />
-                </div>
+      {/* Main Content */}
+      {cohorts.length > 0 ? (
+        <main className='pl-[8.5%] pr-[8%] relative z-10 grid min-w-0 pt-24 lg:grid-cols-2 lg:items-start gap-10 xl:gap-20'>
+          {/* Left column — desktop only */}
+          <aside className='hidden min-w-0 lg:block lg:py-8'>
+            <PortalInfoColumn variant='sidebar' />
+          </aside>
 
-                {/* Timeline Section */}
-                <div className='pl-2 mb-8'>
-                  <h1 className='text-xl font-semibold text-[#1E1E1E] mb-8'>
-                    Application Timeline
-                  </h1>
-                  <div className='flex gap-7 items-center'>
-                    <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'>
-                      <p>1</p>
-                    </div>
-                    <div className='flex gap-2 items-center'>
-                      <div className='bg-[#525252] w-2 h-1'></div>
-                      <div className='bg-[#525252] w-3 h-1'></div>
-                      <div className='bg-[#525252] w-4 h-1'></div>
-                      <div className='bg-[#525252] w-5 h-1'></div>
-                    </div>
-                    <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'>
-                      <p>2</p>
-                    </div>
-                    <div className='flex gap-2 items-center'>
-                      <div className='bg-[#525252] w-2 h-1'></div>
-                      <div className='bg-[#525252] w-3 h-1'></div>
-                      <div className='bg-[#525252] w-4 h-1'></div>
-                      <div className='bg-[#525252] w-5 h-1'></div>
-                    </div>
-                    <div className='bg-[#525252] text-white text-center items-center w-8 h-8 rounded-full pt-1'>
-                      <p>3</p>
-                    </div>
-                  </div>
-                  <div className='flex gap-16 mt-4 items-center'>
-                    <p>Application</p>
-                    <p>Interview</p>
-                    <p>Selection</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <section className='min-w-0 py-6 pb-8 pt-20 sm:py-8 sm:pb-10'>
+            <div className='text-center lg:text-left'>
+              <SubHeading>NECA ICT Academy Application Portal</SubHeading>
 
-            <div className='relative z-10 w-full lg:w-1/2 lg:ml-[50%] overflow-y-auto h-full pt-5'>
-              <div className='max-w-2xl mx-auto px-8 py-8 lg:pr-[10%] text-center lg:text-left'>
-                <SubHeading>NECA ICT Academy Application Portal</SubHeading>
-                <h2 className='text-2xl font-semibold text-[#27156F] mb-4 mt-6'>
-                  Register Now!
-                </h2>
-                <p className='text-gray-600 text-xl mb-7'>
-                  Please fill out the form below with accurate and current
-                  information to begin your application.
-                </p>
+              <h2 className='mb-2 mt-6 text-2xl font-bold text-[#27156F] sm:text-3xl'>
+                Register Now
+              </h2>
+              <p className='mb-8 text-base leading-relaxed text-gray-600 sm:text-lg'>
+                Fill in accurate, up-to-date details to complete your
+                application.
+              </p>
 
-                <form
-                  onSubmit={handleSubmit((data: FormData) =>
-                    submitMutation.mutate(data)
-                  )}
-                  className='space-y-6 bg-white'
+              <form
+                onSubmit={handleSubmit((data: FormData) =>
+                  submitMutation.mutate(data),
+                )}
+                className='space-y-6 text-left'
+              >
+                <FormSection
+                  title='Personal information'
+                  description='Tell us how to reach you.'
                 >
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    <div className='md:col-span-2'>
-                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            Surname
-                          </label>
-                          <input
-                            type='text'
-                            placeholder='Surname'
-                            {...register("surname", { required: true })}
-                            className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                            disabled={submitMutation.status === "pending"}
-                          />
-                          {errors.surname && (
-                            <span className='text-red-500 text-xs'>
-                              Surname is required
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                            Other Names
-                          </label>
-                          <input
-                            type='text'
-                            placeholder='Other Names'
-                            {...register("otherNames", { required: true })}
-                            className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                            disabled={submitMutation.status === "pending"}
-                          />
-                          {errors.otherNames && (
-                            <span className='text-red-500 text-xs'>
-                              Other names is required
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Email Address
-                      </label>
-                      <input
+                  <div className='grid grid-cols-1 gap-5 sm:grid-cols-2'>
+                    <FormField
+                      label='Surname'
+                      htmlFor='surname'
+                      required
+                      error={errors.surname ? "Surname is required" : undefined}
+                    >
+                      <Input
+                        id='surname'
+                        type='text'
+                        placeholder='Surname'
+                        className={inputClassName}
+                        disabled={submitMutation.isPending}
+                        {...register("surname", { required: true })}
+                      />
+                    </FormField>
+                    <FormField
+                      label='Other names'
+                      htmlFor='otherNames'
+                      required
+                      error={
+                        errors.otherNames
+                          ? "Other names are required"
+                          : undefined
+                      }
+                    >
+                      <Input
+                        id='otherNames'
+                        type='text'
+                        placeholder='Other names'
+                        className={inputClassName}
+                        disabled={submitMutation.isPending}
+                        {...register("otherNames", { required: true })}
+                      />
+                    </FormField>
+                    <FormField
+                      label='Email address'
+                      htmlFor='email'
+                      required
+                      error={errors.email ? "Email is required" : undefined}
+                    >
+                      <Input
+                        id='email'
                         type='email'
+                        placeholder='you@example.com'
+                        className={inputClassName}
+                        disabled={submitMutation.isPending}
                         {...register("email", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                        placeholder='Enter your email address'
                       />
-                      {errors.email && (
-                        <span className='text-red-500 text-xs'>
-                          Email is required
-                        </span>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Phone Number
-                      </label>
-                      <input
+                    </FormField>
+                    <FormField
+                      label='Phone number'
+                      htmlFor='phoneNumber'
+                      required
+                      error={
+                        errors.phoneNumber
+                          ? "Phone number is required"
+                          : undefined
+                      }
+                    >
+                      <Input
+                        id='phoneNumber'
                         type='tel'
+                        placeholder='08012345678'
+                        className={inputClassName}
+                        disabled={submitMutation.isPending}
                         {...register("phoneNumber", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] cursor-pointer'
-                        placeholder='Enter your phone number'
                       />
-                      {errors.phoneNumber && (
-                        <span className='text-red-500 text-xs'>
-                          Phone number is required
-                        </span>
-                      )}
-                    </div>
+                    </FormField>
+                    <FormField
+                      label='State of residence'
+                      htmlFor='state'
+                      required
+                      error={errors.state ? "State is required" : undefined}
+                    >
+                      <Controller
+                        name='state'
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <FormSelect
+                            id='state'
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder='Select your state'
+                            disabled={submitMutation.isPending}
+                            options={states.map((state) => ({
+                              value: state,
+                              label: state,
+                            }))}
+                          />
+                        )}
+                      />
+                    </FormField>
+                    <FormField
+                      label='Gender'
+                      htmlFor='gender'
+                      required
+                      error={errors.gender ? "Gender is required" : undefined}
+                    >
+                      <Controller
+                        name='gender'
+                        control={control}
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <FormSelect
+                            id='gender'
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder='Select gender'
+                            disabled={submitMutation.isPending}
+                            options={genderOptions.map((gender) => ({
+                              value: gender,
+                              label: gender,
+                            }))}
+                          />
+                        )}
+                      />
+                    </FormField>
                   </div>
+                </FormSection>
 
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        State of Residence
-                      </label>
-                      <div className='relative'>
-                        <select
-                          {...register("state", { required: true })}
-                          disabled={submitMutation.status === "pending"}
-                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                        >
-                          <option value=''>Select your state</option>
-                          {states.map((state) => (
-                            <option key={state} value={state}>
-                              {state}
-                            </option>
-                          ))}
-                        </select>
-                        <MdArrowDropDown
-                          size={24}
-                          className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
+                <FormSection
+                  title='Application details'
+                  description='Choose your cohort and preferred course.'
+                >
+                  <FormField
+                    label='Cohort'
+                    htmlFor='cohort'
+                    required
+                    error={errors.cohort ? "Cohort is required" : undefined}
+                  >
+                    <Controller
+                      name='cohort'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <FormSelect
+                          id='cohort'
+                          value={field.value}
+                          onChange={(value) => {
+                            field.onChange(value);
+                            setValue("course", "");
+                          }}
+                          placeholder={
+                            cohorts.length === 0
+                              ? "No cohorts in session"
+                              : "Select a cohort"
+                          }
+                          disabled={
+                            submitMutation.isPending || cohorts.length === 0
+                          }
+                          options={cohorts.map((cohort) => ({
+                            value: cohort._id,
+                            label: cohort.name,
+                          }))}
                         />
-                      </div>
-                      {errors.state && (
-                        <span className='text-red-500 text-xs'>
-                          State is required
-                        </span>
                       )}
-                    </div>
-
-                    <div>
-                      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                        Gender
-                      </label>
-                      <div className='relative'>
-                        <select
-                          {...register("gender", { required: true })}
-                          disabled={submitMutation.status === "pending"}
-                          className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none capitalize'
-                        >
-                          <option value=''>Select gender</option>
-                          {genderOptions.map((gender) => (
-                            <option key={gender} value={gender}>
-                              {gender}
-                            </option>
-                          ))}
-                        </select>
-                        <MdArrowDropDown
-                          size={24}
-                          className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
+                    />
+                  </FormField>
+                  <FormField
+                    label='Course'
+                    htmlFor='course'
+                    required
+                    error={errors.course ? "Course is required" : undefined}
+                  >
+                    <Controller
+                      name='course'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <FormSelect
+                          id='course'
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder={
+                            !selectedCohort
+                              ? "Select a cohort first"
+                              : cohortCourses.length === 0
+                                ? "No courses available"
+                                : "Select a course"
+                          }
+                          disabled={
+                            submitMutation.isPending ||
+                            !selectedCohort ||
+                            cohortCourses.length === 0
+                          }
+                          options={cohortCourses.map((course) => ({
+                            value: course._id,
+                            label: course.title,
+                          }))}
                         />
-                      </div>
-                      {errors.gender && (
-                        <span className='text-red-500 text-xs'>
-                          Gender is required
-                        </span>
                       )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                      Cohorts
-                    </label>
-                    <div className='relative'>
-                      <select
-                        {...register("cohort", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                        onChange={(e) => {
-                          setValue("cohort", e.target.value);
-                          setSelectedCohort(e.target.value);
-                        }}
-                        value={selectedCohort}
-                      >
-                        <option value=''>
-                          {!cohorts || cohorts.length === 0
-                            ? "No cohorts in session"
-                            : "Select a cohort"}
-                        </option>
-                        {cohorts.length > 0 &&
-                          cohorts.map((cohort) => (
-                            <option key={cohort._id} value={cohort._id}>
-                              {cohort.name}
-                            </option>
-                          ))}
-                      </select>
-                      <MdArrowDropDown
-                        size={24}
-                        className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
-                      />
-                    </div>
-                    {errors.cohort && (
-                      <span className='text-red-500 text-xs'>
-                        Cohort is required
-                      </span>
-                    )}
-                  </div>
+                    />
+                  </FormField>
+                  <FormField
+                    label='Employment status'
+                    htmlFor='employmentStatus'
+                    required
+                    error={
+                      errors.employmentStatus
+                        ? "Employment status is required"
+                        : undefined
+                    }
+                  >
+                    <Controller
+                      name='employmentStatus'
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <FormSelect
+                          id='employmentStatus'
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder='Select employment status'
+                          disabled={submitMutation.isPending}
+                          options={employmentStatusOptions.map((opt) => ({
+                            value: opt.key,
+                            label: opt.label,
+                          }))}
+                        />
+                      )}
+                    />
+                  </FormField>
+                </FormSection>
 
-                  <div>
-                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                      Course
-                    </label>
-                    <div className='relative'>
-                      <select
-                        {...register("course", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                      >
-                        <option value=''>
-                          {!selectedCohort
-                            ? "Select a cohort first..."
-                            : !cohortCourses || cohortCourses.length === 0
-                              ? "No courses available"
-                              : "Select a course"}
-                        </option>
-                        {cohortCourses.length > 0 &&
-                          cohortCourses.map((course) => (
-                            <option key={course._id} value={course._id}>
-                              {course.title}
-                            </option>
-                          ))}
-                      </select>
-                      <MdArrowDropDown
-                        size={24}
-                        className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
-                      />
-                    </div>
-                    {errors.course && (
-                      <span className='text-red-500 text-xs'>
-                        Course is required
-                      </span>
-                    )}
-                  </div>
-
-                  <div className='md:col-span-2'>
-                    <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
-                      Employment Status
-                    </label>
-                    <div className='relative'>
-                      <select
-                        {...register("employmentStatus", { required: true })}
-                        disabled={submitMutation.status === "pending"}
-                        className='w-full p-3 border border-[#1E1E1E] rounded-md focus:outline-none focus:ring focus:ring-[#1E1E1E] appearance-none'
-                      >
-                        <option value=''>Select employment status</option>
-                        {employmentStatusOptions.map((opt) => (
-                          <option key={opt.key} value={opt.key}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      <MdArrowDropDown
-                        size={24}
-                        className='absolute top-1/2 right-3 transform -translate-y-1/2 pointer-events-none'
-                      />
-                    </div>
-                    {errors.employmentStatus && (
-                      <span className='text-red-500 text-xs'>
-                        Employment status is required
-                      </span>
-                    )}
-                  </div>
-
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                <FormSection
+                  title='Documents'
+                  description='Upload a PDF CV and a clear profile photo (max 1MB each).'
+                >
+                  <div className='grid grid-cols-1 gap-5 sm:grid-cols-2'>
                     <Controller
                       name='cv'
                       control={control}
                       rules={{ required: true }}
-                      render={({ field }: any) => (
-                        <FileUploader
-                          label='Upload CV'
-                          name='cv'
-                          required
-                          accept='.pdf'
-                          icon={<MdDescription />}
-                          placeholder='Upload your CV'
-                          onFileChange={field.onChange}
-                          currentFile={field.value}
-                          maxSize={MAX_UPLOAD_SIZE_BYTES}
-                        />
+                      render={({ field }) => (
+                        <div className='space-y-1.5'>
+                          <FileUploader
+                            label='CV (PDF)'
+                            name='cv'
+                            required
+                            accept='.pdf'
+                            icon={<FileText className='size-5' />}
+                            placeholder='Upload your CV'
+                            onFileChange={field.onChange}
+                            currentFile={field.value}
+                            maxSize={MAX_UPLOAD_SIZE_BYTES}
+                          />
+                          <FieldError
+                            message={errors.cv ? "CV is required" : undefined}
+                          />
+                        </div>
                       )}
                     />
                     <Controller
                       name='profileImage'
                       control={control}
                       rules={{ required: true }}
-                      render={({ field }: any) => (
-                        <FileUploader
-                          label='Upload Profile Image'
-                          name='profileImage'
-                          required
-                          accept='image/*'
-                          icon={<MdImage />}
-                          placeholder='Upload your image'
-                          onFileChange={field.onChange}
-                          currentFile={field.value}
-                          maxSize={MAX_UPLOAD_SIZE_BYTES}
-                        />
+                      render={({ field }) => (
+                        <div className='space-y-1.5'>
+                          <FileUploader
+                            label='Profile photo'
+                            name='profileImage'
+                            required
+                            accept='image/*'
+                            icon={<ImageIcon className='size-5' />}
+                            placeholder='Upload your photo'
+                            onFileChange={field.onChange}
+                            currentFile={field.value}
+                            maxSize={MAX_UPLOAD_SIZE_BYTES}
+                          />
+                          <FieldError
+                            message={
+                              errors.profileImage
+                                ? "Profile photo is required"
+                                : undefined
+                            }
+                          />
+                        </div>
                       )}
                     />
                   </div>
+                </FormSection>
 
-                  <button
-                    type='submit'
-                    disabled={submitMutation.status === "pending"}
-                    className={`w-full bg-[#E02B20] text-white py-3 px-5 rounded-md hover:bg-[#E02B20]/90 transition-colors focus:outline-none focus:ring-2 focus:ring-[#E02B20] focus:ring-opacity-50 cursor-pointer ${
-                      submitMutation.status === "pending" ? "opacity-75" : ""
-                    }`}
-                  >
-                    {submitMutation.status === "pending"
-                      ? "Submitting..."
-                      : "Submit Application"}
-                  </button>
-                </form>
-              </div>
+                <Button
+                  type='submit'
+                  disabled={submitMutation.isPending}
+                  className='h-12 w-full gap-2 bg-[#27156F] text-base text-white hover:bg-[#27156F]/90'
+                >
+                  {submitMutation.isPending && (
+                    <Loader2 className='size-4 animate-spin' />
+                  )}
+                  {submitMutation.isPending
+                    ? "Submitting application..."
+                    : "Submit application"}
+                </Button>
+              </form>
             </div>
+          </section>
+
+          {/* Left column — mobile only, below the form */}
+          <aside className='min-w-0 px-6 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
+            <div className='mx-auto min-w-0 max-w-2xl'>
+              <PortalInfoColumn variant='mobile' />
+            </div>
+          </aside>
+        </main>
+      ) : (
+        <div className='flex min-h-[70vh] flex-col items-center justify-center px-4 pt-24 text-center sm:pt-20'>
+          <div className='mb-6 flex size-20 items-center justify-center rounded-full bg-[#DBEAF6]/50 text-[#27156F]/40'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+              className='size-10'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25'
+              />
+            </svg>
           </div>
+          <h1 className='mb-3 text-2xl font-bold text-[#27156F]'>
+            No active cohorts right now
+          </h1>
+          <p className='mb-6 max-w-md text-gray-600'>
+            We&apos;re preparing for the next intake. Check back soon for new
+            learning opportunities.
+          </p>
+          <div className='max-w-md rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 text-left'>
+            <h2 className='mb-3 font-semibold text-[#27156F]'>
+              What to expect
+            </h2>
+            <ul className='space-y-2.5 text-sm text-gray-700'>
+              <li className='flex items-center gap-2'>
+                <svg
+                  className='size-4 shrink-0 text-[#27156F]'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M5 13l4 4L19 7'
+                  />
+                </svg>
+                Hands-on training with industry experts
+              </li>
+              <li className='flex items-center gap-2'>
+                <svg
+                  className='size-4 shrink-0 text-[#27156F]'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M5 13l4 4L19 7'
+                  />
+                </svg>
+                Real-world project experience
+              </li>
+              <li className='flex items-center gap-2'>
+                <svg
+                  className='size-4 shrink-0 text-[#27156F]'
+                  fill='none'
+                  stroke='currentColor'
+                  viewBox='0 0 24 24'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M5 13l4 4L19 7'
+                  />
+                </svg>
+                Career support and mentorship
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+      {showModal &&
+        (!showReview ? (
+          <CheckStatusModal
+            email={email}
+            setEmail={setEmail}
+            onCheckStatus={handleCheckStatus}
+            emailError={emailError}
+            onClose={toggleModal}
+            isPending={checkStatusMutation.status === "pending"}
+          />
         ) : (
-          <div className='flex flex-col justify-center items-center min-h-[70vh] px-4 text-center'>
-            <div className='w-24 h-24 mb-6 text-gray-400'>
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                strokeWidth={1.5}
-                stroke='currentColor'
-              >
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  d='M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25'
-                />
-              </svg>
-            </div>
-            <h1 className='text-2xl font-semibold text-gray-800 mb-3'>
-              No Active Cohorts at the Moment
-            </h1>
-            <p className='text-gray-600 max-w-md mb-6'>
-              We're currently preparing for our next cohort. Stay tuned for
-              exciting learning opportunities coming soon!
-            </p>
-            <div className='bg-blue-50 border border-blue-100 rounded-lg p-4 max-w-md'>
-              <h2 className='text-blue-800 font-medium mb-2'>What to Expect</h2>
-              <ul className='text-blue-700 text-sm space-y-2'>
-                <li className='flex items-center gap-2'>
-                  <svg
-                    className='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M5 13l4 4L19 7'
-                    />
-                  </svg>
-                  Hands-on training with industry experts
-                </li>
-                <li className='flex items-center gap-2'>
-                  <svg
-                    className='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M5 13l4 4L19 7'
-                    />
-                  </svg>
-                  Real-world project experience
-                </li>
-                <li className='flex items-center gap-2'>
-                  <svg
-                    className='w-4 h-4'
-                    fill='none'
-                    stroke='currentColor'
-                    viewBox='0 0 24 24'
-                  >
-                    <path
-                      strokeLinecap='round'
-                      strokeLinejoin='round'
-                      strokeWidth='2'
-                      d='M5 13l4 4L19 7'
-                    />
-                  </svg>
-                  Career support and mentorship
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
-        {showModal &&
-          (!showReview ? (
-            <CheckStatusModal
-              email={email}
-              setEmail={setEmail}
-              onCheckStatus={handleCheckStatus}
-              emailError={emailError}
-              onClose={toggleModal}
-              isPending={checkStatusMutation.status === "pending"}
-            />
-          ) : (
-            <ApplicationReview
-              applicantStatus={applicantStatus}
-              statusError={statusError}
-              onClose={handleCloseReview}
-            />
-          ))}
-        <SuccessModal
-          isOpen={isSuccessModalOpen}
-          onClose={handleCloseSuccessModal}
-        />
-      </div>
+          <ApplicationReview
+            applicantStatus={applicantStatus}
+            statusError={statusError}
+            onClose={handleCloseReview}
+          />
+        ))}
+      <SuccessModal
+        isOpen={isSuccessModalOpen}
+        onClose={handleCloseSuccessModal}
+      />
     </div>
   );
 };

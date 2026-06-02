@@ -1,13 +1,78 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { BookOpen, ChartPieIcon, ImageIcon, SquareLibrary } from "lucide-react";
+import {
+  BookOpen,
+  ExternalLink,
+  ImageIcon,
+  LayoutDashboard,
+  LogOut,
+  Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
+  SquareLibrary,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { FiLogOut, FiMenu, FiX } from "react-icons/fi";
 import { AdminLogo } from "./AdminLogo";
 import { LogoutModal } from "./LogoutModal";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  match: (pathname: string) => boolean;
+  external?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    href: "/admin/dashboard",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    match: (pathname) => pathname === "/admin/dashboard",
+  },
+  {
+    href: "/admin/cohorts",
+    label: "Cohorts",
+    icon: SquareLibrary,
+    match: (pathname) => pathname.startsWith("/admin/cohorts"),
+  },
+  {
+    href: "/admin/courses",
+    label: "Courses",
+    icon: BookOpen,
+    match: (pathname) => pathname.startsWith("/admin/courses"),
+  },
+  {
+    href: "/gallery",
+    label: "Manage Gallery",
+    icon: ImageIcon,
+    match: () => false,
+    external: true,
+  },
+];
+
+function getInitials(name?: string | null, email?: string | null) {
+  if (name?.trim()) {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  }
+  if (email) return email.slice(0, 2).toUpperCase();
+  return "AD";
+}
 
 export const Sidebar = ({
   collapsed = false,
@@ -17,130 +82,193 @@ export const Sidebar = ({
   onToggle?: () => void;
 }) => {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const effectiveCollapsed = collapsed && isDesktop;
 
-  const isActive = (path: string) => pathname === path;
+  const userName = session?.user?.firstName
+    ? `${session?.user?.firstName} ${session?.user?.lastName}`
+    : "Admin User";
+  const userEmail = session?.user?.email ?? "";
+  const userRole = session?.user?.role?.replace("_", " ") ?? "Admin";
+  const initials = getInitials(userName, userEmail);
+
+  const closeMobile = () => setIsOpen(false);
 
   return (
     <div className='relative'>
-      {/* Mobile Top Bar */}
-      <div className='flex justify-between items-center p-4 bg-white shadow-sm lg:hidden'>
-        <button className='focus:outline-none' onClick={() => setIsOpen(true)}>
-          <FiMenu size={24} />
+      {/* Mobile top bar */}
+      <div className='flex items-center justify-between border-b border-[#27156F]/10 bg-white px-4 py-3 shadow-sm lg:hidden'>
+        <button
+          type='button'
+          className='rounded-lg p-2 text-[#27156F] transition hover:bg-[#DBEAF6]/60'
+          onClick={() => setIsOpen(true)}
+          aria-label='Open menu'
+        >
+          <Menu className='size-5' />
         </button>
-        <div className='py-1 flex md:hidden'>
-          <AdminLogo />
-        </div>
+        <AdminLogo compact />
+        <div className='size-9' aria-hidden />
       </div>
 
-      {/* Overlay for mobile */}
       {isOpen && (
-        <div
-          className='fixed inset-0 bg-black/60 z-40'
-          onClick={() => setIsOpen(false)}
-        ></div>
+        <button
+          type='button'
+          className='fixed inset-0 z-40 bg-[#27156F]/40 backdrop-blur-[1px] lg:hidden'
+          onClick={closeMobile}
+          aria-label='Close menu'
+        />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen bg-gray-50 flex flex-col justify-between transition-all duration-300 z-50
-          ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0
-          ${collapsed ? "w-[64px] pl-3" : "w-[260px]"}
-        `}
+        className={cn(
+          "fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-[#27156F]/10 bg-white shadow-sm transition-all duration-300",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          effectiveCollapsed ? "w-[72px]" : "w-[260px]",
+        )}
       >
-        <div>
-          {/* Collapse/Expand button for desktop */}
-          {/* <div className='hidden lg:flex justify-end p-2'>
-            <button
-              onClick={onToggle}
-              className='p-2 rounded hover:bg-gray-100 transition'
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {collapsed ? <PanelLeft size={20} /> : <PanelLeft size={20} />}
-            </button>
-          </div> */}
-          {/* Close button for mobile */}
-          <button
-            className='lg:hidden p-4 flex justify-end w-full'
-            onClick={() => setIsOpen(false)}
-          >
-            <FiX size={24} />
-          </button>
-          {/* Logo */}
-          {!collapsed && <AdminLogo />}
-          {collapsed && (
-            <div className='flex flex-col items-start text-xl pt-3 font-extrabold text-[#27156F] my-4 text-center tracking-wide'>
-              NECA
-              {/* <span className='text-xs text-gray-500 align-sub ml-1'>ICT</span> */}
-            </div>
-          )}
-          {/* Section Title */}
-          {!collapsed && (
-            <div className='px-6 pt-2 pb-1 text-xs font-semibold text-gray-400 tracking-wider uppercase'>
-              Main
-            </div>
-          )}
-          {/* Navigation */}
-          <nav
-            className={`mt-2 flex flex-col gap-1 px-2 ${collapsed ? "items-center" : ""}`}
-          >
-            <SidebarLink
-              href='/admin/dashboard'
-              icon={<ChartPieIcon size={20} />}
-              label='Dashboard'
-              active={isActive("/admin/dashboard")}
-              onClick={() => setIsOpen(false)}
-              collapsed={collapsed}
-            />
-            <SidebarLink
-              href='/admin/cohorts'
-              icon={<SquareLibrary size={20} />}
-              label='Cohorts'
-              active={isActive("/admin/cohorts")}
-              onClick={() => setIsOpen(false)}
-              collapsed={collapsed}
-            />
-            <SidebarLink
-              href='/admin/courses'
-              icon={<BookOpen size={20} />}
-              label='Courses'
-              active={isActive("/admin/courses")}
-              onClick={() => setIsOpen(false)}
-              collapsed={collapsed}
-            />
-            <SidebarLink
-              href='/gallery'
-              target='_blank'
-              icon={<ImageIcon size={20} />}
-              label='Manage Gallery'
-              active={false}
-              onClick={() => setIsOpen(false)}
-              collapsed={collapsed}
-            />
-
-          </nav>
-        </div>
-        {/* Logout */}
+        {/* Header */}
         <div
           className={cn(
-            "mb-6 px-4 flex flex-col justify-center",
-            collapsed && "px-0"
+            "flex shrink-0 items-center border-b border-[#27156F]/10",
+            effectiveCollapsed
+              ? "justify-center px-2 py-4"
+              : "justify-between px-4 py-4",
           )}
         >
-          <div className=''>
-            <hr className='my-4 border-gray-200' />
-          </div>
+          {effectiveCollapsed ? (
+            <Link
+              href='/admin/dashboard'
+              className='flex size-10 items-center justify-center rounded-xl bg-[#27156F] text-sm font-bold text-white'
+              onClick={closeMobile}
+            >
+              N
+            </Link>
+          ) : (
+            <Link
+              href='/admin/dashboard'
+              onClick={closeMobile}
+              className='-ml-1'
+            >
+              <AdminLogo compact />
+            </Link>
+          )}
+
+          {!effectiveCollapsed && (
+            <button
+              type='button'
+              className='hidden rounded-lg p-2 text-[#27156F]/70 transition hover:bg-[#DBEAF6]/60 hover:text-[#27156F] lg:flex'
+              onClick={onToggle}
+              aria-label='Collapse sidebar'
+            >
+              <PanelLeftClose className='size-5' />
+            </button>
+          )}
+
           <button
-            onClick={() => setShowModal(true)}
-            className={`flex items-center text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition
-              ${collapsed ? "justify-center px-2 py-2" : "gap-2 px-4 py-2 w-full"}
-            `}
+            type='button'
+            className='rounded-lg p-2 text-[#27156F]/70 transition hover:bg-[#DBEAF6]/60 lg:hidden'
+            onClick={closeMobile}
+            aria-label='Close menu'
           >
-            <FiLogOut size={20} />
-            {!collapsed && "Logout"}
+            <X className='size-5' />
           </button>
         </div>
+
+        {effectiveCollapsed && (
+          <div className='hidden border-b border-[#27156F]/10 px-2 py-2 lg:flex lg:justify-center'>
+            <button
+              type='button'
+              className='rounded-lg p-2 text-[#27156F]/70 transition hover:bg-[#DBEAF6]/60 hover:text-[#27156F]'
+              onClick={onToggle}
+              aria-label='Expand sidebar'
+            >
+              <PanelLeftOpen className='size-5' />
+            </button>
+          </div>
+        )}
+
+        {/* Navigation */}
+        <nav
+          className={cn(
+            "flex-1 overflow-y-auto px-3 py-4",
+            effectiveCollapsed && "px-2",
+          )}
+        >
+          {!effectiveCollapsed && (
+            <p className='mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400'>
+              Main menu
+            </p>
+          )}
+          <ul className='flex flex-col gap-1'>
+            {NAV_ITEMS.map((item) => (
+              <li key={item.href}>
+                <SidebarLink
+                  item={item}
+                  active={item.match(pathname)}
+                  collapsed={effectiveCollapsed}
+                  onClick={closeMobile}
+                />
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Footer */}
+        <div
+          className={cn(
+            "shrink-0 border-t border-[#27156F]/10 p-3",
+            effectiveCollapsed && "px-2",
+          )}
+        >
+          {!effectiveCollapsed && (
+            <div className='mb-3 flex items-center gap-3 rounded-xl bg-[#DBEAF6]/40 px-3 py-2.5'>
+              <div className='flex size-9 shrink-0 items-center justify-center rounded-full bg-[#27156F] text-xs font-bold text-white'>
+                {initials}
+              </div>
+              <div className='min-w-0 flex-1'>
+                <p className='truncate text-sm font-semibold text-[#27156F]'>
+                  {userName}
+                </p>
+                <p className='truncate text-xs text-gray-500'>{userEmail}</p>
+              </div>
+            </div>
+          )}
+
+          {effectiveCollapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type='button'
+                  onClick={() => setShowModal(true)}
+                  className='flex w-full items-center justify-center rounded-lg p-2.5 text-[#E02B20] transition hover:bg-red-50'
+                  aria-label='Logout'
+                >
+                  <LogOut className='size-5' />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side='right'>Logout</TooltipContent>
+            </Tooltip>
+          ) : (
+            <button
+              type='button'
+              onClick={() => setShowModal(true)}
+              className='flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#E02B20] transition hover:bg-red-50'
+            >
+              <LogOut className='size-4 shrink-0' />
+              Sign out
+            </button>
+          )}
+
+          {!effectiveCollapsed && (
+            <p className='mt-2 px-1 text-center text-[10px] uppercase tracking-wide text-gray-400'>
+              {userRole}
+            </p>
+          )}
+        </div>
+
         <LogoutModal isOpen={showModal} onClose={() => setShowModal(false)} />
       </aside>
     </div>
@@ -148,39 +276,60 @@ export const Sidebar = ({
 };
 
 function SidebarLink({
-  href,
-  target="self",
-  icon,
-  label,
+  item,
   active,
-  onClick,
   collapsed,
+  onClick,
 }: {
-  href: string;
-  target?: string;
-  icon: React.ReactNode;
-  label: string;
+  item: NavItem;
   active: boolean;
-  onClick?: () => void;
   collapsed?: boolean;
+  onClick?: () => void;
 }) {
-  return (
+  const Icon = item.icon;
+
+  const link = (
     <Link
-      href={href}
-      target={target}
+      href={item.href}
+      target={item.external ? "_blank" : undefined}
+      rel={item.external ? "noopener noreferrer" : undefined}
       onClick={onClick}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center gap-3 px-4 py-2 rounded-lg font-medium transition
-        ${
-          active
-            ? "bg-blue-50 text-blue-700 shadow-sm"
-            : "text-gray-700 hover:bg-gray-100"
-        }
-        ${collapsed ? "justify-center px-2" : ""}
-      `}
+      className={cn(
+        "group flex items-center rounded-xl text-sm font-medium transition-all duration-200",
+        collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
+        active
+          ? "bg-[#27156F] text-white shadow-sm"
+          : "text-gray-600 hover:bg-[#DBEAF6]/50 hover:text-[#27156F]",
+      )}
     >
-      {icon}
-      {!collapsed && label}
+      <Icon
+        className={cn(
+          "size-5 shrink-0",
+          active
+            ? "text-white"
+            : "text-[#27156F]/70 group-hover:text-[#27156F]",
+        )}
+      />
+      {!collapsed && (
+        <>
+          <span className='flex-1 truncate'>{item.label}</span>
+          {item.external && (
+            <ExternalLink className='size-3.5 shrink-0 opacity-60' />
+          )}
+        </>
+      )}
     </Link>
   );
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side='right'>{item.label}</TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return link;
 }

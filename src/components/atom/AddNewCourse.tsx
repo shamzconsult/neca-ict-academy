@@ -2,7 +2,6 @@
 
 import { CourseType } from "@/types";
 import React, { useRef, useState } from "react";
-import { FiImage } from "react-icons/fi";
 import { toast } from "sonner";
 import { CourseOutline } from "../molecules/admin/courses/ManageCourses";
 import {
@@ -27,39 +26,90 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MAX_UPLOAD_SIZE_BYTES, MAX_UPLOAD_SIZE_KB } from "@/const";
+import { parseApiError } from "@/lib/parse-api-error";
+import {
+  FieldError,
+  FormErrorBanner,
+  fieldErrorClass,
+} from "./form/FormFeedback";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+
+type CourseFormData = {
+  title: string;
+  description: string;
+  lesson: string;
+  duration: string;
+  rating: string;
+  review: string;
+  skillLevel: string;
+  courseOutlines: CourseOutline[];
+  hasCertificate: boolean;
+  type: string;
+};
+
+type FieldErrors = Partial<Record<keyof CourseFormData | "coverImage", string>>;
 
 type AddNewCourseProps = {
   toggleModal: () => void;
   courseToEdit: CourseType | null;
   setCourseToEdit: (course: CourseType | null) => void;
-  formData: {
-    title: string;
-    description: string;
-    lesson: string;
-    duration: string;
-    rating: string;
-    review: string;
-    skillLevel: string;
-    courseOutlines: CourseOutline[];
-    hasCertificate: boolean;
-    type: string;
-  };
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      title: string;
-      description: string;
-      lesson: string;
-      duration: string;
-      rating: string;
-      review: string;
-      skillLevel: string;
-      courseOutlines: CourseOutline[];
-      hasCertificate: boolean;
-      type: string;
-    }>
-  >;
+  formData: CourseFormData;
+  setFormData: React.Dispatch<React.SetStateAction<CourseFormData>>;
   open: boolean;
 };
+
+const EMPTY_FORM: CourseFormData = {
+  title: "",
+  description: "",
+  lesson: "",
+  duration: "",
+  rating: "",
+  review: "",
+  skillLevel: "",
+  courseOutlines: [],
+  hasCertificate: false,
+  type: "",
+};
+
+function validateCourseForm(
+  data: CourseFormData,
+  options: { isEdit: boolean; hasCover: boolean },
+): FieldErrors {
+  const errors: FieldErrors = {};
+
+  if (!data.title.trim()) errors.title = "Course title is required.";
+  if (!data.description.trim()) errors.description = "Description is required.";
+  if (!data.lesson.trim()) {
+    errors.lesson = "Number of lessons is required.";
+  } else if (Number(data.lesson) <= 0) {
+    errors.lesson = "Lessons must be greater than zero.";
+  }
+  if (!data.duration.trim()) errors.duration = "Duration is required.";
+  if (!data.skillLevel) errors.skillLevel = "Please select a skill level.";
+  if (!data.type) errors.type = "Please select a course type.";
+  if (!options.isEdit && !options.hasCover) {
+    errors.coverImage = "Cover image is required.";
+  }
+
+  return errors;
+}
+
+function buildFormDataPayload(data: CourseFormData, file: File | null) {
+  const formDataToSend = new FormData();
+  formDataToSend.append("title", data.title.trim());
+  formDataToSend.append("description", data.description.trim());
+  formDataToSend.append("lesson", data.lesson);
+  formDataToSend.append("duration", data.duration.trim());
+  formDataToSend.append("rating", data.rating);
+  formDataToSend.append("review", data.review);
+  formDataToSend.append("skillLevel", data.skillLevel);
+  formDataToSend.append("hasCertificate", String(data.hasCertificate));
+  formDataToSend.append("type", data.type);
+  if (file) formDataToSend.append("coverImage", file);
+  formDataToSend.append("courseOutlines", JSON.stringify(data.courseOutlines));
+  return formDataToSend;
+}
 
 export const AddNewCourse = ({
   toggleModal,
@@ -71,8 +121,27 @@ export const AddNewCourse = ({
 }: AddNewCourseProps) => {
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [apiError, setApiError] = useState("");
   const queryClient = useQueryClient();
+
+  const resetLocalState = () => {
+    setFormData(EMPTY_FORM);
+    setFile(null);
+    setFieldErrors({});
+    setApiError("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const clearFieldError = (field: keyof FieldErrors) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setApiError("");
+  };
 
   const addCourseMutation = useMutation({
     mutationFn: async (formDataToSend: FormData) => {
@@ -80,32 +149,22 @@ export const AddNewCourse = ({
         method: "POST",
         body: formDataToSend,
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        throw new Error(await parseApiError(res, "Failed to create course"));
+      }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course Created Successfully 🎉");
-      setFormData({
-        title: "",
-        description: "",
-        lesson: "",
-        duration: "",
-        rating: "",
-        review: "",
-        skillLevel: "",
-        courseOutlines: [],
-        hasCertificate: false,
-        type: "",
-      });
-      setFile(null);
+      toast.success("Course created successfully");
+      resetLocalState();
       toggleModal();
     },
-    onError: () => {
-      toast.error("Failed to create course");
+    onError: (error: Error) => {
+      const message = error.message || "Failed to create course";
+      setApiError(message);
+      toast.error(message);
     },
-    onMutate: () => setLoading(true),
-    onSettled: () => setLoading(false),
   });
 
   const updateCourseMutation = useMutation({
@@ -120,166 +179,164 @@ export const AddNewCourse = ({
         method: "PUT",
         body: formDataToSend,
       });
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        throw new Error(await parseApiError(res, "Failed to update course"));
+      }
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
-      toast.success("Course Updated Successfully 🎉");
+      toast.success("Course updated successfully");
       setCourseToEdit(null);
-      setFormData({
-        title: "",
-        description: "",
-        lesson: "",
-        duration: "",
-        rating: "",
-        review: "",
-        skillLevel: "",
-        courseOutlines: [],
-        hasCertificate: false,
-        type: "",
-      });
-      setFile(null);
+      resetLocalState();
       toggleModal();
     },
-    onError: () => {
-      toast.error("Failed to update course");
+    onError: (error: Error) => {
+      const message = error.message || "Failed to update course";
+      setApiError(message);
+      toast.error(message);
     },
-    onMutate: () => setLoading(true),
-    onSettled: () => setLoading(false),
   });
+
+  const isSubmitting =
+    addCourseMutation.isPending || updateCourseMutation.isPending;
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    clearFieldError(name as keyof FieldErrors);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleClose = () => {
+    if (isSubmitting) return;
+    toggleModal();
+    setCourseToEdit(null);
+    resetLocalState();
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!file) {
-      toast.error("No file selected");
+    setApiError("");
+
+    const hasCover = !!file || !!courseToEdit?.coverImage;
+    const errors = validateCourseForm(formData, {
+      isEdit: !!courseToEdit,
+      hasCover,
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      toast.error("Please fix the errors below before submitting.");
       return;
     }
-    setLoading(true);
-    const formDataToSend = new FormData();
-    formDataToSend.append("title", formData.title);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("lesson", formData.lesson);
-    formDataToSend.append("duration", formData.duration);
-    formDataToSend.append("rating", formData.rating);
-    formDataToSend.append("review", formData.review);
-    formDataToSend.append("skillLevel", formData.skillLevel);
-    formDataToSend.append("hasCertificate", String(formData.hasCertificate));
-    formDataToSend.append("type", formData.type);
-    formDataToSend.append("coverImage", file);
-    formDataToSend.append(
-      "courseOutlines",
-      JSON.stringify(formData.courseOutlines)
-    );
-    addCourseMutation.mutate(formDataToSend);
+
+    setFieldErrors({});
+    const payload = buildFormDataPayload(formData, file);
+
+    if (courseToEdit) {
+      updateCourseMutation.mutate({
+        slug: courseToEdit.slug,
+        formDataToSend: payload,
+      });
+    } else {
+      addCourseMutation.mutate(payload);
+    }
   };
 
-  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!courseToEdit) return;
-    setLoading(true);
-    const formDataToSend = new FormData();
-    formDataToSend.append("title", formData.title);
-    formDataToSend.append("description", formData.description);
-    formDataToSend.append("lesson", formData.lesson);
-    formDataToSend.append("duration", formData.duration);
-    formDataToSend.append("rating", formData.rating);
-    formDataToSend.append("review", formData.review);
-    formDataToSend.append("skillLevel", formData.skillLevel);
-    formDataToSend.append("hasCertificate", String(formData.hasCertificate));
-    formDataToSend.append("type", formData.type);
-    if (file) {
-      formDataToSend.append("coverImage", file);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0] || null;
+    if (selected && selected.size > MAX_UPLOAD_SIZE_BYTES) {
+      const message = `Image must be less than ${MAX_UPLOAD_SIZE_KB}KB (1MB).`;
+      setFieldErrors((prev) => ({ ...prev, coverImage: message }));
+      toast.error(message);
+      e.target.value = "";
+      setFile(null);
+      return;
     }
-    formDataToSend.append(
-      "courseOutlines",
-      JSON.stringify(formData.courseOutlines)
-    );
-    updateCourseMutation.mutate({ slug: courseToEdit.slug, formDataToSend });
+    setFile(selected);
+    clearFieldError("coverImage");
   };
+
+  const coverPreview = file
+    ? URL.createObjectURL(file)
+    : courseToEdit?.coverImage;
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(openState) => {
-        if (!openState) {
-          toggleModal();
-          setCourseToEdit(null);
-          setFormData({
-            title: "",
-            description: "",
-            lesson: "",
-            duration: "",
-            rating: "",
-            review: "",
-            skillLevel: "",
-            courseOutlines: [],
-            hasCertificate: false,
-            type: "",
-          });
-          setFile(null);
-        }
-      }}
+      onOpenChange={(openState) => !openState && handleClose()}
     >
-      <DialogContent className='max-h-[90vh] lg:max-w-xl px-0'>
+      <DialogContent className='max-h-[90vh] px-0 sm:max-w-xl'>
         <DialogHeader className='px-6'>
           <DialogTitle>
             {courseToEdit ? "Edit Course" : "Add New Course"}
           </DialogTitle>
+          <p className='text-sm text-muted-foreground'>
+            {courseToEdit
+              ? "Update course details and cover image."
+              : "Fill in the details to publish a new course."}
+          </p>
         </DialogHeader>
 
-        <form
-          onSubmit={courseToEdit ? handleUpdate : handleSubmit}
-          className='space-y-4'
-        >
-          <ScrollArea className='h-[calc(90vh-450px)] px-6'>
-            <div className='space-y-4'>
+        <form onSubmit={handleFormSubmit} className='space-y-4' noValidate>
+          <div className='px-6'>
+            <FormErrorBanner
+              message={apiError}
+              onDismiss={() => setApiError("")}
+            />
+          </div>
+
+          <ScrollArea className='h-[calc(90vh-280px)] px-6'>
+            <div className='space-y-4 pb-2'>
               <div className='space-y-1'>
-                <Label>Course Title</Label>
+                <Label>
+                  Course Title <span className='text-red-500'>*</span>
+                </Label>
                 <Input
                   type='text'
                   name='title'
                   value={formData.title}
                   onChange={handleChange}
                   placeholder='Software Engineering'
-                  required
+                  aria-invalid={!!fieldErrors.title}
+                  className={fieldErrorClass(!!fieldErrors.title)}
                 />
+                <FieldError message={fieldErrors.title} />
               </div>
 
               <div className='space-y-1'>
-                <Label>Description</Label>
+                <Label>
+                  Description <span className='text-red-500'>*</span>
+                </Label>
                 <Textarea
                   name='description'
                   value={formData.description}
                   onChange={handleChange}
-                  rows={8}
+                  rows={5}
                   placeholder='Write a brief description here...'
-                  required
+                  aria-invalid={!!fieldErrors.description}
+                  className={fieldErrorClass(!!fieldErrors.description)}
                 />
+                <FieldError message={fieldErrors.description} />
               </div>
 
-              <div className='space-y-1 cursor-pointer'>
-                <Label>Upload Cover Image</Label>
-                <div className='relative'>
-                  {(file || courseToEdit?.coverImage) && (
-                    <div className='mb-4 relative'>
-                      <img
-                        src={
-                          file
-                            ? URL.createObjectURL(file)
-                            : courseToEdit?.coverImage
-                        }
-                        alt='Cover preview'
-                        className='w-full h-48 object-cover rounded-lg'
-                      />
+              <div className='space-y-2'>
+                <Label>
+                  Cover Image{" "}
+                  {!courseToEdit && <span className='text-red-500'>*</span>}
+                </Label>
+                {coverPreview && (
+                  <div className='relative mb-2'>
+                    <img
+                      src={coverPreview}
+                      alt='Cover preview'
+                      className='h-48 w-full rounded-lg object-cover'
+                    />
+                    {file && (
                       <button
                         type='button'
                         onClick={() => {
@@ -288,103 +345,83 @@ export const AddNewCourse = ({
                             fileInputRef.current.value = "";
                           }
                         }}
-                        className='absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors'
+                        className='absolute right-2 top-2 rounded-full bg-red-500 p-1.5 text-white hover:bg-red-600'
+                        aria-label='Remove image'
                       >
-                        <svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          className='h-5 w-5'
-                          viewBox='0 0 20 20'
-                          fill='currentColor'
-                        >
-                          <path
-                            fillRule='evenodd'
-                            d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                            clipRule='evenodd'
-                          />
-                        </svg>
+                        ×
                       </button>
-                    </div>
-                  )}
-                  <div className='flex items-center gap-3'>
-                    <Input
-                      type='file'
-                      accept='image/*'
-                      className='cursor-pointer'
-                      ref={fileInputRef}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null;
-                        if (file && file.size > MAX_UPLOAD_SIZE_BYTES) {
-                          alert(`File size must be less than ${MAX_UPLOAD_SIZE_KB}KB (1MB).`);
-                          e.target.value = "";
-                          setFile(null);
-                          return;
-                        }
-                        setFile(file);
-                      }}
-                    />
+                    )}
                   </div>
-                </div>
+                )}
+                <Input
+                  type='file'
+                  accept='image/*'
+                  className={cn(
+                    "cursor-pointer",
+                    fieldErrorClass(!!fieldErrors.coverImage),
+                  )}
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  aria-invalid={!!fieldErrors.coverImage}
+                />
+                <p className='text-xs text-gray-500'>
+                  Max file size: {MAX_UPLOAD_SIZE_KB}KB (1MB). JPG, PNG, or
+                  WebP.
+                </p>
+                <FieldError message={fieldErrors.coverImage} />
               </div>
 
-              <div className='flex flex-col md:flex-row gap-4'>
-                <div className='flex-1 space-y-1'>
-                  <Label>Lesson</Label>
+              <div className='grid gap-4 sm:grid-cols-2'>
+                <div className='space-y-1'>
+                  <Label>
+                    Lessons <span className='text-red-500'>*</span>
+                  </Label>
                   <Input
                     type='number'
                     name='lesson'
+                    min={1}
                     value={formData.lesson}
                     onChange={handleChange}
                     placeholder='140'
-                    required
+                    aria-invalid={!!fieldErrors.lesson}
+                    className={fieldErrorClass(!!fieldErrors.lesson)}
                   />
+                  <FieldError message={fieldErrors.lesson} />
                 </div>
-                <div className='flex-1 space-y-1'>
-                  <Label>Duration</Label>
+                <div className='space-y-1'>
+                  <Label>
+                    Duration <span className='text-red-500'>*</span>
+                  </Label>
                   <Input
                     type='text'
                     name='duration'
                     value={formData.duration}
                     onChange={handleChange}
                     placeholder='8 weeks'
-                    required
+                    aria-invalid={!!fieldErrors.duration}
+                    className={fieldErrorClass(!!fieldErrors.duration)}
                   />
+                  <FieldError message={fieldErrors.duration} />
                 </div>
               </div>
 
-              {/* <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 space-y-1">
-                <Label>Rating</Label>
-                <Input
-                  type="text"
-                  name="rating"
-                  value={formData.rating}
-                  onChange={handleChange}
-                  placeholder="4.0"
-                  required
-                />
-              </div>
-              <div className="flex-1 space-y-1">
-                <Label>Review</Label>
-                <Input
-                  type="text"
-                  name="review"
-                  value={formData.review}
-                  onChange={handleChange}
-                  placeholder="48 reviews"
-                  required
-                />
-              </div>
-            </div> */}
-
-              <div className='space-y-1 w-full'>
-                <Label>Skill Level</Label>
+              <div className='space-y-1'>
+                <Label>
+                  Skill Level <span className='text-red-500'>*</span>
+                </Label>
                 <Select
                   value={formData.skillLevel}
                   onValueChange={(value) => {
                     setFormData({ ...formData, skillLevel: value });
+                    clearFieldError("skillLevel");
                   }}
                 >
-                  <SelectTrigger className='w-full'>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full",
+                      fieldErrorClass(!!fieldErrors.skillLevel),
+                    )}
+                  >
                     <SelectValue placeholder='Select skill level' />
                   </SelectTrigger>
                   <SelectContent>
@@ -393,17 +430,26 @@ export const AddNewCourse = ({
                     <SelectItem value='Advanced'>Advanced</SelectItem>
                   </SelectContent>
                 </Select>
+                <FieldError message={fieldErrors.skillLevel} />
               </div>
 
-              <div className='space-y-1 w-full'>
-                <Label>Type</Label>
+              <div className='space-y-1'>
+                <Label>
+                  Type <span className='text-red-500'>*</span>
+                </Label>
                 <Select
                   value={formData.type}
                   onValueChange={(value) => {
                     setFormData({ ...formData, type: value });
+                    clearFieldError("type");
                   }}
                 >
-                  <SelectTrigger className='w-full'>
+                  <SelectTrigger
+                    className={cn(
+                      "w-full",
+                      fieldErrorClass(!!fieldErrors.type),
+                    )}
+                  >
                     <SelectValue placeholder='Select course type' />
                   </SelectTrigger>
                   <SelectContent>
@@ -412,31 +458,16 @@ export const AddNewCourse = ({
                     <SelectItem value='Hybrid'>Hybrid</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='hasCertificate'
-                  checked={formData.hasCertificate}
-                  onCheckedChange={(checked: boolean) => {
-                    setFormData({
-                      ...formData,
-                      hasCertificate: checked,
-                    });
-                  }}
-                />
-                <Label htmlFor='hasCertificate'>
-                  This course offers a certificate
-                </Label>
+                <FieldError message={fieldErrors.type} />
               </div>
 
               <div className='space-y-2'>
                 <Label>Course Outline</Label>
                 {formData.courseOutlines.map((outline, index) => (
-                  <div key={index} className='border p-3 rounded-md space-y-2'>
+                  <div key={index} className='space-y-2 rounded-lg border p-3'>
                     <Input
                       type='text'
-                      placeholder='Outline Header'
+                      placeholder='Section title'
                       value={outline.header}
                       onChange={(e) => {
                         const newOutlines = [...formData.courseOutlines];
@@ -448,11 +479,11 @@ export const AddNewCourse = ({
                       }}
                     />
                     <div className='space-y-2'>
-                      <div className='flex flex-wrap gap-2 mb-2'>
+                      <div className='flex flex-wrap gap-2'>
                         {outline.lists.map((item, itemIndex) => (
                           <div
                             key={itemIndex}
-                            className='bg-gray-100 px-3 py-1 rounded-full flex items-center gap-2'
+                            className='flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm'
                           >
                             <span>{item}</span>
                             <button
@@ -478,7 +509,7 @@ export const AddNewCourse = ({
                       </div>
                       <Input
                         type='text'
-                        placeholder='Type and press comma or enter to add items'
+                        placeholder='Type and press Enter or comma to add items'
                         value={outline.currentInput || ""}
                         onChange={(e) => {
                           const newOutlines = [...formData.courseOutlines];
@@ -513,19 +544,18 @@ export const AddNewCourse = ({
                       <Button
                         type='button'
                         variant='ghost'
-                        className='cursor-pointer text-[#e02a20ce] hover:text-[#e02a20ce]'
                         size='sm'
+                        className='text-[#E02B20] hover:text-[#E02B20]'
                         onClick={() => {
-                          const newOutlines = formData.courseOutlines.filter(
-                            (_, i) => i !== index
-                          );
                           setFormData({
                             ...formData,
-                            courseOutlines: newOutlines,
+                            courseOutlines: formData.courseOutlines.filter(
+                              (_, i) => i !== index,
+                            ),
                           });
                         }}
                       >
-                        Remove
+                        Remove section
                       </Button>
                     </div>
                   </div>
@@ -533,7 +563,6 @@ export const AddNewCourse = ({
                 <Button
                   type='button'
                   variant='outline'
-                  className='cursor-pointer'
                   onClick={() =>
                     setFormData({
                       ...formData,
@@ -547,50 +576,45 @@ export const AddNewCourse = ({
                   + Add Section
                 </Button>
               </div>
+
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='hasCertificate'
+                  checked={formData.hasCertificate}
+                  onCheckedChange={(checked: boolean) => {
+                    setFormData({ ...formData, hasCertificate: checked });
+                  }}
+                />
+                <Label htmlFor='hasCertificate' className='font-normal'>
+                  This course offers a certificate
+                </Label>
+              </div>
             </div>
           </ScrollArea>
 
-          <DialogFooter className='flex flex-col md:flex-row gap-2 mt-6 px-6'>
-            <Button
-              type='submit'
-              disabled={loading}
-              className={`px-4 py-2 ${
-                courseToEdit
-                  ? "bg-green-600 hover:bg-green-500"
-                  : "bg-[#E02B20]  hover:bg-[#e02a20ce]"
-              }  duration-300 text-white  rounded-md cursor-pointer w-1/2 ${
-                loading ? "opacity-60 cursor-not-allowed" : ""
-              }`}
-            >
-              {loading
-                ? "Loading..."
-                : courseToEdit
-                  ? "Update Course"
-                  : "Add Course"}
-            </Button>
+          <DialogFooter className='flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end'>
             <Button
               type='button'
               variant='outline'
-              className='px-4 py-2 hover:text-white bg-black text-white rounded-md w-1/2 cursor-pointer hover:bg-black/80'
-              onClick={() => {
-                toggleModal();
-                setCourseToEdit(null);
-                setFormData({
-                  title: "",
-                  description: "",
-                  lesson: "",
-                  duration: "",
-                  rating: "",
-                  review: "",
-                  skillLevel: "",
-                  courseOutlines: [],
-                  hasCertificate: false,
-                  type: "",
-                });
-                setFile(null);
-              }}
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className='border-[#27156F]/20'
             >
               Cancel
+            </Button>
+            <Button
+              type='submit'
+              disabled={isSubmitting}
+              className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
+            >
+              {isSubmitting && <Loader2 className='size-4 animate-spin' />}
+              {isSubmitting
+                ? courseToEdit
+                  ? "Updating..."
+                  : "Creating..."
+                : courseToEdit
+                  ? "Update Course"
+                  : "Add Course"}
             </Button>
           </DialogFooter>
         </form>

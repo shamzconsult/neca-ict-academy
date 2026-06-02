@@ -33,11 +33,20 @@ export const LogoutModal = ({ isOpen, onClose }: LogoutModalProps) => {
           </DialogTitle>
         </DialogHeader>
         <p className='text-center'>Are you sure you want to logout?</p>
-        <DialogFooter>
-          <Button variant='secondary' onClick={onClose} type='button'>
+        <DialogFooter className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
+          <Button
+            variant='outline'
+            onClick={onClose}
+            type='button'
+            className='border-[#27156F]/20'
+          >
             No, Cancel
           </Button>
-          <Button onClick={handleConfirm} type='button' variant='destructive'>
+          <Button
+            onClick={handleConfirm}
+            type='button'
+            className='gap-2 bg-[#E02B20] text-white hover:bg-[#E02B20]/90'
+          >
             Yes, Logout
           </Button>
         </DialogFooter>

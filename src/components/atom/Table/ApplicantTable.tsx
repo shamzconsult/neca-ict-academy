@@ -1,73 +1,84 @@
 import { applicantTableHead } from "@/const";
+import { EnrollmentType } from "@/types";
 import {
   Table,
   TableBody,
   TableCell,
+  TableContainer,
+  TableEmptyRow,
   TableHead,
   TableHeader,
   TableRow,
+  TableStatusBadge,
 } from "./Table";
-import { EnrollmentType } from "@/types";
+
+const getStatusVariant = (
+  status: string
+): "pending" | "admitted" | "declined" | "graduated" | "default" => {
+  const normalized = status.toLowerCase();
+  if (normalized === "admitted") return "admitted";
+  if (normalized === "pending") return "pending";
+  if (normalized === "declined") return "declined";
+  if (normalized === "graduated") return "graduated";
+  return "default";
+};
 
 type ApplicantTableProps = {
   tableData: EnrollmentType[];
-  status: string;
-  level: string;
-  searchTerm: string;
 };
 
 const ApplicantTable = ({ tableData }: ApplicantTableProps) => {
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          {applicantTableHead.map((header) => (
-            <TableHeader key={header}>{header}</TableHeader>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {tableData.length > 0 ? (
-          tableData.map((applicant) => (
-            <TableRow key={applicant._id} className='hover:bg-slate-50'>
-              <TableCell>
-                {applicant.surname} {applicant.otherNames}
-              </TableCell>
-              <TableCell>{applicant.email}</TableCell>
-              <TableCell>{applicant.phoneNumber}</TableCell>
-              <TableCell>{applicant.state}</TableCell>
-              <TableCell>{applicant.course}</TableCell>
-              <TableCell>{applicant.level}</TableCell>
-              <TableCell>
-                {applicant.status && (
-                  <span
-                    className={`px-3 py-1 text-nowrap rounded-md text-sm capitalize ${
-                      applicant.status.toLowerCase() === "Admitted"
-                        ? "bg-green-100 text-[#78A55A]"
-                        : applicant.status === "Pending"
-                          ? "bg-yellow-100 text-[#F29D38]"
-                          : applicant.status.toLowerCase() === "declined"
-                            ? "bg-red-100 text-[#E02B20]"
-                            : "bg-gray-100 text-[#525252]"
-                    }`}
-                  >
-                    {applicant.status}
-                  </span>
-                )}
-              </TableCell>
-            </TableRow>
-          ))
-        ) : (
-          <TableRow>
-            <td colSpan={7} className='text-center text-red-500'>
-              <div className='text-center font-bold py-24'>
-                No results founds
-              </div>
-            </td>
+    <TableContainer>
+      <Table className="min-w-[800px]">
+        <TableHead>
+          <TableRow className="hover:bg-transparent border-b border-[#27156F]/10">
+            {applicantTableHead.map((header, i) => (
+              <TableHeader
+                key={header}
+                align={header === "Status" ? "center" : "left"}
+                className={i === 0 ? "min-w-[180px]" : undefined}
+              >
+                {header}
+              </TableHeader>
+            ))}
           </TableRow>
-        )}
-      </TableBody>
-    </Table>
+        </TableHead>
+        <TableBody>
+          {tableData.length > 0 ? (
+            tableData.map((applicant) => (
+              <TableRow key={applicant._id}>
+                <TableCell>
+                  <span className="font-medium text-[#27156F]">
+                    {applicant.surname} {applicant.otherNames}
+                  </span>
+                </TableCell>
+                <TableCell className="text-gray-600">{applicant.email}</TableCell>
+                <TableCell className="text-gray-600 whitespace-nowrap">
+                  {applicant.phoneNumber}
+                </TableCell>
+                <TableCell className="text-gray-600">{applicant.state}</TableCell>
+                <TableCell className="max-w-[200px] truncate text-gray-600">
+                  {applicant.course}
+                </TableCell>
+                <TableCell className="capitalize text-gray-600">
+                  {applicant.level}
+                </TableCell>
+                <TableCell align="center">
+                  {applicant.status && (
+                    <TableStatusBadge variant={getStatusVariant(applicant.status)}>
+                      {applicant.status}
+                    </TableStatusBadge>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableEmptyRow colSpan={applicantTableHead.length} />
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 };
 

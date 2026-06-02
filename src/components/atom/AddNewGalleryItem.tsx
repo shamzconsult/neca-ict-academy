@@ -303,7 +303,7 @@ export const AddNewGalleryItem = ({
               <Button
                 type='button'
                 onClick={addItemToList}
-                className='w-full cursor-pointer'
+                className='w-full cursor-pointer gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
                 disabled={
                   !currentItem.title || !currentItem.date || !currentItem.image
                 }
@@ -375,7 +375,7 @@ export const AddNewGalleryItem = ({
             disabled={
               editingItemId !== null || loading || galleryItems.length === 0
             }
-            className='w-full cursor-pointer mt-4'
+            className='mt-4 w-full cursor-pointer gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
           >
             {galleryToEdit ? "Update" : "Upload Batch"}
             {loading && <Loader2 className='h-4 w-4 animate-spin' />}

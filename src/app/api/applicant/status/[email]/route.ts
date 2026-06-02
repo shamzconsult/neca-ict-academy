@@ -1,6 +1,8 @@
 import connectViaMongoose from "@/lib/db";
 import { Enrollment } from "@/models/enrollment";
 import { Applicant } from "@/models/applicant";
+import Course from "@/models/course";
+import Cohort from "@/models/cohort";
 import { NextResponse } from "next/server";
 
 export const GET = async (req: Request) => {
@@ -29,7 +31,11 @@ export const GET = async (req: Request) => {
 
     const enrollment = await Enrollment.findOne({
       applicant: applicant._id,
-    }).select("status level");
+    })
+      .sort({ createdAt: -1 })
+      .populate("course", "title", Course)
+      .populate("cohort", "name", Cohort)
+      .select("status level course cohort");
 
     if (!enrollment) {
       return NextResponse.json(
@@ -38,12 +44,31 @@ export const GET = async (req: Request) => {
       );
     }
 
+    const course =
+      enrollment.course &&
+      typeof enrollment.course === "object" &&
+      "title" in enrollment.course
+        ? enrollment.course.title
+        : null;
+
+    const cohort =
+      enrollment.cohort &&
+      typeof enrollment.cohort === "object" &&
+      "name" in enrollment.cohort
+        ? enrollment.cohort.name
+        : null;
+
     return NextResponse.json({
       status: enrollment.status,
       level: enrollment.level,
+      course,
+      cohort,
       applicant: {
         surname: applicant.surname,
         otherNames: applicant.otherNames,
+        profilePicture: applicant.profilePicture?.url
+          ? { url: applicant.profilePicture.url }
+          : null,
       },
     });
   } catch (error) {

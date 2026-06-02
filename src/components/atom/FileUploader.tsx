@@ -1,6 +1,9 @@
 "use client";
+
 import { FiX } from "react-icons/fi";
 import { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface FileUploaderProps {
   label: string;
@@ -11,7 +14,7 @@ interface FileUploaderProps {
   placeholder: string;
   onFileChange: (file: File | null) => void;
   currentFile?: File | null;
-  maxSize?: number; // in bytes
+  maxSize?: number;
 }
 
 export const FileUploader = ({
@@ -35,7 +38,6 @@ export const FileUploader = ({
         return;
       }
 
-      // Check if file is a PDF when accept is .pdf
       if (accept === ".pdf" && file.type !== "application/pdf") {
         alert("Please upload a valid PDF file.");
         e.target.value = "";
@@ -49,7 +51,6 @@ export const FileUploader = ({
   const clearFile = (e: React.MouseEvent) => {
     e.stopPropagation();
     onFileChange(null);
-    // Clear input value
     const input = e.currentTarget
       .closest("div")
       ?.querySelector('input[type="file"]');
@@ -57,40 +58,44 @@ export const FileUploader = ({
   };
 
   return (
-    <div className='mb-4'>
-      <label className='block text-sm font-medium text-gray-700 text-left mb-2'>
+    <div className="space-y-1.5 text-left">
+      <Label className="text-[#27156F]">
         {label}
-        {required}
-      </label>
-      <div className='relative h-14'>
-        <div className='flex items-center gap-3 p-3 h-full border border-[#1E1E1E] rounded-md focus-within:ring-1 focus-within:ring-[#1E1E1E] cursor-pointer hover:border-[#1E1E1E]/80 transition-colors'>
-          <div className='text-gray-500 text-xl flex-shrink-0'>{icon}</div>
+        {required && <span className="text-[#E02B20]"> *</span>}
+      </Label>
+      <div className="relative h-11">
+        <div
+          className={cn(
+            "flex h-full items-center gap-3 rounded-lg border border-[#27156F]/15 bg-white px-3 shadow-xs transition",
+            "cursor-pointer hover:border-[#27156F]/30 focus-within:border-[#27156F]/40 focus-within:ring-2 focus-within:ring-[#27156F]/20",
+            currentFile && "border-[#27156F]/25 bg-[#DBEAF6]/20"
+          )}
+        >
+          <div className="shrink-0 text-[#27156F]/60">{icon}</div>
           <input
-            type='file'
+            type="file"
             name={name}
             accept={accept}
             required={required}
             onChange={handleFileChange}
-            className='w-full opacity-0 absolute inset-0 cursor-pointer'
+            className="absolute inset-0 cursor-pointer opacity-0"
           />
           {currentFile ? (
-            <div className='flex items-center gap-2 w-full min-w-0'>
-              <span className='text-gray-700 text-sm truncate flex-1 min-w-0'>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <span className="min-w-0 flex-1 truncate text-sm text-[#27156F]">
                 {currentFile.name}
               </span>
               <button
-                type='button'
+                type="button"
                 onClick={clearFile}
-                className='text-gray-500 hover:text-gray-700 flex-shrink-0 transition-colors'
+                className="shrink-0 rounded-md p-0.5 text-gray-500 transition-colors hover:bg-[#27156F]/10 hover:text-[#27156F]"
                 aria-label={`Clear ${label}`}
               >
                 <FiX />
               </button>
             </div>
           ) : (
-            <span className='text-gray-500 text-sm truncate'>
-              {placeholder}
-            </span>
+            <span className="truncate text-sm text-gray-400">{placeholder}</span>
           )}
         </div>
       </div>
