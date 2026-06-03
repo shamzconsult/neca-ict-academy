@@ -68,9 +68,9 @@ type ApplicationStatsChartProps = {
   error?: Error;
 };
 
-const MAX_LOCATIONS = 10;
 const BRAND_MALE = "#27156F";
 const BRAND_FEMALE = "#E02B20";
+const LOCATION_BAR_WIDTH = 36;
 
 export const ApplicationStatsChart = ({
   data,
@@ -83,27 +83,16 @@ export const ApplicationStatsChart = ({
   const isMobile = useMediaQuery("(max-width: 639px)");
 
   const sortedLocationData = useMemo(() => {
-    const withData =
-      data?.locationStats
-        ?.filter((d) => d.total > 0)
-        .sort((a, b) => b.total - a.total) ?? [];
-
-    if (withData.length <= MAX_LOCATIONS) return withData;
-
-    const top = withData.slice(0, MAX_LOCATIONS);
-    const rest = withData.slice(MAX_LOCATIONS);
-    const others = rest.reduce(
-      (acc, curr) => ({
-        state: "Others",
-        male: acc.male + curr.male,
-        female: acc.female + curr.female,
-        total: acc.total + curr.total,
-      }),
-      { state: "Others", male: 0, female: 0, total: 0 },
+    return (
+      data?.locationStats?.slice().sort((a, b) => {
+        if (b.total !== a.total) return b.total - a.total;
+        return a.state.localeCompare(b.state);
+      }) ?? []
     );
-
-    return [...top, others];
   }, [data?.locationStats]);
+
+  const locationChartWidth =
+    sortedLocationData.length * LOCATION_BAR_WIDTH + 80;
 
   const cohortLabel =
     selectedCohort !== "all"
@@ -167,11 +156,10 @@ export const ApplicationStatsChart = ({
         stacked: true,
         grid: { display: false },
         ticks: {
-          maxRotation: isMobile ? 65 : 35,
-          minRotation: isMobile ? 45 : 35,
-          font: { size: isMobile ? 9 : 11 },
-          autoSkip: true,
-          maxTicksLimit: isMobile ? 6 : undefined,
+          maxRotation: isMobile ? 65 : 45,
+          minRotation: isMobile ? 45 : 45,
+          font: { size: isMobile ? 8 : 10 },
+          autoSkip: false,
         },
       },
       y: {
@@ -214,7 +202,7 @@ export const ApplicationStatsChart = ({
     },
   };
 
-  const hasLocationData = sortedLocationData.length > 0;
+  const hasApplicationData = (data?.totalApplications ?? 0) > 0;
 
   return (
     <div className='overflow-hidden rounded-2xl border border-[#27156F]/10 bg-white shadow-sm'>
@@ -283,7 +271,7 @@ export const ApplicationStatsChart = ({
           </div>
         ) : isFetching ? (
           <ChartSkeleton />
-        ) : !hasLocationData ? (
+        ) : !hasApplicationData ? (
           <div className='flex h-full flex-col items-center justify-center gap-2 text-gray-500'>
             <Search className='size-8 text-gray-300' />
             <p className='font-medium'>No application data yet</p>
@@ -292,7 +280,14 @@ export const ApplicationStatsChart = ({
             </p>
           </div>
         ) : chartType === "location" ? (
-          <Bar data={locationChartData} options={locationChartOptions} />
+          <div className='h-full overflow-x-auto'>
+            <div
+              className='h-full'
+              style={{ minWidth: locationChartWidth }}
+            >
+              <Bar data={locationChartData} options={locationChartOptions} />
+            </div>
+          </div>
         ) : (
           <div className='mx-auto flex h-full max-w-sm items-center justify-center'>
             <Pie data={genderChartData} options={genderChartOptions} />
