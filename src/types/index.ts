@@ -115,4 +115,5 @@ export type CourseType = {
   hasCertificate: boolean;
   type: "Physical" | "Virtual" | "Hybrid";
   totalEnrolled?: number;
+  acceptingApplications?: boolean;
 };

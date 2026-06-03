@@ -193,7 +193,8 @@ export const ApplicantInfoModal = ({
   const displayPosition =
     globalPosition ?? (currentIndex !== undefined ? currentIndex + 1 : 1);
   const displayTotal = totalApplicants ?? totalEnrollments ?? 1;
-  const prevDisabled = canGoPrev !== undefined ? !canGoPrev : currentIndex === 0;
+  const prevDisabled =
+    canGoPrev !== undefined ? !canGoPrev : currentIndex === 0;
   const nextDisabled =
     canGoNext !== undefined
       ? !canGoNext
@@ -367,24 +368,24 @@ function ApplicantInfoModalContent({
 
   return (
     <>
-        <div
-          className={cn(
-            "relative flex min-h-0 flex-1 flex-col overflow-hidden transition-opacity duration-200",
-            isNavigating && "opacity-40",
-          )}
-        >
-          {isNavigating && (
-            <div
-              className='absolute inset-0 z-20 flex items-center justify-center bg-white/30'
-              aria-busy='true'
-              aria-live='polite'
-            >
-              <div className='flex flex-col items-center gap-2 rounded-xl border border-[#27156F]/10 bg-white px-5 py-4 shadow-sm'>
-                <Loader2 className='size-6 animate-spin text-[#27156F]' />
-                <p className='text-sm text-gray-600'>Loading applicant...</p>
-              </div>
+      <div
+        className={cn(
+          "relative flex min-h-0 flex-1 flex-col overflow-hidden transition-opacity duration-200",
+          isNavigating && "opacity-40",
+        )}
+      >
+        {isNavigating && (
+          <div
+            className='absolute inset-0 z-20 flex items-center justify-center bg-white/30'
+            aria-busy='true'
+            aria-live='polite'
+          >
+            <div className='flex flex-col items-center gap-2 rounded-xl border border-[#27156F]/10 bg-white px-5 py-4 shadow-sm'>
+              <Loader2 className='size-6 animate-spin text-[#27156F]' />
+              <p className='text-sm text-gray-600'>Loading applicant...</p>
             </div>
-          )}
+          </div>
+        )}
         <div className='flex min-h-0 flex-1 flex-col overflow-y-auto lg:flex-row'>
           {/* Left: profile + details */}
           <div className='w-full shrink-0 border-b border-[#27156F]/10 p-6 overflow-y-scroll lg:w-[380px] lg:border-b-0 lg:border-r'>
@@ -550,31 +551,34 @@ function ApplicantInfoModalContent({
             </div>
           )}
         </div>
-        </div>
+      </div>
 
-        <DialogFooter className='shrink-0 border-t border-[#27156F]/10 px-6 py-4 sm:justify-between'>
-          <p className='hidden text-xs text-gray-500 sm:block'>
-            {hasChanges ? "Unsaved changes" : "No pending changes"}
-          </p>
-          <div className='flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row'>
-            <Button
-              variant='outline'
-              onClick={() => onOpenChange(false)}
-              disabled={isUpdating}
-              className='border-[#27156F]/20'
-            >
-              Close
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={!hasChanges || isUpdating || disabled}
-              className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
-            >
-              {isUpdating && <Loader2 className='size-4 animate-spin' />}
-              {isUpdating ? "Saving..." : "Save changes"}
-            </Button>
-          </div>
-        </DialogFooter>
+      <DialogFooter className='shrink-0 border-t border-[#27156F]/10 px-6 py-4 sm:justify-between'>
+        <p className='hidden text-xs text-gray-500 sm:block'>
+          {hasChanges ? "Unsaved changes" : "No pending changes"}
+        </p>
+        <div className='flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row'>
+          <Button
+            variant='outline'
+            onClick={() => onOpenChange(false)}
+            disabled={isUpdating}
+            className='border-[#27156F]/20'
+          >
+            Close
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={!hasChanges || isUpdating || disabled}
+            className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
+          >
+            {isUpdating ? (
+              <Loader2 className='size-4 animate-spin' />
+            ) : (
+              "Save changes"
+            )}
+          </Button>
+        </div>
+      </DialogFooter>
     </>
   );
-};
+}

@@ -607,14 +607,13 @@ export const AddNewCourse = ({
               disabled={isSubmitting}
               className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
             >
-              {isSubmitting && <Loader2 className='size-4 animate-spin' />}
-              {isSubmitting
-                ? courseToEdit
-                  ? "Updating..."
-                  : "Creating..."
-                : courseToEdit
-                  ? "Update Course"
-                  : "Add Course"}
+              {isSubmitting ? (
+                <Loader2 className='size-4 animate-spin' />
+              ) : courseToEdit ? (
+                "Update Course"
+              ) : (
+                "Add Course"
+              )}
             </Button>
           </DialogFooter>
         </form>

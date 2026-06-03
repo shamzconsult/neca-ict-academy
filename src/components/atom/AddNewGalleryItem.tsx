@@ -150,7 +150,7 @@ export const AddNewGalleryItem = ({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setCurrentItem({ ...currentItem, [e.target.name]: e.target.value });
   };
@@ -212,7 +212,7 @@ export const AddNewGalleryItem = ({
   };
 
   const handleSubmit = (
-    e: React.FormEvent<HTMLFormElement | HTMLButtonElement>
+    e: React.FormEvent<HTMLFormElement | HTMLButtonElement>,
   ) => {
     e.preventDefault();
 

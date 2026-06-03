@@ -3,7 +3,7 @@ import { EnrollBtn } from "./EnrollBtn";
 import { CourseType } from "@/types";
 
 export const JoinUs = ({
-  courseData: { title },
+  courseData: { title, acceptingApplications },
 }: {
   courseData: CourseType;
 }) => {
@@ -31,7 +31,7 @@ export const JoinUs = ({
           real-time assignments, and prepare yourself for a thriving career in
           tech.
         </p>
-        <EnrollBtn />
+        <EnrollBtn acceptingApplications={acceptingApplications} />
       </div>
     </div>
   );

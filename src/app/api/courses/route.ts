@@ -3,6 +3,7 @@ import connectViaMongoose from "@/lib/db";
 import Course from "@/models/course";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Enrollment } from "@/models/enrollment";
+import { getOpenApplicationCourseIds } from "@/services/courses/courses.server";
 import { revalidatePath } from "next/cache";
 
 export const POST = async (req: Request) => {
@@ -134,7 +135,9 @@ export const GET = async (req: Request) => {
       .sort({ [sort]: order })
       .exec();
 
-    // Fetch totalEnrolled for each course
+    const openApplicationCourseIds = await getOpenApplicationCourseIds();
+
+    // Fetch totalEnrolled and application status for each course
     const coursesWithEnrolled = await Promise.all(
       courses.map(async (course) => {
         const totalEnrolled = await Enrollment.countDocuments({
@@ -143,8 +146,11 @@ export const GET = async (req: Request) => {
         return {
           ...course.toObject(),
           totalEnrolled,
+          acceptingApplications: openApplicationCourseIds.has(
+            course._id.toString(),
+          ),
         };
-      })
+      }),
     );
 
     return NextResponse.json(coursesWithEnrolled, { status: 200 });

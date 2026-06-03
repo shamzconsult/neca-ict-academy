@@ -71,7 +71,9 @@ function validateCohortForm(data: CohortFormData): FieldErrors {
     errors.applicationEndDate = "Application end date is required.";
   }
   if (data.applicationStartDate && data.applicationEndDate) {
-    if (new Date(data.applicationEndDate) < new Date(data.applicationStartDate)) {
+    if (
+      new Date(data.applicationEndDate) < new Date(data.applicationStartDate)
+    ) {
       errors.applicationEndDate =
         "Application end date must be on or after the start date.";
     }
@@ -83,7 +85,8 @@ function validateCohortForm(data: CohortFormData): FieldErrors {
     data.applicationEndDate &&
     new Date(data.startDate) <= new Date(data.applicationEndDate)
   ) {
-    errors.startDate = "Cohort start date must be after the application end date.";
+    errors.startDate =
+      "Cohort start date must be after the application end date.";
   }
 
   if (!data.endDate) {
@@ -181,7 +184,10 @@ export const CohortForm = ({
       formDataToSend.append("name", payload.name);
       formDataToSend.append("startDate", payload.startDate);
       formDataToSend.append("endDate", payload.endDate);
-      formDataToSend.append("applicationStartDate", payload.applicationStartDate);
+      formDataToSend.append(
+        "applicationStartDate",
+        payload.applicationStartDate,
+      );
       formDataToSend.append("applicationEndDate", payload.applicationEndDate);
       formDataToSend.append("active", payload.active.toString());
       formDataToSend.append("courses", JSON.stringify(payload.courses));
@@ -211,7 +217,7 @@ export const CohortForm = ({
             };
           }
           return cohort;
-        })
+        }),
       );
 
       toast.success("Cohort updated successfully");
@@ -229,7 +235,7 @@ export const CohortForm = ({
   const isSubmitting = createCohort.isPending || updateCohort.isPending;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -280,39 +286,42 @@ export const CohortForm = ({
 
   return (
     <Dialog open onOpenChange={(openState) => !openState && handleClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>
             {cohortToEdit ? "Update Cohort" : "Create Cohort"}
           </DialogTitle>
-          <p className="text-sm text-muted-foreground">
+          <p className='text-sm text-muted-foreground'>
             {cohortToEdit
               ? "Edit cohort details and linked courses."
               : "Set up a new cohort with application and schedule dates."}
           </p>
         </DialogHeader>
 
-        <form onSubmit={handleFormSubmit} className="space-y-5" noValidate>
-          <FormErrorBanner message={apiError} onDismiss={() => setApiError("")} />
+        <form onSubmit={handleFormSubmit} className='space-y-5' noValidate>
+          <FormErrorBanner
+            message={apiError}
+            onDismiss={() => setApiError("")}
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="name">
-              Cohort Name <span className="text-red-500">*</span>
+          <div className='space-y-2'>
+            <Label htmlFor='name'>
+              Cohort Name <span className='text-red-500'>*</span>
             </Label>
             <Input
-              id="name"
-              name="name"
+              id='name'
+              name='name'
               value={formData.name}
               onChange={handleChange}
-              placeholder="e.g. AI & 3D Animation — Cohort 3"
+              placeholder='e.g. AI & 3D Animation — Cohort 3'
               aria-invalid={!!fieldErrors.name}
               className={fieldErrorClass(!!fieldErrors.name)}
             />
             <FieldError message={fieldErrors.name} />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="active">Status</Label>
+          <div className='space-y-2'>
+            <Label htmlFor='active'>Status</Label>
             <Select
               value={formData.active ? "true" : "false"}
               onValueChange={(val) => {
@@ -320,20 +329,20 @@ export const CohortForm = ({
                 setApiError("");
               }}
             >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
+              <SelectTrigger className='w-full'>
+                <SelectValue placeholder='Select status' />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="true">Active</SelectItem>
-                <SelectItem value="false">Inactive</SelectItem>
+                <SelectItem value='true'>Active</SelectItem>
+                <SelectItem value='false'>Inactive</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <div className='space-y-2'>
               <Label>
-                Application Start <span className="text-red-500">*</span>
+                Application Start <span className='text-red-500'>*</span>
               </Label>
               <DatePicker
                 value={
@@ -350,14 +359,17 @@ export const CohortForm = ({
                   }));
                   clearFieldError("applicationStartDate");
                 }}
-                placeholder="Pick a date"
-                className={cn("w-full", fieldErrorClass(!!fieldErrors.applicationStartDate))}
+                placeholder='Pick a date'
+                className={cn(
+                  "w-full",
+                  fieldErrorClass(!!fieldErrors.applicationStartDate),
+                )}
               />
               <FieldError message={fieldErrors.applicationStartDate} />
             </div>
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Label>
-                Application End <span className="text-red-500">*</span>
+                Application End <span className='text-red-500'>*</span>
               </Label>
               <DatePicker
                 value={
@@ -372,17 +384,20 @@ export const CohortForm = ({
                   }));
                   clearFieldError("applicationEndDate");
                 }}
-                placeholder="Pick a date"
-                className={cn("w-full", fieldErrorClass(!!fieldErrors.applicationEndDate))}
+                placeholder='Pick a date'
+                className={cn(
+                  "w-full",
+                  fieldErrorClass(!!fieldErrors.applicationEndDate),
+                )}
               />
               <FieldError message={fieldErrors.applicationEndDate} />
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
+          <div className='grid gap-4 sm:grid-cols-2'>
+            <div className='space-y-2'>
               <Label>
-                Cohort Start <span className="text-red-500">*</span>
+                Cohort Start <span className='text-red-500'>*</span>
               </Label>
               <DatePicker
                 value={
@@ -395,14 +410,17 @@ export const CohortForm = ({
                   }));
                   clearFieldError("startDate");
                 }}
-                placeholder="Pick a date"
-                className={cn("w-full", fieldErrorClass(!!fieldErrors.startDate))}
+                placeholder='Pick a date'
+                className={cn(
+                  "w-full",
+                  fieldErrorClass(!!fieldErrors.startDate),
+                )}
               />
               <FieldError message={fieldErrors.startDate} />
             </div>
-            <div className="space-y-2">
+            <div className='space-y-2'>
               <Label>
-                Cohort End <span className="text-red-500">*</span>
+                Cohort End <span className='text-red-500'>*</span>
               </Label>
               <DatePicker
                 value={
@@ -415,40 +433,42 @@ export const CohortForm = ({
                   }));
                   clearFieldError("endDate");
                 }}
-                placeholder="Pick a date"
+                placeholder='Pick a date'
                 className={cn("w-full", fieldErrorClass(!!fieldErrors.endDate))}
               />
               <FieldError message={fieldErrors.endDate} />
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className='space-y-2'>
             <Label>Courses</Label>
             <Input
-              type="text"
-              placeholder="Search courses..."
+              type='text'
+              placeholder='Search courses...'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <div className="max-h-48 overflow-y-auto rounded-lg border border-[#27156F]/10 bg-gray-50/50 p-3">
+            <div className='max-h-48 overflow-y-auto rounded-lg border border-[#27156F]/10 bg-gray-50/50 p-3'>
               {coursesLoadError ? (
-                <p className="text-sm text-red-600">
+                <p className='text-sm text-red-600'>
                   Failed to load courses. Please refresh and try again.
                 </p>
               ) : allCourses.length === 0 ? (
-                <p className="text-sm text-gray-500">No courses available yet.</p>
+                <p className='text-sm text-gray-500'>
+                  No courses available yet.
+                </p>
               ) : (
                 allCourses
                   .filter((course) =>
-                    course.title.toLowerCase().includes(search.toLowerCase())
+                    course.title.toLowerCase().includes(search.toLowerCase()),
                   )
                   .map((course) => (
                     <label
                       key={course._id}
-                      className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white"
+                      className='flex cursor-pointer items-center gap-2 rounded-md px-1 py-1.5 hover:bg-white'
                     >
                       <input
-                        type="checkbox"
+                        type='checkbox'
                         checked={formData.courses.includes(course._id)}
                         onChange={(e) => {
                           setFormData((prev) => ({
@@ -459,44 +479,43 @@ export const CohortForm = ({
                           }));
                           setApiError("");
                         }}
-                        className="rounded border-gray-300"
+                        className='rounded border-gray-300'
                       />
-                      <span className="text-sm">{course.title}</span>
+                      <span className='text-sm'>{course.title}</span>
                     </label>
                   ))
               )}
             </div>
             {formData.courses.length > 0 && (
-              <p className="text-xs text-gray-500">
+              <p className='text-xs text-gray-500'>
                 {formData.courses.length} course
                 {formData.courses.length !== 1 ? "s" : ""} selected
               </p>
             )}
           </div>
 
-          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <DialogFooter className='flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'>
             <Button
-              variant="outline"
-              type="button"
+              variant='outline'
+              type='button'
               onClick={handleClose}
               disabled={isSubmitting}
-              className="border-[#27156F]/20"
+              className='border-[#27156F]/20'
             >
               Cancel
             </Button>
             <Button
-              type="submit"
+              type='submit'
               disabled={isSubmitting}
-              className="gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90"
+              className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
             >
-              {isSubmitting && <Loader2 className="size-4 animate-spin" />}
-              {isSubmitting
-                ? cohortToEdit
-                  ? "Updating..."
-                  : "Creating..."
-                : cohortToEdit
-                  ? "Update Cohort"
-                  : "Create Cohort"}
+              {isSubmitting ? (
+                <Loader2 className='size-4 animate-spin' />
+              ) : cohortToEdit ? (
+                "Update Cohort"
+              ) : (
+                "Create Cohort"
+              )}
             </Button>
           </DialogFooter>
         </form>

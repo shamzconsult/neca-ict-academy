@@ -856,12 +856,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                   disabled={submitMutation.isPending}
                   className='h-12 w-full gap-2 bg-[#27156F] text-base text-white hover:bg-[#27156F]/90'
                 >
-                  {submitMutation.isPending && (
+                  {submitMutation.isPending ? (
                     <Loader2 className='size-4 animate-spin' />
+                  ) : (
+                    "Submit application"
                   )}
-                  {submitMutation.isPending
-                    ? "Submitting application..."
-                    : "Submit application"}
                 </Button>
               </form>
             </div>
