@@ -1,4 +1,5 @@
 import connectViaMongoose from "@/lib/db";
+import { getHonorsByEnrollmentIds } from "@/lib/enrollment-honors.server";
 import { Applicant } from "@/models/applicant";
 import Cohort from "@/models/cohort";
 import Course from "@/models/course";
@@ -48,6 +49,16 @@ type HistoryEnrollment = {
     _id: string;
     title: string;
   };
+  honors: Array<{
+    _id: string;
+    titleId: string;
+    name: string;
+    slug: string;
+    scope: "course" | "cohort";
+    badgeColor: string;
+    notes?: string;
+    awardedAt: string;
+  }>;
 };
 
 function isPopulatedApplicant(
@@ -63,6 +74,7 @@ function isPopulatedApplicant(
 
 function formatHistoryEnrollment(
   enrollment: Record<string, unknown>,
+  honors: HistoryEnrollment["honors"] = [],
 ): HistoryEnrollment | null {
   const cohort = enrollment.cohort as PopulatedCohort | null;
   const course = enrollment.course as PopulatedCourse | null;
@@ -88,6 +100,7 @@ function formatHistoryEnrollment(
       _id: String(course._id),
       title: course.title,
     },
+    honors,
   };
 }
 
@@ -121,11 +134,25 @@ export async function GET(
       .sort({ createdAt: 1 })
       .lean()) as Record<string, unknown>[];
 
+    const enrollmentIds = allEnrollments.map((e) => String(e._id));
+    enrollmentIds.push(String(focusEnrollment._id));
+    const honorsMap = await getHonorsByEnrollmentIds([
+      ...new Set(enrollmentIds),
+    ]);
+
     const enrollments = allEnrollments
-      .map((entry) => formatHistoryEnrollment(entry))
+      .map((entry) =>
+        formatHistoryEnrollment(
+          entry,
+          honorsMap.get(String(entry._id)) ?? [],
+        ),
+      )
       .filter((entry): entry is HistoryEnrollment => entry !== null);
 
-    const focus = formatHistoryEnrollment(focusEnrollment);
+    const focus = formatHistoryEnrollment(
+      focusEnrollment,
+      honorsMap.get(String(focusEnrollment._id)) ?? [],
+    );
 
     if (!focus) {
       return NextResponse.json(

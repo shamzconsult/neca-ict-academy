@@ -22,6 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import type { HonorSummary } from "@/types";
+import { HonorBadgeOverlay } from "./HonorBadge";
 
 type Graduate = {
   id: string;
@@ -30,6 +32,7 @@ type Graduate = {
   year: number;
   cohort: string;
   course: string;
+  honors?: HonorSummary[];
 };
 
 const YEAR_SELECT_TRIGGER =
@@ -78,6 +81,7 @@ function GraduatesFilterSkeleton() {
           <div className='h-9 w-32 animate-pulse rounded-md bg-gray-200/80' />
           <div className='h-9 w-52 animate-pulse rounded-md bg-gray-200/80' />
           <div className='h-9 w-52 animate-pulse rounded-md bg-gray-200/80' />
+          <div className='h-9 w-52 animate-pulse rounded-md bg-gray-200/80' />
         </div>
       </div>
       <div className='-mt-4 mb-6 h-4 w-48 animate-pulse rounded bg-gray-100' aria-hidden />
@@ -107,6 +111,12 @@ function GraduateCard({ graduate }: { graduate: Graduate }) {
               {initials}
             </span>
           </div>
+        )}
+        {graduate.honors && graduate.honors.length > 0 && (
+          <HonorBadgeOverlay
+            honors={graduate.honors}
+            className='absolute left-3 top-3 z-10'
+          />
         )}
         <div className='absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#27156F]/90 via-[#27156F]/50 to-transparent px-4 pb-4 pt-16'>
           <Badge className='mb-2 border-0 bg-white/20 text-white backdrop-blur-sm hover:bg-white/20'>
@@ -142,6 +152,7 @@ export function GraduatesDashboard() {
   const [yearFilter, setYearFilter] = useState("all");
   const [cohortFilter, setCohortFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
+  const [titleFilter, setTitleFilter] = useState("all");
 
   const { data, isLoading, error } = useQuery<{
     success: boolean;
@@ -156,6 +167,20 @@ export function GraduatesDashboard() {
     },
     staleTime: 5 * 60 * 1000,
   });
+
+  const { data: titlesData } = useQuery<{
+    success: boolean;
+    data: Array<{ _id: string; name: string }>;
+  }>({
+    queryKey: ["graduation-titles", "active"],
+    queryFn: async () => {
+      const res = await fetch("/api/graduation-titles?activeOnly=true");
+      if (!res.ok) throw new Error("Failed to fetch titles");
+      return res.json();
+    },
+  });
+
+  const titleOptions = titlesData?.data ?? [];
 
   const graduates = data?.data ?? [];
 
@@ -190,6 +215,7 @@ export function GraduatesDashboard() {
     setYearFilter(value);
     setCohortFilter("all");
     setCourseFilter("all");
+    setTitleFilter("all");
   };
 
   const handleCohortChange = (value: string) => {
@@ -204,16 +230,21 @@ export function GraduatesDashboard() {
       if (yearFilter !== "all" && g.year !== Number(yearFilter)) return false;
       if (cohortFilter !== "all" && g.cohort !== cohortFilter) return false;
       if (courseFilter !== "all" && g.course !== courseFilter) return false;
+      if (titleFilter !== "all") {
+        const hasTitle = g.honors?.some((h) => h.titleId === titleFilter);
+        if (!hasTitle) return false;
+      }
       if (q && !g.fullName.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [graduates, search, yearFilter, cohortFilter, courseFilter]);
+  }, [graduates, search, yearFilter, cohortFilter, courseFilter, titleFilter]);
 
   const hasFilters =
     !!search.trim() ||
     yearFilter !== "all" ||
     cohortFilter !== "all" ||
-    courseFilter !== "all";
+    courseFilter !== "all" ||
+    titleFilter !== "all";
 
   return (
     <>
@@ -286,6 +317,17 @@ export function GraduatesDashboard() {
               options={courseOptions.map((course) => ({
                 value: course,
                 label: course,
+              }))}
+            />
+            <CohortCourseSelect
+              value={titleFilter}
+              onValueChange={setTitleFilter}
+              disabled={titleOptions.length === 0}
+              placeholder='All honors'
+              allOption={{ value: "all", label: "All honors" }}
+              options={titleOptions.map((title) => ({
+                value: title._id,
+                label: title.name,
               }))}
             />
           </div>

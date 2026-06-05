@@ -31,6 +31,9 @@ import { CohortCourseSelect } from "@/components/ui/cohort-course-select";
 import { levelOptions, statusOptions } from "@/const";
 import { parseApiError } from "@/lib/parse-api-error";
 import { formatDisplayDate } from "@/utils/format-date";
+import type { HonorSummary } from "@/types";
+import { HonorBadgeList } from "./HonorBadge";
+import { EnrollmentHonorsPanel } from "./EnrollmentHonorsPanel";
 
 type ApplicantProfile = {
   _id: string;
@@ -62,6 +65,7 @@ type EnrollmentRecord = {
     _id: string;
     title: string;
   };
+  honors: HonorSummary[];
 };
 
 type GraduateDetailResponse = {
@@ -318,6 +322,10 @@ function ProfileHero({
                 {activeEnrollment.status}
               </TableStatusBadge>
             </div>
+            <HonorBadgeList
+              honors={activeEnrollment.honors}
+              className='mt-2'
+            />
           </div>
 
           <div className='flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600'>
@@ -661,7 +669,21 @@ export function GraduateDetail() {
           )}
         </section>
 
-        <aside>
+        <aside className='space-y-4'>
+          <section className='rounded-2xl border border-[#27156F]/10 bg-white p-4 shadow-sm sm:p-5'>
+            <h2 className='mb-3 text-sm font-semibold text-[#27156F]'>
+              Graduation honors
+            </h2>
+            <EnrollmentHonorsPanel
+              enrollmentId={activeEnrollmentId}
+              honors={activeEnrollment.honors ?? []}
+              isGraduated={
+                activeEnrollment.status.toLowerCase() === "graduated"
+              }
+              queryKeysToInvalidate={[["enrollment-detail", enrollmentId]]}
+            />
+          </section>
+
           <AdminActionsPanel
             formData={formData}
             setFormData={setFormData}

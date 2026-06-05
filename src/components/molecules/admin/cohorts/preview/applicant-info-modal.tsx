@@ -35,6 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { TableStatusBadge } from "@/components/atom/Table/Table";
 import { FormErrorBanner } from "@/components/atom/form/FormFeedback";
+import { EnrollmentHonorsPanel } from "@/components/molecules/admin/graduates/EnrollmentHonorsPanel";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -317,6 +318,7 @@ function ApplicantInfoModalContent({
         queryKey: ["cohort-applicants-stats", slug],
         exact: false,
       });
+      queryClient.invalidateQueries({ queryKey: ["graduated-applicants"] });
       toast.success("Applicant updated successfully");
       setUpdateError("");
     },
@@ -526,6 +528,25 @@ function ApplicantInfoModalContent({
                 </div>
               </div>
             </div>
+
+            {enrollment.enrollmentId &&
+              formData.status.toLowerCase() === "graduated" && (
+                <div className='mb-4 rounded-xl border border-[#27156F]/10 bg-[#DBEAF6]/25 p-4'>
+                  <p className='mb-3 text-xs font-semibold uppercase tracking-wide text-[#27156F]'>
+                    Graduation honors
+                  </p>
+                  <EnrollmentHonorsPanel
+                    enrollmentId={enrollment.enrollmentId}
+                    honors={enrollment.honors ?? []}
+                    isGraduated
+                    compact
+                    queryKeysToInvalidate={[
+                      ["cohort-applicants", slug],
+                      ["cohort-applicants-stats", slug],
+                    ]}
+                  />
+                </div>
+              )}
 
             {/* Mobile CV preview */}
             {cvUrl && (

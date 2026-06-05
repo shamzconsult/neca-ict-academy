@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import {
+  Award,
   BookOpen,
   ExternalLink,
   GraduationCap,
@@ -58,7 +59,15 @@ const NAV_ITEMS: NavItem[] = [
     href: "/admin/graduates",
     label: "Graduates",
     icon: GraduationCap,
-    match: (pathname) => pathname.startsWith("/admin/graduates"),
+    match: (pathname) =>
+      pathname.startsWith("/admin/graduates") &&
+      !pathname.startsWith("/admin/graduation-titles"),
+  },
+  {
+    href: "/admin/graduation-titles",
+    label: "Graduation Titles",
+    icon: Award,
+    match: (pathname) => pathname.startsWith("/admin/graduation-titles"),
   },
   {
     href: "/gallery",

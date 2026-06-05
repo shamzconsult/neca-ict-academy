@@ -12,8 +12,32 @@ export type CourseOutline = {
   lists: string[];
 };
 
+export type HonorSummary = {
+  _id: string;
+  titleId: string;
+  name: string;
+  slug: string;
+  scope: "course" | "cohort";
+  badgeColor: string;
+  notes?: string;
+  awardedAt: string;
+};
+
+export type GraduationTitleType = {
+  _id: string;
+  name: string;
+  slug: string;
+  description: string;
+  scope: "course" | "cohort";
+  maxWinners: number;
+  badgeColor: string;
+  active: boolean;
+  sortOrder: number;
+};
+
 export type EnrollmentType = {
   _id: string;
+  enrollmentId?: string;
   course: string;
   surname: string;
   otherNames: string;
@@ -35,6 +59,7 @@ export type EnrollmentType = {
     public_id: string;
   };
   employmentStatus: EmploymentStatusKey;
+  honors?: HonorSummary[];
 };
 
 export type EnrollmentsType = EnrollmentType[];

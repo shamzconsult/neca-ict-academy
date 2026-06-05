@@ -14,6 +14,7 @@ import {
   TableRow,
   TableStatusBadge,
 } from "@/components/atom/Table/Table";
+import { HonorBadgeList } from "@/components/molecules/admin/graduates/HonorBadge";
 
 type Props = {
   enrollment: EnrollmentType;
@@ -68,6 +69,9 @@ export const ApplicantTr = ({
           <span className="min-w-0 flex-1">
             <span className="block font-semibold text-[#27156F]">{fullName}</span>
             <span className="block truncate text-sm text-gray-500">{email}</span>
+            {status.toLowerCase() === "graduated" && enrollment.honors?.length ? (
+              <HonorBadgeList honors={enrollment.honors} className="mt-1.5" max={2} />
+            ) : null}
           </span>
         </button>
       </TableCell>

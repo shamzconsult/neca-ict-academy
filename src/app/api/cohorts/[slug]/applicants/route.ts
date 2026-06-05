@@ -1,4 +1,5 @@
 import connectViaMongoose from "@/lib/db";
+import { getHonorsByEnrollmentIds } from "@/lib/enrollment-honors.server";
 import { Applicant } from "@/models/applicant";
 import Cohort from "@/models/cohort";
 import Course from "@/models/course";
@@ -149,9 +150,16 @@ export async function GET(
       .filter((enrollment) => isPopulatedApplicant(enrollment.applicant))
       .map((enrollment) => formatEnrollmentRow(enrollment, cohort.name));
 
+    const honorIds = paginatedEnrollments.map((e) => String(e._id));
+    const honorsMap = await getHonorsByEnrollmentIds(honorIds);
+    const enrichedWithHonors = enrichedApplicants.map((row) => ({
+      ...row,
+      honors: honorsMap.get(String(row.enrollmentId)) ?? [],
+    }));
+
     if (isDownload) {
       const parser = new Parser();
-      const csv = parser.parse(enrichedApplicants);
+      const csv = parser.parse(enrichedWithHonors);
       return new Response(csv, {
         headers: {
           "Content-Type": "text/csv",
@@ -173,7 +181,7 @@ export async function GET(
         courses: cohort.courses,
         createdAt: cohort.createdAt,
       },
-      data: enrichedApplicants,
+      data: enrichedWithHonors,
       pagination: {
         page,
         limit,
