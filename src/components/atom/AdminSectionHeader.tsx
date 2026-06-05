@@ -13,7 +13,7 @@ export function AdminSectionHeader({
   return (
     <header
       className={cn(
-        "mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-start md:justify-between",
+        "mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-center md:justify-between",
         className,
       )}
     >

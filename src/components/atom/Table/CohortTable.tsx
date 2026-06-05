@@ -12,6 +12,7 @@ import {
   TableStatusBadge,
 } from "./Table";
 import { CohortType } from "@/types";
+import { formatDisplayDate } from "@/utils/format-date";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
@@ -86,10 +87,10 @@ const CohortTable = ({
                 <TableStat value={cohort.declined ?? 0} />
               </TableCell>
               <TableCell align="center" className="text-gray-600 whitespace-nowrap">
-                {cohort.startDate}
+                {formatDisplayDate(cohort.startDate)}
               </TableCell>
               <TableCell align="center" className="text-gray-600 whitespace-nowrap">
-                {cohort.endDate}
+                {formatDisplayDate(cohort.endDate)}
               </TableCell>
               {action && (
                 <TableCell align="center">
