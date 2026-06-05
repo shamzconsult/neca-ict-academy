@@ -103,38 +103,38 @@ const StatCard = ({ stat }: { stat: DashboardStat }) => {
     <div
       className={cn(
         "flex items-start gap-3 rounded-2xl border border-[#27156F]/10 bg-white p-4 shadow-sm transition-shadow hover:shadow-md border-l-4 sm:gap-4 sm:p-5",
-        stat.accent
+        stat.accent,
       )}
     >
       <div
         className={cn(
           "flex size-11 shrink-0 items-center justify-center rounded-xl",
-          stat.iconBg
+          stat.iconBg,
         )}
       >
         <Icon className={cn("size-5", stat.iconColor)} />
       </div>
-      <div className="min-w-0">
-        <p className="text-2xl font-bold tabular-nums text-[#27156F] sm:text-3xl">
+      <div className='min-w-0'>
+        <p className='text-2xl font-bold tabular-nums text-[#27156F] sm:text-3xl'>
           {stat.value.toLocaleString()}
         </p>
-        <p className="mt-0.5 text-sm text-gray-500">{stat.name}</p>
+        <p className='mt-0.5 text-sm text-gray-500'>{stat.name}</p>
       </div>
     </div>
   );
 };
 
 const StatsSkeleton = () => (
-  <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+  <div className='mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
     {STAT_CONFIG.map((_, i) => (
       <div
         key={i}
-        className="flex animate-pulse items-start gap-4 rounded-2xl border border-[#27156F]/10 bg-white p-5 shadow-sm"
+        className='flex animate-pulse items-start gap-4 rounded-2xl border border-[#27156F]/10 bg-white p-5 shadow-sm'
       >
-        <div className="size-11 shrink-0 rounded-xl bg-gray-200" />
-        <div className="flex-1 space-y-2">
-          <div className="h-8 w-16 rounded bg-gray-200" />
-          <div className="h-4 w-24 rounded bg-gray-100" />
+        <div className='size-11 shrink-0 rounded-xl bg-gray-200' />
+        <div className='flex-1 space-y-2'>
+          <div className='h-8 w-16 rounded bg-gray-200' />
+          <div className='h-4 w-24 rounded bg-gray-100' />
         </div>
       </div>
     ))}
@@ -150,9 +150,9 @@ const DashboardSection = ({
   action?: React.ReactNode;
   children: React.ReactNode;
 }) => (
-  <section className="mb-8">
-    <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <h2 className="text-lg font-bold text-[#27156F] sm:text-xl">{title}</h2>
+  <section className='mb-8'>
+    <div className='mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4'>
+      <h2 className='text-lg font-bold text-[#27156F] sm:text-xl'>{title}</h2>
       {action}
     </div>
     {children}
@@ -162,11 +162,15 @@ const DashboardSection = ({
 export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   const [showModal, setShowModal] = useState(false);
   const [localCohorts, setLocalCohorts] = useState<CohortType[]>(
-    cohortsData || []
+    cohortsData || [],
   );
   const [selectedCohort, setSelectedCohort] = useState<string>("all");
 
-  const { data: statsData, isLoading, isFetching } = useQuery<{
+  const {
+    data: statsData,
+    isLoading,
+    isFetching,
+  } = useQuery<{
     success: boolean;
     data: {
       locationStats: LocationStats[];
@@ -180,11 +184,12 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
     queryKey: ["applications-stats", selectedCohort],
     queryFn: async () => {
       const res = await fetch(
-        `/api/applications/stats?cohortId=${selectedCohort}`
+        `/api/applications/stats?cohortId=${selectedCohort}`,
       );
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   const dashboardStats: DashboardStat[] = statsData?.data
@@ -208,19 +213,23 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
   return (
     <>
       <AdminSectionHeader
-        title="Overview"
+        title='Overview'
         cta={
           <>
             <Button
               onClick={toggleModal}
-              className="gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90"
+              className='gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
             >
-              <PlusCircle className="size-4" />
+              <PlusCircle className='size-4' />
               Create Cohort
             </Button>
-            <Button variant="outline" asChild className="gap-2 border-[#27156F]/20">
-              <Link href="/enroll" target="_blank">
-                <ExternalLink className="size-4" />
+            <Button
+              variant='outline'
+              asChild
+              className='gap-2 border-[#27156F]/20'
+            >
+              <Link href='/enroll' target='_blank'>
+                <ExternalLink className='size-4' />
                 Go to Enroll Portal
               </Link>
             </Button>
@@ -231,14 +240,14 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       {!statsData && isLoading ? (
         <StatsSkeleton />
       ) : statsData ? (
-        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5">
+        <div className='mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
           {dashboardStats.map((stat) => (
             <StatCard key={stat.name} stat={stat} />
           ))}
         </div>
       ) : null}
 
-      <DashboardSection title="Application Statistics">
+      <DashboardSection title='Application Statistics'>
         <ApplicationStatsChart
           data={statsData?.data}
           selectedCohort={selectedCohort}
@@ -248,14 +257,14 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       </DashboardSection>
 
       <DashboardSection
-        title="Recent Cohorts"
+        title='Recent Cohorts'
         action={
           <Link
-            href="/admin/cohorts"
-            className="inline-flex items-center gap-1 text-sm font-semibold text-[#27156F] transition-colors hover:text-[#E02B20]"
+            href='/admin/cohorts'
+            className='inline-flex items-center gap-1 text-sm font-semibold text-[#27156F] transition-colors hover:text-[#E02B20]'
           >
             View all
-            <ArrowRight className="size-4" />
+            <ArrowRight className='size-4' />
           </Link>
         }
       >
@@ -267,8 +276,8 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
           />
         ) : (
           <EmptyState
-            title="No cohort created yet"
-            message="Click Create Cohort to get started"
+            title='No cohort created yet'
+            message='Click Create Cohort to get started'
           />
         )}
       </DashboardSection>
