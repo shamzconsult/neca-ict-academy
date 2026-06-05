@@ -8,7 +8,7 @@ import { Footer } from "@/components/atom/Footer";
 import { Navbar } from "@/components/atom/Navbar";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Pencil, Trash2, Upload } from "lucide-react";
+import { ImageIcon, Pencil, Trash2, Upload } from "lucide-react";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -193,7 +193,8 @@ export default function PhotoAlbumPage() {
         </section>
         {isAdmin && (
           <div className="flex max-w-6xl mx-auto justify-between items-center text-center px-2 md:px-0 mb-5">
-            <h3 className="text-xl font-semibold text-gray-700">
+            <h3 className='flex items-center gap-2 text-xl font-semibold text-[#27156F]'>
+              <ImageIcon className='size-7' />
               Manage Gallery
             </h3>
             <Button

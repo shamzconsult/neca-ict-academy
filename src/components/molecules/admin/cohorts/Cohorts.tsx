@@ -8,7 +8,7 @@ import { CohortsProps, CohortType } from "@/types";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ExternalLink, PlusCircle } from "lucide-react";
+import { ExternalLink, PlusCircle, SquareLibrary } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 
 export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
@@ -51,6 +51,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
     <>
       <AdminSectionHeader
         title='Cohorts'
+        icon={SquareLibrary}
         cta={
           <>
             <Button

@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { CohortCourseSelect } from "@/components/ui/cohort-course-select";
 import { Input } from "@/components/ui/input";
 import { EnrollmentsType, CohortType, EnrollmentType } from "@/types";
 import { ApplicantInfoModal } from "./applicant-info-modal";
@@ -650,26 +651,20 @@ export const CohortPreview = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <Select
+              <CohortCourseSelect
                 value={course}
                 onValueChange={(value) => {
                   setCourse(value);
                   setPage(1);
                 }}
                 disabled={isLoading || cohortCourses.length === 0}
-              >
-                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[140px] sm:w-auto'>
-                  <SelectValue placeholder='All Courses' />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>All Courses</SelectItem>
-                  {cohortCourses.map((c) => (
-                    <SelectItem value={String(c._id)} key={String(c._id)}>
-                      {c.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder='All Courses'
+                allOption={{ value: "all", label: "All Courses" }}
+                options={cohortCourses.map((c) => ({
+                  value: String(c._id),
+                  label: c.title,
+                }))}
+              />
               <Button
                 variant='outline'
                 className='w-full gap-2 border-[#27156F]/20 bg-white sm:w-auto'

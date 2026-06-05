@@ -15,6 +15,7 @@ import {
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
 import { AlertTriangle, BarChart3, Search } from "lucide-react";
+import { CohortCourseSelect } from "@/components/ui/cohort-course-select";
 import {
   Select,
   SelectTrigger,
@@ -224,19 +225,18 @@ export const ApplicationStatsChart = ({
         </div>
 
         <div className='flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3'>
-          <Select value={selectedCohort} onValueChange={onCohortChange}>
-            <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:w-[180px]'>
-              <SelectValue placeholder='Select cohort' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='all'>All Cohorts</SelectItem>
-              {data?.cohorts?.map((cohort) => (
-                <SelectItem key={cohort.id} value={cohort.id}>
-                  {cohort.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <CohortCourseSelect
+            value={selectedCohort}
+            onValueChange={onCohortChange}
+            placeholder='Select cohort'
+            allOption={{ value: "all", label: "All Cohorts" }}
+            options={
+              data?.cohorts?.map((cohort) => ({
+                value: cohort.id,
+                label: cohort.name,
+              })) ?? []
+            }
+          />
           <Select
             value={chartType}
             onValueChange={(value: "location" | "gender") =>

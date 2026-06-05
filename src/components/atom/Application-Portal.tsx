@@ -10,6 +10,7 @@ import SuccessModal from "./SuccessPage";
 import { FileUploader } from "@/components/atom/FileUploader";
 import { FieldError } from "@/components/atom/form/FormFeedback";
 import { Button } from "@/components/ui/button";
+import { CohortCourseSelect } from "@/components/ui/cohort-course-select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -704,10 +705,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       control={control}
                       rules={{ required: true }}
                       render={({ field }) => (
-                        <FormSelect
+                        <CohortCourseSelect
                           id='cohort'
+                          size='form'
                           value={field.value}
-                          onChange={(value) => {
+                          onValueChange={(value) => {
                             field.onChange(value);
                             setValue("course", "");
                           }}
@@ -738,10 +740,11 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
                       control={control}
                       rules={{ required: true }}
                       render={({ field }) => (
-                        <FormSelect
+                        <CohortCourseSelect
                           id='course'
+                          size='form'
                           value={field.value}
-                          onChange={field.onChange}
+                          onValueChange={field.onChange}
                           placeholder={
                             !selectedCohort
                               ? "Select a cohort first"

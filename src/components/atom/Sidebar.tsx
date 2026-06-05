@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import {
   BookOpen,
   ExternalLink,
+  GraduationCap,
   ImageIcon,
   LayoutDashboard,
   LogOut,
@@ -52,6 +53,12 @@ const NAV_ITEMS: NavItem[] = [
     label: "Courses",
     icon: BookOpen,
     match: (pathname) => pathname.startsWith("/admin/courses"),
+  },
+  {
+    href: "/admin/graduates",
+    label: "Graduates",
+    icon: GraduationCap,
+    match: (pathname) => pathname.startsWith("/admin/graduates"),
   },
   {
     href: "/gallery",

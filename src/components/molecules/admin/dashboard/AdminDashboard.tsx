@@ -16,6 +16,7 @@ import {
   Clock,
   ExternalLink,
   GraduationCap,
+  LayoutDashboard,
   PlusCircle,
   Users,
   XCircle,
@@ -214,6 +215,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
     <>
       <AdminSectionHeader
         title='Overview'
+        icon={LayoutDashboard}
         cta={
           <>
             <Button

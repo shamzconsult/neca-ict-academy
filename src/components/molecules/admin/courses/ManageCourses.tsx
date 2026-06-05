@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { useDebounce } from "@/hooks/useDebounce";
-import { ExternalLink, PlusCircle, X } from "lucide-react";
+import { BookOpen, ExternalLink, PlusCircle, X } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
@@ -122,6 +122,7 @@ export const ManageCourses = () => {
     <>
       <AdminSectionHeader
         title='Course Overview'
+        icon={BookOpen}
         cta={
           <>
             <Button
