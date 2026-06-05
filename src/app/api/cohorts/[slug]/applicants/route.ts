@@ -3,9 +3,82 @@ import { Applicant } from "@/models/applicant";
 import Cohort from "@/models/cohort";
 import Course from "@/models/course";
 import { Enrollment } from "@/models/enrollment";
-import { Types } from "mongoose";
 import { NextResponse } from "next/server";
 import { Parser } from "json2csv";
+
+type PopulatedApplicant = {
+  _id: string;
+  surname: string;
+  otherNames: string;
+  email: string;
+  phoneNumber: string;
+  state: string;
+  gender?: string;
+  profilePicture?: { url: string; public_id: string };
+};
+
+type PopulatedEnrollment = {
+  _id: string;
+  createdAt: Date;
+  status: string;
+  level: string;
+  cv?: { url: string; public_id: string };
+  employmentStatus: string;
+  applicant: PopulatedApplicant;
+  course: { title: string } | string;
+};
+
+const ALLOWED_SORT_FIELDS = ["createdAt", "status", "level"] as const;
+const ALLOWED_PAGE_SIZES = [10, 20, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = 10;
+
+function isPopulatedApplicant(
+  applicant: unknown,
+): applicant is PopulatedApplicant {
+  return (
+    typeof applicant === "object" &&
+    applicant !== null &&
+    "_id" in applicant &&
+    "surname" in applicant
+  );
+}
+
+function matchesSearch(applicant: PopulatedApplicant, searchQuery: string) {
+  const q = searchQuery.toLowerCase();
+  return [applicant.surname, applicant.otherNames, applicant.email, applicant.phoneNumber]
+    .filter(Boolean)
+    .some((field) => field.toLowerCase().includes(q));
+}
+
+function formatEnrollmentRow(
+  enrollment: PopulatedEnrollment,
+  cohortName: string,
+) {
+  const applicant = enrollment.applicant;
+  const courseTitle =
+    typeof enrollment.course === "object" && enrollment.course !== null
+      ? enrollment.course.title
+      : "No course";
+
+  return {
+    _id: applicant._id,
+    surname: applicant.surname,
+    otherNames: applicant.otherNames,
+    email: applicant.email,
+    phoneNumber: applicant.phoneNumber,
+    state: applicant.state,
+    gender: applicant.gender,
+    profilePicture: applicant.profilePicture,
+    createdAt: enrollment.createdAt,
+    cv: enrollment.cv || null,
+    status: enrollment.status || "Not enrolled",
+    level: enrollment.level || "Not enrolled",
+    course: courseTitle,
+    cohort: cohortName,
+    enrollmentId: enrollment._id,
+    employmentStatus: enrollment.employmentStatus,
+  };
+}
 
 export async function GET(
   request: Request,
@@ -16,16 +89,27 @@ export async function GET(
     const { slug } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const sortBy = searchParams.get("sortBy") || "createdAt";
-    const sortOrder = searchParams.get("sortOrder") || "desc";
+    const limitParam = parseInt(
+      searchParams.get("limit") || String(DEFAULT_PAGE_SIZE),
+    );
+    const limit = (ALLOWED_PAGE_SIZES as readonly number[]).includes(limitParam)
+      ? limitParam
+      : DEFAULT_PAGE_SIZE;
+    const sortByParam = searchParams.get("sortBy") || "createdAt";
+    const sortOrder = searchParams.get("sortOrder") === "asc" ? 1 : -1;
     const searchQuery = searchParams.get("search") || "";
     const statusFilter = searchParams.get("status") || "";
     const levelFilter = searchParams.get("level") || "";
     const locationFilter = searchParams.get("location") || "";
+    const courseFilter = searchParams.get("course") || "";
     const isDownload = searchParams.get("download") === "1";
 
-    // Find cohort by slug
+    const sortBy = ALLOWED_SORT_FIELDS.includes(
+      sortByParam as (typeof ALLOWED_SORT_FIELDS)[number],
+    )
+      ? sortByParam
+      : "createdAt";
+
     const cohort = await Cohort.findOne({ slug });
     if (!cohort) {
       return NextResponse.json(
@@ -33,69 +117,39 @@ export async function GET(
         { status: 404 }
       );
     }
-    const cohortId = cohort._id;
 
-    // 1. Find enrollments for this cohort (with status/level filters)
-    const enrollmentQuery: Record<string, unknown> = { cohort: cohortId };
+    const enrollmentQuery: Record<string, unknown> = { cohort: cohort._id };
     if (statusFilter) enrollmentQuery.status = statusFilter;
     if (levelFilter) enrollmentQuery.level = levelFilter;
+    if (courseFilter) enrollmentQuery.course = courseFilter;
 
-    const enrollments = await Enrollment.find(enrollmentQuery)
+    const enrollments = (await Enrollment.find(enrollmentQuery)
+      .populate("applicant", "", Applicant)
       .populate("course", "title", Course)
-      .populate("cohort", "name", Cohort)
-      .sort({ createdAt: -1 })
-      .lean();
+      .sort({ [sortBy]: sortOrder })
+      .lean()) as unknown as PopulatedEnrollment[];
 
-    const applicantIds = enrollments.map((enr) => enr.applicant);
+    const filteredEnrollments = enrollments.filter((enrollment) => {
+      if (!isPopulatedApplicant(enrollment.applicant)) return false;
+      if (locationFilter && enrollment.applicant.state !== locationFilter) {
+        return false;
+      }
+      if (searchQuery && !matchesSearch(enrollment.applicant, searchQuery)) {
+        return false;
+      }
+      return true;
+    });
 
-    // 2. Build applicant query (search, and restrict to applicantIds)
-    const query: Record<string, unknown> = { _id: { $in: applicantIds } };
-    if (searchQuery) {
-      query.$or = [
-        { surname: { $regex: searchQuery, $options: "i" } },
-        { otherNames: { $regex: searchQuery, $options: "i" } },
-        { email: { $regex: searchQuery, $options: "i" } },
-        { phoneNumber: { $regex: searchQuery, $options: "i" } },
-      ];
-    }
-    if (locationFilter) {
-      query.state = locationFilter;
-    }
+    const total = filteredEnrollments.length;
+    const paginatedEnrollments = isDownload
+      ? filteredEnrollments
+      : filteredEnrollments.slice((page - 1) * limit, page * limit);
 
-    // If download, fetch all matching applicants (no pagination)
+    const enrichedApplicants = paginatedEnrollments
+      .filter((enrollment) => isPopulatedApplicant(enrollment.applicant))
+      .map((enrollment) => formatEnrollmentRow(enrollment, cohort.name));
+
     if (isDownload) {
-      const allApplicants = await Applicant.find(query)
-        .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
-        .lean();
-      // Enrich applicants with their latest enrollment (if any)
-      const enrichedApplicants = allApplicants.map((applicant) => {
-        const applicantEnrollments = enrollments.filter((enr) => {
-          const enrollmentApplicantId =
-            enr.applicant instanceof Types.ObjectId
-              ? enr.applicant
-              : enr.applicant._id;
-          return enrollmentApplicantId.equals(applicant._id);
-        });
-        const latestEnrollment = applicantEnrollments[0] || null;
-        return {
-          surname: applicant.surname,
-          otherNames: applicant.otherNames,
-          email: applicant.email,
-          phoneNumber: applicant.phoneNumber,
-          state: applicant.state,
-          cv: latestEnrollment?.cv || null,
-          status: latestEnrollment?.status || "Not enrolled",
-          level: latestEnrollment?.level || "Not enrolled",
-          course:
-            latestEnrollment?.course && "title" in latestEnrollment.course
-              ? latestEnrollment.course.title
-              : "No course",
-          cohort: cohort.name,
-          enrollmentId: latestEnrollment?._id,
-          employmentStatus: latestEnrollment.employmentStatus,
-        };
-      });
-      // Convert to CSV
       const parser = new Parser();
       const csv = parser.parse(enrichedApplicants);
       return new Response(csv, {
@@ -105,40 +159,6 @@ export async function GET(
         },
       });
     }
-
-    // 3. Paginate applicants
-    const total = await Applicant.countDocuments(query);
-    const applicants = await Applicant.find(query)
-      .sort({ [sortBy]: sortOrder === "desc" ? -1 : 1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
-
-    // 4. Enrich applicants with their latest enrollment (if any)
-    const enrichedApplicants = applicants.map((applicant) => {
-      const applicantEnrollments = enrollments.filter((enr) => {
-        const enrollmentApplicantId =
-          enr.applicant instanceof Types.ObjectId
-            ? enr.applicant
-            : enr.applicant._id;
-        return enrollmentApplicantId.equals(applicant._id);
-      });
-
-      const latestEnrollment = applicantEnrollments[0] || null;
-      return {
-        ...applicant,
-        cv: latestEnrollment?.cv || null,
-        status: latestEnrollment?.status || "Not enrolled",
-        level: latestEnrollment?.level || "Not enrolled",
-        course:
-          latestEnrollment?.course && "title" in latestEnrollment.course
-            ? latestEnrollment.course.title
-            : "No course",
-        cohort: cohort.name,
-        enrollmentId: latestEnrollment?._id,
-        employmentStatus: latestEnrollment.employmentStatus,
-      };
-    });
 
     return NextResponse.json({
       success: true,

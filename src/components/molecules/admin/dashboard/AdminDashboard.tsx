@@ -243,7 +243,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
           data={statsData?.data}
           selectedCohort={selectedCohort}
           onCohortChange={setSelectedCohort}
-          isFetching={isFetching && !isLoading}
+          isFetching={isLoading || isFetching}
         />
       </DashboardSection>
 

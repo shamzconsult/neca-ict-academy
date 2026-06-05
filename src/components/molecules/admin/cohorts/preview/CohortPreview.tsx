@@ -23,6 +23,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCell,
   TableContainer,
   TableHead,
   TableHeader,
@@ -46,12 +47,31 @@ import { EnrollmentsType, CohortType, EnrollmentType } from "@/types";
 import { ApplicantInfoModal } from "./applicant-info-modal";
 import { cn } from "@/lib/utils";
 
-const LIMIT = 10;
+const PAGE_SIZE_OPTIONS = [10, 20, 50, 100] as const;
+const DEFAULT_PAGE_SIZE = PAGE_SIZE_OPTIONS[0];
+
+function parsePageSize(value: string | null) {
+  const parsed = Number(value);
+  return (PAGE_SIZE_OPTIONS as readonly number[]).includes(parsed)
+    ? parsed
+    : DEFAULT_PAGE_SIZE;
+}
+
+type CourseRef = { _id: string; title: string; slug?: string };
+
+function getCohortCourses(
+  courses: CohortType["courses"] | CourseRef[] | undefined,
+) {
+  if (!courses || !Array.isArray(courses)) return [];
+  return courses.filter(
+    (c): c is CourseRef => typeof c === "object" && c !== null && "title" in c,
+  );
+}
 
 const APPLICANT_TABLE_HEADERS = [
   "Applicants",
   "Location",
-  "Date",
+  "Application Date",
   "Level",
   "Status",
   "Review",
@@ -95,25 +115,82 @@ const STAT_ITEMS = [
   },
 ] as const;
 
-const TableSkeleton = () => (
-  <TableContainer className='rounded-none border-0 shadow-none'>
-    <div className='border-b border-[#27156F]/10 px-4 py-3'>
-      <div className='h-4 w-48 animate-pulse rounded bg-gray-200' />
+const SkeletonBar = ({ className }: { className?: string }) => (
+  <div className={cn("animate-pulse rounded-md bg-gray-200/80", className)} />
+);
+
+const ApplicantRowSkeleton = () => (
+  <TableRow className='hover:bg-transparent'>
+    <TableCell>
+      <div className='flex items-center gap-3'>
+        <SkeletonBar className='size-9 shrink-0 rounded-full' />
+        <div className='min-w-0 flex-1 space-y-2'>
+          <SkeletonBar className='h-4 w-36 max-w-full' />
+          <SkeletonBar className='h-3 w-44 max-w-full' />
+        </div>
+      </div>
+    </TableCell>
+    <TableCell>
+      <SkeletonBar className='h-4 w-20' />
+    </TableCell>
+    <TableCell>
+      <SkeletonBar className='h-4 w-24' />
+    </TableCell>
+    <TableCell>
+      <SkeletonBar className='h-4 w-16' />
+    </TableCell>
+    <TableCell align='center'>
+      <SkeletonBar className='mx-auto h-6 w-20 rounded-full' />
+    </TableCell>
+    <TableCell align='center'>
+      <SkeletonBar className='mx-auto h-8 w-[5.5rem] rounded-md' />
+    </TableCell>
+  </TableRow>
+);
+
+const PaginationSkeleton = () => (
+  <div className='flex flex-wrap items-center justify-center gap-1' aria-hidden>
+    <SkeletonBar className='h-9 w-[5.75rem] rounded-md sm:w-24' />
+    <div className='flex items-center gap-1 px-1'>
+      {Array.from({ length: 5 }).map((_, idx) => (
+        <SkeletonBar key={idx} className='size-9 rounded-md' />
+      ))}
     </div>
-    <table className='w-full min-w-[800px]'>
-      <tbody>
-        {Array.from({ length: 8 }).map((_, rowIdx) => (
-          <tr key={rowIdx} className='border-b border-[#27156F]/5'>
-            {APPLICANT_TABLE_HEADERS.map((_, colIdx) => (
-              <td key={colIdx} className='px-4 py-3.5'>
-                <div className='h-4 animate-pulse rounded bg-gray-100' />
-              </td>
-            ))}
-          </tr>
+    <SkeletonBar className='h-9 w-[5.75rem] rounded-md sm:w-20' />
+  </div>
+);
+
+const TableSkeleton = ({
+  totalRows = DEFAULT_PAGE_SIZE,
+}: {
+  totalRows?: number;
+}) => (
+  <>
+    <div className='border-b border-[#27156F]/10 bg-gray-50/80 px-4 py-2.5'>
+      <SkeletonBar className='h-4 w-52' />
+    </div>
+    <Table className='min-w-[800px]'>
+      <TableHead>
+        <TableRow className='hover:bg-transparent border-b border-[#27156F]/10'>
+          {APPLICANT_TABLE_HEADERS.map((header) => (
+            <TableHeader
+              key={header}
+              align={
+                header === "Status" || header === "Review" ? "center" : "left"
+              }
+            >
+              {header}
+            </TableHeader>
+          ))}
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {Array.from({ length: totalRows }).map((_, rowIdx) => (
+          <ApplicantRowSkeleton key={rowIdx} />
         ))}
-      </tbody>
-    </table>
-  </TableContainer>
+      </TableBody>
+    </Table>
+  </>
 );
 
 const StatsSkeleton = () => (
@@ -206,6 +283,10 @@ export const CohortPreview = () => {
   const [location, setLocation] = useState(
     searchParams.get("location") ?? "all",
   );
+  const [course, setCourse] = useState(searchParams.get("course") ?? "all");
+  const [pageSize, setPageSize] = useState(() =>
+    parsePageSize(searchParams.get("limit")),
+  );
   const [modalOpen, setModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [navToLastOnLoad, setNavToLastOnLoad] = useState(false);
@@ -218,8 +299,9 @@ export const CohortPreview = () => {
     search: debouncedSearchTerm,
     status: status !== "all" ? status : "",
     location: location !== "all" ? location : "",
+    course: course !== "all" ? course : "",
     page: String(page),
-    limit: String(LIMIT),
+    limit: String(pageSize),
   };
   const queryString = Object.entries(queryParams)
     .filter((entry) => entry[1])
@@ -244,7 +326,9 @@ export const CohortPreview = () => {
       debouncedSearchTerm,
       status,
       location,
+      course,
       page,
+      pageSize,
     ],
     queryFn: async () => {
       if (!slug) throw new Error("No slug provided");
@@ -273,9 +357,22 @@ export const CohortPreview = () => {
     if (debouncedSearchTerm) urlParams.set("search", debouncedSearchTerm);
     if (status && status !== "all") urlParams.set("status", status);
     if (location && location !== "all") urlParams.set("location", location);
+    if (course && course !== "all") urlParams.set("course", course);
     if (page > 1) urlParams.set("page", String(page));
+    if (pageSize !== DEFAULT_PAGE_SIZE) {
+      urlParams.set("limit", String(pageSize));
+    }
     router.push(`${pathname}?${urlParams.toString()}`, { scroll: false });
-  }, [debouncedSearchTerm, status, location, page, pathname, router]);
+  }, [
+    debouncedSearchTerm,
+    status,
+    location,
+    course,
+    page,
+    pageSize,
+    pathname,
+    router,
+  ]);
 
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -286,8 +383,8 @@ export const CohortPreview = () => {
   const totalPages = data?.pagination?.totalPages || 1;
   const totalApplicants = data?.pagination?.total ?? filteredEnrollments.length;
   const globalPosition = navToLastOnLoad
-    ? Math.min(page * LIMIT, totalApplicants)
-    : (page - 1) * LIMIT + currentIndex + 1;
+    ? Math.min(page * pageSize, totalApplicants)
+    : (page - 1) * pageSize + currentIndex + 1;
   const canGoPrev = page > 1 || currentIndex > 0;
   const canGoNext =
     page < totalPages || currentIndex < filteredEnrollments.length - 1;
@@ -302,8 +399,9 @@ export const CohortPreview = () => {
     if (debouncedSearchTerm) params.set("search", debouncedSearchTerm);
     if (status !== "all") params.set("status", status);
     if (location !== "all") params.set("location", location);
+    if (course !== "all") params.set("course", course);
     params.set("page", String(targetPage));
-    params.set("limit", String(LIMIT));
+    params.set("limit", String(pageSize));
     const res = await fetch(`/api/cohorts/${slug}/applicants?${params}`);
     if (!res.ok) throw new Error("Network response was not ok");
     return res.json() as Promise<ApiResponse>;
@@ -338,7 +436,7 @@ export const CohortPreview = () => {
     setNavToLastOnLoad(false);
     setIsCrossPageNav(false);
     setStickyEnrollment(null);
-  }, [debouncedSearchTerm, status, location]);
+  }, [debouncedSearchTerm, status, location, course, pageSize]);
 
   useEffect(() => {
     if (!modalOpen || !slug) return;
@@ -352,6 +450,8 @@ export const CohortPreview = () => {
           debouncedSearchTerm,
           status,
           location,
+          course,
+          pageSize,
           targetPage,
         ],
         queryFn: () => fetchApplicantsPage(targetPage),
@@ -374,6 +474,8 @@ export const CohortPreview = () => {
     debouncedSearchTerm,
     status,
     location,
+    course,
+    pageSize,
     filteredEnrollments.length,
     queryClient,
   ]);
@@ -427,6 +529,7 @@ export const CohortPreview = () => {
     if (status && status !== "all") downloadParams.set("status", status);
     if (location && location !== "all")
       downloadParams.set("location", location);
+    if (course && course !== "all") downloadParams.set("course", course);
     downloadParams.set("download", "1");
     window.open(
       `/api/cohorts/${slug}/applicants?${downloadParams.toString()}`,
@@ -439,7 +542,9 @@ export const CohortPreview = () => {
   }
 
   const cohortName = cohortDetails?.name || data?.cohort?.name;
-  const hasFilters = !!searchTerm || status !== "all" || location !== "all";
+  const cohortCourses = getCohortCourses(cohortDetails?.courses);
+  const hasFilters =
+    !!searchTerm || status !== "all" || location !== "all" || course !== "all";
 
   const showTable = !isLoading && filteredEnrollments.length > 0;
   const showEmptyState = !isLoading && filteredEnrollments.length === 0;
@@ -545,6 +650,26 @@ export const CohortPreview = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Select
+                value={course}
+                onValueChange={(value) => {
+                  setCourse(value);
+                  setPage(1);
+                }}
+                disabled={isLoading || cohortCourses.length === 0}
+              >
+                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[140px] sm:w-auto'>
+                  <SelectValue placeholder='All Courses' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>All Courses</SelectItem>
+                  {cohortCourses.map((c) => (
+                    <SelectItem value={String(c._id)} key={String(c._id)}>
+                      {c.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Button
                 variant='outline'
                 className='w-full gap-2 border-[#27156F]/20 bg-white sm:w-auto'
@@ -594,19 +719,51 @@ export const CohortPreview = () => {
                   ))}
                 </TableBody>
               </Table>
-              {totalPages > 1 && (
-                <div className='border-t border-[#27156F]/10 px-4 py-3'>
-                  <Pagination
-                    currentPage={page}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                  />
-                </div>
-              )}
             </>
           )}
 
-          {isLoading && <TableSkeleton />}
+          {isLoading && <TableSkeleton totalRows={pageSize} />}
+
+          {(showTable || isLoading) && (
+            <div className='border-t border-[#27156F]/10 px-4 py-3'>
+              <div className='flex flex-col items-center justify-between gap-3 sm:flex-row'>
+                <div className='flex items-center gap-2 text-sm text-gray-600'>
+                  <span className='whitespace-nowrap'>Show</span>
+                  <Select
+                    value={String(pageSize)}
+                    onValueChange={(value) => {
+                      setPageSize(parsePageSize(value));
+                      setPage(1);
+                    }}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger className='h-9 w-[5.5rem] border-[#27156F]/15 bg-white'>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAGE_SIZE_OPTIONS.map((size) => (
+                        <SelectItem key={size} value={String(size)}>
+                          {size}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <span className='whitespace-nowrap'>per page</span>
+                </div>
+                {isLoading ? (
+                  <PaginationSkeleton />
+                ) : (
+                  totalPages > 1 && (
+                    <Pagination
+                      currentPage={page}
+                      totalPages={totalPages}
+                      onPageChange={handlePageChange}
+                    />
+                  )
+                )}
+              </div>
+            </div>
+          )}
 
           {showEmptyState && (
             <EmptyState

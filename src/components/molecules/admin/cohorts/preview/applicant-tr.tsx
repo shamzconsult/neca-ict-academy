@@ -4,6 +4,10 @@ import React from "react";
 import { Eye } from "lucide-react";
 
 import { EnrollmentType } from "@/types";
+import {
+  formatRelativeDate,
+  formatRelativeDateTitle,
+} from "@/utils/format-relative-date";
 import { Button } from "@/components/ui/button";
 import {
   TableCell,
@@ -69,11 +73,9 @@ export const ApplicantTr = ({
       </TableCell>
       <TableCell className="whitespace-nowrap text-gray-600">{state}</TableCell>
       <TableCell className="whitespace-nowrap text-gray-600">
-        {new Date(createdAt).toLocaleDateString("en-GB", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })}
+        <span title={formatRelativeDateTitle(createdAt)}>
+          {formatRelativeDate(createdAt)}
+        </span>
       </TableCell>
       {showCourse && (
         <TableCell className="max-w-[220px]">

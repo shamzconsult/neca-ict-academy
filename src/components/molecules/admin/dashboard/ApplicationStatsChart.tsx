@@ -191,9 +191,7 @@ export const ApplicationStatsChart = ({
             const value = Number(context.raw ?? 0);
             const datasetData = context.dataset.data as number[];
             const total = datasetData.reduce((a, b) => a + b, 0);
-            const percentage = total
-              ? ((value / total) * 100).toFixed(1)
-              : "0";
+            const percentage = total ? ((value / total) * 100).toFixed(1) : "0";
             return `${context.label}: ${value} (${percentage}%)`;
           },
         },
@@ -281,10 +279,7 @@ export const ApplicationStatsChart = ({
           </div>
         ) : chartType === "location" ? (
           <div className='h-full overflow-x-auto'>
-            <div
-              className='h-full'
-              style={{ minWidth: locationChartWidth }}
-            >
+            <div className='h-full' style={{ minWidth: locationChartWidth }}>
               <Bar data={locationChartData} options={locationChartOptions} />
             </div>
           </div>

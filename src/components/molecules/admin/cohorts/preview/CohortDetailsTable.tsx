@@ -38,13 +38,19 @@ function formatDate(dateStr?: string) {
       });
 }
 
-function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
-    <TableRow className="hover:bg-transparent">
-      <TableCell className="w-[180px] bg-gray-50/80 font-medium text-gray-600 text-sm">
+    <TableRow className='hover:bg-transparent'>
+      <TableCell className='w-[180px] bg-gray-50/80 font-medium text-gray-600 text-sm'>
         {label}
       </TableCell>
-      <TableCell className="text-sm text-[#27156F]">{children}</TableCell>
+      <TableCell className='text-sm text-[#27156F]'>{children}</TableCell>
     </TableRow>
   );
 }
@@ -58,13 +64,13 @@ export function CohortDetailsTable({
 }) {
   if (isLoading) {
     return (
-      <TableContainer className="mb-8">
-        <div className="border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3">
-          <div className="h-5 w-32 animate-pulse rounded bg-gray-200" />
+      <TableContainer className='mb-8'>
+        <div className='border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3'>
+          <div className='h-5 w-32 animate-pulse rounded bg-gray-200' />
         </div>
-        <div className="space-y-3 p-4">
+        <div className='space-y-3 p-4'>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-4 animate-pulse rounded bg-gray-100" />
+            <div key={i} className='h-4 animate-pulse rounded bg-gray-100' />
           ))}
         </div>
       </TableContainer>
@@ -75,41 +81,41 @@ export function CohortDetailsTable({
 
   const courses = (cohort.courses ?? []) as CourseRef[];
   const courseList = courses.filter(
-    (c): c is CourseRef => typeof c === "object" && c !== null && "title" in c
+    (c): c is CourseRef => typeof c === "object" && c !== null && "title" in c,
   );
 
   return (
-    <TableContainer className="mb-8">
-      <div className="flex items-center gap-2 border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3">
-        <Calendar className="size-4 text-[#27156F]" />
-        <h2 className="font-semibold text-[#27156F]">Cohort Details</h2>
+    <TableContainer className='mb-8'>
+      <div className='flex items-center gap-2 border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3'>
+        <Calendar className='size-4 text-[#27156F]' />
+        <h2 className='font-semibold text-[#27156F]'>Cohort Details</h2>
       </div>
-      <Table className="min-w-0">
+      <Table className='min-w-0'>
         <TableBody>
-          <DetailRow label="Cohort Name">{cohort.name}</DetailRow>
-          <DetailRow label="Status">
+          <DetailRow label='Cohort Name'>{cohort.name}</DetailRow>
+          <DetailRow label='Status'>
             <TableStatusBadge variant={cohort.active ? "active" : "inactive"}>
               {cohort.active ? "Active" : "Inactive"}
             </TableStatusBadge>
           </DetailRow>
-          <DetailRow label="Application Window">
+          <DetailRow label='Application Window'>
             {formatDate(cohort.applicationStartDate)} —{" "}
             {formatDate(cohort.applicationEndDate)}
           </DetailRow>
-          <DetailRow label="Cohort Duration">
+          <DetailRow label='Cohort Duration'>
             {formatDate(cohort.startDate)} — {formatDate(cohort.endDate)}
           </DetailRow>
-          <DetailRow label="Linked Courses">
+          <DetailRow label={`Linked Courses (${courseList.length})`}>
             {courseList.length > 0 ? (
-              <ul className="flex flex-col gap-1.5">
+              <ul className='flex flex-col gap-1.5'>
                 {courseList.map((course) => (
-                  <li key={course._id} className="flex items-center gap-2">
-                    <BookOpen className="size-3.5 shrink-0 text-[#27156F]/60" />
+                  <li key={course._id} className='flex items-center gap-2'>
+                    <BookOpen className='size-3.5 shrink-0 text-[#27156F]/60' />
                     {course.slug ? (
                       <Link
                         href={`/courses/${course.slug}`}
-                        target="_blank"
-                        className="text-[#27156F] hover:text-[#E02B20] hover:underline"
+                        target='_blank'
+                        className='text-[#27156F] hover:text-[#E02B20] hover:underline'
                       >
                         {course.title}
                       </Link>
@@ -120,11 +126,11 @@ export function CohortDetailsTable({
                 ))}
               </ul>
             ) : (
-              <span className="text-gray-500">No courses linked</span>
+              <span className='text-gray-500'>No courses linked</span>
             )}
           </DetailRow>
           {"createdAt" in cohort && cohort.createdAt && (
-            <DetailRow label="Created">
+            <DetailRow label='Created'>
               {formatDate(cohort.createdAt as string)}
             </DetailRow>
           )}

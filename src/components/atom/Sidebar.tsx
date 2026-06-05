@@ -90,7 +90,7 @@ export const Sidebar = ({
 
   const userName = session?.user?.firstName
     ? `${session?.user?.firstName} ${session?.user?.lastName}`
-    : "Admin User";
+    : "";
   const userEmail = session?.user?.email ?? "";
   const userRole = session?.user?.role?.replace("_", " ") ?? "Admin";
   const initials = getInitials(userName, userEmail);
@@ -224,6 +224,11 @@ export const Sidebar = ({
           )}
         >
           {!effectiveCollapsed && (
+            <p className='mb-2 px-1 text-[10px] uppercase tracking-wide text-gray-400'>
+              {userRole}
+            </p>
+          )}
+          {!effectiveCollapsed && (
             <div className='mb-3 flex items-center gap-3 rounded-xl bg-[#DBEAF6]/40 px-3 py-2.5'>
               <div className='flex size-9 shrink-0 items-center justify-center rounded-full bg-[#27156F] text-xs font-bold text-white'>
                 {initials}
@@ -260,12 +265,6 @@ export const Sidebar = ({
               <LogOut className='size-4 shrink-0' />
               Sign out
             </button>
-          )}
-
-          {!effectiveCollapsed && (
-            <p className='mt-2 px-1 text-center text-[10px] uppercase tracking-wide text-gray-400'>
-              {userRole}
-            </p>
           )}
         </div>
 
