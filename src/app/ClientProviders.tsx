@@ -9,7 +9,7 @@ interface Props {
 
 export default function ClientProviders({ children }: Props) {
   return (
-    <SessionProvider>
+    <SessionProvider refetchInterval={300} refetchOnWindowFocus>
       <ReactQueryProvider>{children}</ReactQueryProvider>
     </SessionProvider>
   );

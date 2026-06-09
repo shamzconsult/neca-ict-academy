@@ -45,6 +45,66 @@ body {
   animation: bgMove 40s linear infinite;
 }
 
+@keyframes logo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.96;
+  }
+}
+
+@keyframes loader-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes loader-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes loader-dot-pulse {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.75);
+    opacity: 0.35;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-logo-breathe {
+  animation: logo-breathe 2.4s ease-in-out infinite;
+}
+
+.animate-loader-ring {
+  animation: loader-ring-spin 1.8s linear infinite;
+}
+
+.animate-loader-ring-reverse {
+  animation: loader-ring-spin 2.4s linear infinite reverse;
+}
+
+.animate-loader-shimmer {
+  animation: loader-shimmer 2.2s ease-in-out infinite;
+}
+
+.animate-loader-dot {
+  animation: loader-dot-pulse 1.2s ease-in-out infinite;
+}
+
 @layer components {
   .bg-ellipse {
     @apply absolute w-full h-[100px] rounded-[50%] bg-[#dbeaf6] -z-1 -top-13 overflow-hidden;

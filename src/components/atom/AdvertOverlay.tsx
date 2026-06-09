@@ -44,15 +44,21 @@ const AD_IMAGES = [
 ];
 
 const SWITCH_INTERVAL = 5000;
+const SHOW_DELAY_MS = 2000;
 
 export const AdvertOverlay: React.FC = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setOpen(true), SHOW_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;

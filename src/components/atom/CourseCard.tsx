@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import {
   ArrowRight,
   Award,
+  CircleCheck,
+  CircleX,
   ExternalLink,
   MoreVertical,
   Pencil,
@@ -115,6 +117,11 @@ const ApplicationStatusBadge = ({
       className,
     )}
   >
+    {acceptingApplications ? (
+      <CircleCheck className='size-3.5 shrink-0' aria-hidden />
+    ) : (
+      <CircleX className='size-3.5 shrink-0' aria-hidden />
+    )}
     {acceptingApplications ? "Open for applications" : "Applications closed"}
   </Badge>
 );
@@ -143,6 +150,7 @@ export const CourseCard = ({
   setCourseToEdit,
   setFormData,
   loading = false,
+  columnsPerRow = 2,
 }: {
   courses: CourseType[];
   searchTerm?: string;
@@ -161,6 +169,7 @@ export const CourseCard = ({
     type: string;
   }) => void;
   loading?: boolean;
+  columnsPerRow?: 2 | 3;
 }) => {
   const pathname = usePathname();
   const isCoursesPath = pathname === "/courses" || pathname === "/";
@@ -188,16 +197,25 @@ export const CourseCard = ({
   };
 
   const gridClass = cn(
-    "grid min-w-0 gap-6 lg:gap-8",
+    "grid min-w-0",
     admin
-      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-      : "grid-cols-1 sm:grid-cols-2",
+      ? "gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+      : columnsPerRow === 3
+        ? "gap-4 md:gap-5 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+        : "gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2",
+  );
+
+  const containerClass = cn(
+    "mx-auto mt-8",
+    admin && "max-w-auto",
+    !admin && columnsPerRow === 3 && "w-full max-w-none",
+    !admin && columnsPerRow !== 3 && "max-w-6xl",
   );
 
   if (loading) {
     const skeletonCount = admin ? 9 : 6;
     return (
-      <div className={cn("max-w-6xl mx-auto mt-8", admin && "max-w-auto")}>
+      <div className={containerClass}>
         <div className={gridClass}>
           {Array.from({ length: skeletonCount }).map((_, i) => (
             <SkeletonCard
@@ -212,7 +230,7 @@ export const CourseCard = ({
   }
 
   return (
-    <div className={cn("max-w-6xl mx-auto mt-8", admin && "max-w-auto")}>
+    <div className={containerClass}>
       {courses.length > 0 ? (
         <div className={gridClass}>
           {courses.map((course) => (
@@ -336,8 +354,8 @@ export const CourseCard = ({
                   </div>
                 )}
 
-                <div className='mt-auto flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-between'>
-                  <div className='flex flex-wrap items-center gap-2'>
+                <div className='mt-auto flex flex-wrap gap-3 pt-1 sm:flex-row sm:items-center justify-between'>
+                  <div className='flex flex-wra items-center gap-2'>
                     {course.hasCertificate && (
                       <Badge className='border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-50'>
                         <Award className='size-3' />
@@ -356,14 +374,14 @@ export const CourseCard = ({
                     <Link
                       href={`/courses/${course.slug}`}
                       target='_blank'
-                      className='inline-flex w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c9251c]'
+                      className='inline-flex whitespace-nowrap w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#c9251c]'
                       onClick={(e) => e.stopPropagation()}
                     >
                       Learn More
                       <ArrowRight className='size-4' />
                     </Link>
                   ) : (
-                    <span className='inline-flex w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-[#c9251c]'>
+                    <span className='inline-flex whitespace-nowrap w-fit items-center gap-1.5 rounded-full bg-[#E02B20] px-4 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-[#c9251c]'>
                       Learn More
                       <ArrowRight className='size-4 transition-transform group-hover:translate-x-0.5' />
                     </span>

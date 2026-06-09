@@ -23,6 +23,10 @@ const GallerySchema = new Schema(
       type: String,
       required: true,
     },
+    useAsHeroBackground: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

@@ -315,7 +315,7 @@ function ApplicantInfoModalContent({
         exact: false,
       });
       queryClient.invalidateQueries({
-        queryKey: ["cohort-applicants-stats", slug],
+        queryKey: ["cohort-preview-stats", slug],
         exact: false,
       });
       queryClient.invalidateQueries({ queryKey: ["graduated-applicants"] });
@@ -542,7 +542,7 @@ function ApplicantInfoModalContent({
                     compact
                     queryKeysToInvalidate={[
                       ["cohort-applicants", slug],
-                      ["cohort-applicants-stats", slug],
+                      ["cohort-preview-stats", slug],
                     ]}
                   />
                 </div>

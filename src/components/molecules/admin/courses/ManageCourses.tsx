@@ -146,8 +146,8 @@ export const ManageCourses = () => {
         }
       />
       {/* Filter & Sort Controls */}
-      <div className='flex flex-col md:flex-row gap-4 mb-6'>
-        <div className='relative w-full md:w-1/2 lg:w-full'>
+      <div className='flex flex-col md:flex-row gap-4 mb-6 flex-wrap justify-between'>
+        <div className='relative min-w-[300px] w-full md:w-1/2'>
           <Input
             placeholder='Search course title...'
             value={search}

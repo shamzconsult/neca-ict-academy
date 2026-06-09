@@ -1,10 +1,10 @@
 "use client";
 
+import { PageLoader } from "@/components/atom/PageLoader";
 import { Sidebar } from "@/components/atom/Sidebar";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import AdminSessionProvider from "./AdminSessionProvider";
 import { SidebarContext } from "@/contexts/SidebarContext";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
@@ -58,11 +58,7 @@ function AdminAuthWrapper({ children }: { children: React.ReactNode }) {
   }
 
   if (authenticated === null) {
-    return (
-      <div className='flex items-center justify-center h-screen'>
-        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#E02B20]'></div>
-      </div>
-    );
+    return <PageLoader className='bg-gray-50' />;
   }
 
   if (authenticated === false) {
@@ -94,9 +90,5 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <AdminSessionProvider>
-      <AdminAuthWrapper>{children}</AdminAuthWrapper>
-    </AdminSessionProvider>
-  );
+  return <AdminAuthWrapper>{children}</AdminAuthWrapper>;
 }

@@ -5,6 +5,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Enrollment } from "@/models/enrollment";
 import { getOpenApplicationCourseIds } from "@/services/courses/courses.server";
 import { revalidatePath } from "next/cache";
+import { Types } from "mongoose";
 
 export const POST = async (req: Request) => {
   try {
@@ -133,25 +134,26 @@ export const GET = async (req: Request) => {
 
     const courses = await Course.find(query)
       .sort({ [sort]: order })
-      .exec();
+      .lean();
 
     const openApplicationCourseIds = await getOpenApplicationCourseIds();
 
-    // Fetch totalEnrolled and application status for each course
-    const coursesWithEnrolled = await Promise.all(
-      courses.map(async (course) => {
-        const totalEnrolled = await Enrollment.countDocuments({
-          course: course._id,
-        });
-        return {
-          ...course.toObject(),
-          totalEnrolled,
-          acceptingApplications: openApplicationCourseIds.has(
-            course._id.toString(),
-          ),
-        };
-      }),
+    const enrollmentCounts = await Enrollment.aggregate<{
+      _id: Types.ObjectId;
+      count: number;
+    }>([{ $group: { _id: "$course", count: { $sum: 1 } } }]);
+
+    const enrolledByCourse = new Map(
+      enrollmentCounts.map((entry) => [String(entry._id), entry.count]),
     );
+
+    const coursesWithEnrolled = courses.map((course) => ({
+      ...course,
+      totalEnrolled: enrolledByCourse.get(String(course._id)) ?? 0,
+      acceptingApplications: openApplicationCourseIds.has(
+        String(course._id),
+      ),
+    }));
 
     return NextResponse.json(coursesWithEnrolled, { status: 200 });
   } catch (error) {

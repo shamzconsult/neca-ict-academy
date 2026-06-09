@@ -22,6 +22,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
+import { PageLoader } from "@/components/atom/PageLoader";
 import { cn } from "@/lib/utils";
 
 type LocationStats = {
@@ -125,23 +126,6 @@ const StatCard = ({ stat }: { stat: DashboardStat }) => {
   );
 };
 
-const StatsSkeleton = () => (
-  <div className='mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
-    {STAT_CONFIG.map((_, i) => (
-      <div
-        key={i}
-        className='flex animate-pulse items-start gap-4 rounded-2xl border border-[#27156F]/10 bg-white p-5 shadow-sm'
-      >
-        <div className='size-11 shrink-0 rounded-xl bg-gray-200' />
-        <div className='flex-1 space-y-2'>
-          <div className='h-8 w-16 rounded bg-gray-200' />
-          <div className='h-4 w-24 rounded bg-gray-100' />
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
 const DashboardSection = ({
   title,
   action,
@@ -211,6 +195,10 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
 
   const toggleModal = () => setShowModal((prev) => !prev);
 
+  if (!statsData && isLoading) {
+    return <PageLoader className='bg-gray-50' />;
+  }
+
   return (
     <>
       <AdminSectionHeader
@@ -239,9 +227,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
         }
       />
 
-      {!statsData && isLoading ? (
-        <StatsSkeleton />
-      ) : statsData ? (
+      {statsData ? (
         <div className='mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
           {dashboardStats.map((stat) => (
             <StatCard key={stat.name} stat={stat} />

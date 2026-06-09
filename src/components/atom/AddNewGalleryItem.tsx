@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pencil, Trash2, Plus, Loader2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,6 +25,7 @@ export type GalleryType = {
   description: string;
   url: string;
   images: string[];
+  useAsHeroBackground?: boolean;
 };
 
 type GalleryItem = {
@@ -32,6 +34,7 @@ type GalleryItem = {
   date: string;
   image: File | null;
   id: string;
+  useAsHeroBackground: boolean;
 };
 
 type GalleryFormProps = {
@@ -74,8 +77,24 @@ export const AddNewGalleryItem = ({
     date: "",
     image: null,
     id: crypto.randomUUID(),
+    useAsHeroBackground: false,
   });
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open || !galleryToEdit) return;
+
+    setCurrentItem({
+      title: galleryToEdit.title,
+      description: galleryToEdit.description,
+      date: galleryToEdit.date,
+      image: null,
+      id: galleryToEdit._id,
+      useAsHeroBackground: galleryToEdit.useAsHeroBackground ?? false,
+    });
+    setGalleryItems([]);
+    setEditingItemId(null);
+  }, [open, galleryToEdit]);
 
   const createMutation = useMutation({
     mutationFn: async (items: GalleryItem[]) => {
@@ -84,6 +103,10 @@ export const AddNewGalleryItem = ({
         formData.append("title[]", item.title);
         formData.append("description[]", item.description);
         formData.append("date[]", item.date);
+        formData.append(
+          "useAsHeroBackground[]",
+          item.useAsHeroBackground ? "true" : "false",
+        );
         if (item.image) formData.append("images[]", item.image);
       });
       const res = await fetch("/api/gallery", {
@@ -144,6 +167,7 @@ export const AddNewGalleryItem = ({
       date: "",
       image: null,
       id: crypto.randomUUID(),
+      useAsHeroBackground: false,
     });
     setEditingItemId(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -185,6 +209,7 @@ export const AddNewGalleryItem = ({
       date: "",
       image: null,
       id: crypto.randomUUID(),
+      useAsHeroBackground: false,
     });
     setEditingItemId(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -216,23 +241,33 @@ export const AddNewGalleryItem = ({
   ) => {
     e.preventDefault();
 
+    if (galleryToEdit) {
+      if (!currentItem.title || !currentItem.date) {
+        toast.error("Please fill in all required fields.");
+        return;
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", currentItem.title);
+      formDataToSend.append("date", currentItem.date);
+      formDataToSend.append("description", currentItem.description);
+      formDataToSend.append(
+        "useAsHeroBackground",
+        currentItem.useAsHeroBackground ? "true" : "false",
+      );
+      if (currentItem.image) {
+        formDataToSend.append("images", currentItem.image);
+      }
+      updateMutation.mutate({ _id: galleryToEdit._id, formDataToSend });
+      return;
+    }
+
     if (galleryItems.length === 0) {
       toast.error("Please add at least one gallery item.");
       return;
     }
 
-    if (galleryToEdit) {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", currentItem.title);
-      formDataToSend.append("date", currentItem.date);
-      formDataToSend.append("description", currentItem.description);
-      if (currentItem.image) {
-        formDataToSend.append("images", currentItem.image);
-      }
-      updateMutation.mutate({ _id: galleryToEdit._id, formDataToSend });
-    } else {
-      createMutation.mutate(galleryItems);
-    }
+    createMutation.mutate(galleryItems);
   };
 
   return (
@@ -250,7 +285,7 @@ export const AddNewGalleryItem = ({
           </DialogTitle>
         </DialogHeader>
         <ScrollArea className='max-h-[70vh] px-6 pb-6'>
-          {(galleryItems.length < 6 || editingItemId !== null) && (
+          {(galleryItems.length < 6 || editingItemId !== null || galleryToEdit) && (
             <form className='space-y-4'>
               <div className='space-y-2'>
                 <Label>Title</Label>
@@ -291,25 +326,51 @@ export const AddNewGalleryItem = ({
                   ref={fileInputRef}
                   onChange={handleFileChange}
                 />
-                {currentItem.image && (
+                {currentItem.image ? (
                   <img
                     src={URL.createObjectURL(currentItem.image)}
                     alt='preview'
                     className='h-40 w-full object-cover rounded-md'
                   />
+                ) : (
+                  galleryToEdit?.images[0] && (
+                    <img
+                      src={galleryToEdit.images[0]}
+                      alt='current'
+                      className='h-40 w-full object-cover rounded-md'
+                    />
+                  )
                 )}
               </div>
 
-              <Button
-                type='button'
-                onClick={addItemToList}
-                className='w-full cursor-pointer gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
-                disabled={
-                  !currentItem.title || !currentItem.date || !currentItem.image
-                }
-              >
-                <Plus className='h-4 w-4' /> Add to Batch
-              </Button>
+              <div className='flex items-center gap-2'>
+                <Checkbox
+                  id='useAsHeroBackground'
+                  checked={currentItem.useAsHeroBackground}
+                  onCheckedChange={(checked) =>
+                    setCurrentItem({
+                      ...currentItem,
+                      useAsHeroBackground: checked === true,
+                    })
+                  }
+                />
+                <Label htmlFor='useAsHeroBackground' className='font-normal'>
+                  Use as hero background
+                </Label>
+              </div>
+
+              {!galleryToEdit && (
+                <Button
+                  type='button'
+                  onClick={addItemToList}
+                  className='w-full cursor-pointer gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
+                  disabled={
+                    !currentItem.title || !currentItem.date || !currentItem.image
+                  }
+                >
+                  <Plus className='h-4 w-4' /> Add to Batch
+                </Button>
+              )}
             </form>
           )}
 
@@ -373,7 +434,11 @@ export const AddNewGalleryItem = ({
           <Button
             onClick={(e) => handleSubmit(e)}
             disabled={
-              editingItemId !== null || loading || galleryItems.length === 0
+              editingItemId !== null ||
+              loading ||
+              (galleryToEdit
+                ? !currentItem.title || !currentItem.date
+                : galleryItems.length === 0)
             }
             className='mt-4 w-full cursor-pointer gap-2 bg-[#27156F] text-white hover:bg-[#27156F]/90'
           >

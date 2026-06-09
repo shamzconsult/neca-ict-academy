@@ -51,6 +51,11 @@ const EnrollmentSchema = new Schema(
 
 // Add unique compound index to prevent duplicate enrollments
 EnrollmentSchema.index({ applicant: 1, cohort: 1 }, { unique: true });
+EnrollmentSchema.index({ cohort: 1, createdAt: -1 });
+EnrollmentSchema.index({ cohort: 1, status: 1, createdAt: -1 });
+EnrollmentSchema.index({ cohort: 1, course: 1, createdAt: -1 });
+EnrollmentSchema.index({ status: 1, updatedAt: -1 });
+EnrollmentSchema.index({ course: 1 });
 
 const Enrollment =
   mongoose.models.Enrollment || mongoose.model("Enrollment", EnrollmentSchema);

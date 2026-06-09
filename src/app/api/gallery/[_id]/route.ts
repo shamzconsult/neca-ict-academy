@@ -24,12 +24,16 @@ export const PUT = async (req: Request) => {
     const description = formData.get("description") as string;
     const date = formData.get("date") as string;
     const files = formData.getAll("images") as File[];
+    const useAsHeroBackground = formData.get("useAsHeroBackground") as string;
 
-    const updatedFields: any = {};
+    const updatedFields: Record<string, unknown> = {};
 
     if (title) updatedFields.title = title;
     if (description) updatedFields.description = description;
     if (date) updatedFields.date = date;
+    if (useAsHeroBackground !== null) {
+      updatedFields.useAsHeroBackground = useAsHeroBackground === "true";
+    }
 
     if (files && files.length > 0 && files[0].name !== "undefined") {
       const uploadPromises = files.map(async (file) => {

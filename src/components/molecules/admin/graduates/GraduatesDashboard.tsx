@@ -1,16 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import {
-  BookOpen,
-  GraduationCap,
-  Search,
-  SquareLibrary,
-} from "lucide-react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { BookOpen, GraduationCap, Search, SquareLibrary } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 import EmptyState from "@/components/atom/EmptyState";
+import { Pagination } from "@/components/atom/Pagination";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CohortCourseSelect } from "@/components/ui/cohort-course-select";
@@ -21,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useDebounce } from "@/hooks/useDebounce";
 import { cn } from "@/lib/utils";
 import type { HonorSummary } from "@/types";
 import { HonorBadgeOverlay } from "./HonorBadge";
@@ -35,8 +32,27 @@ type Graduate = {
   honors?: HonorSummary[];
 };
 
+type GraduatesResponse = {
+  success: boolean;
+  data: Graduate[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  filters: {
+    years: number[];
+    cohorts: string[];
+    courses: string[];
+    totalGraduates: number;
+  };
+};
+
 const YEAR_SELECT_TRIGGER =
-  "h-9 w-32 shrink-0 overflow-hidden border-[#27156F]/15 bg-white [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:flex-1 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:whitespace-nowrap [&_[data-slot=select-value]]:text-left";
+  "h-9 w-full shrink-0 overflow-hidden border-[#27156F]/15 bg-white sm:w-32 [&_[data-slot=select-value]]:min-w-0 [&_[data-slot=select-value]]:flex-1 [&_[data-slot=select-value]]:truncate [&_[data-slot=select-value]]:whitespace-nowrap [&_[data-slot=select-value]]:text-left";
+
+const GRADUATE_FILTER_SELECT_TRIGGER = "w-full sm:w-52";
 
 const YEAR_SELECT_CONTENT = "w-32 min-w-32 max-w-32";
 
@@ -84,7 +100,10 @@ function GraduatesFilterSkeleton() {
           <div className='h-9 w-52 animate-pulse rounded-md bg-gray-200/80' />
         </div>
       </div>
-      <div className='-mt-4 mb-6 h-4 w-48 animate-pulse rounded bg-gray-100' aria-hidden />
+      <div
+        className='-mt-4 mb-6 h-4 w-48 animate-pulse rounded bg-gray-100'
+        aria-hidden
+      />
     </>
   );
 }
@@ -149,23 +168,40 @@ function GraduateCard({ graduate }: { graduate: Graduate }) {
 
 export function GraduatesDashboard() {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 400);
   const [yearFilter, setYearFilter] = useState("all");
   const [cohortFilter, setCohortFilter] = useState("all");
   const [courseFilter, setCourseFilter] = useState("all");
   const [titleFilter, setTitleFilter] = useState("all");
+  const [page, setPage] = useState(1);
 
-  const { data, isLoading, error } = useQuery<{
-    success: boolean;
-    data: Graduate[];
-    total: number;
-  }>({
-    queryKey: ["graduated-applicants"],
+  const queryParams = new URLSearchParams();
+  if (debouncedSearch) queryParams.set("search", debouncedSearch);
+  if (yearFilter !== "all") queryParams.set("year", yearFilter);
+  if (cohortFilter !== "all") queryParams.set("cohort", cohortFilter);
+  if (courseFilter !== "all") queryParams.set("course", courseFilter);
+  if (titleFilter !== "all") queryParams.set("titleId", titleFilter);
+  queryParams.set("page", String(page));
+
+  const { data, isLoading, isFetching, error } = useQuery<GraduatesResponse>({
+    queryKey: [
+      "graduated-applicants",
+      debouncedSearch,
+      yearFilter,
+      cohortFilter,
+      courseFilter,
+      titleFilter,
+      page,
+    ],
     queryFn: async () => {
-      const res = await fetch("/api/applicants/graduated");
+      const res = await fetch(
+        `/api/applicants/graduated?${queryParams.toString()}`,
+      );
       if (!res.ok) throw new Error("Failed to fetch graduates");
       return res.json();
     },
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const { data: titlesData } = useQuery<{
@@ -181,70 +217,37 @@ export function GraduatesDashboard() {
   });
 
   const titleOptions = titlesData?.data ?? [];
-
   const graduates = data?.data ?? [];
+  const filters = data?.filters;
+  const totalGraduates = filters?.totalGraduates ?? 0;
+  const filteredTotal = data?.pagination.total ?? 0;
+  const totalPages = data?.pagination.totalPages ?? 1;
+  const tableBusy = isLoading && !data;
 
-  const years = useMemo(
-    () =>
-      [...new Set(graduates.map((g) => g.year))].sort((a, b) => b - a),
-    [graduates],
-  );
-
-  const graduatesForYear = useMemo(() => {
-    if (yearFilter === "all") return graduates;
-    const year = Number(yearFilter);
-    return graduates.filter((g) => g.year === year);
-  }, [graduates, yearFilter]);
-
-  const cohortOptions = useMemo(
-    () => [...new Set(graduatesForYear.map((g) => g.cohort))].sort(),
-    [graduatesForYear],
-  );
-
-  const graduatesForCohort = useMemo(() => {
-    if (cohortFilter === "all") return graduatesForYear;
-    return graduatesForYear.filter((g) => g.cohort === cohortFilter);
-  }, [graduatesForYear, cohortFilter]);
-
-  const courseOptions = useMemo(
-    () => [...new Set(graduatesForCohort.map((g) => g.course))].sort(),
-    [graduatesForCohort],
-  );
+  const hasFilters =
+    !!debouncedSearch ||
+    yearFilter !== "all" ||
+    cohortFilter !== "all" ||
+    courseFilter !== "all" ||
+    titleFilter !== "all";
 
   const handleYearChange = (value: string) => {
     setYearFilter(value);
     setCohortFilter("all");
     setCourseFilter("all");
-    setTitleFilter("all");
+    setPage(1);
   };
 
   const handleCohortChange = (value: string) => {
     setCohortFilter(value);
     setCourseFilter("all");
+    setPage(1);
   };
 
-  const filteredGraduates = useMemo(() => {
-    const q = search.trim().toLowerCase();
-
-    return graduates.filter((g) => {
-      if (yearFilter !== "all" && g.year !== Number(yearFilter)) return false;
-      if (cohortFilter !== "all" && g.cohort !== cohortFilter) return false;
-      if (courseFilter !== "all" && g.course !== courseFilter) return false;
-      if (titleFilter !== "all") {
-        const hasTitle = g.honors?.some((h) => h.titleId === titleFilter);
-        if (!hasTitle) return false;
-      }
-      if (q && !g.fullName.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [graduates, search, yearFilter, cohortFilter, courseFilter, titleFilter]);
-
-  const hasFilters =
-    !!search.trim() ||
-    yearFilter !== "all" ||
-    cohortFilter !== "all" ||
-    courseFilter !== "all" ||
-    titleFilter !== "all";
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
 
   return (
     <>
@@ -252,30 +255,30 @@ export function GraduatesDashboard() {
         title='Graduates'
         icon={GraduationCap}
         cta={
-          !isLoading && graduates.length > 0 ? (
+          totalGraduates > 0 ? (
             <Badge
               variant='outline'
               className='border-[#27156F]/20 bg-[#DBEAF6]/40 px-3 py-1.5 text-sm font-semibold text-[#27156F]'
             >
-              {graduates.length} graduate{graduates.length === 1 ? "" : "s"}
+              {totalGraduates} graduate{totalGraduates === 1 ? "" : "s"}
             </Badge>
           ) : undefined
         }
       />
 
-      {!isLoading && graduates.length > 0 && (
+      {totalGraduates > 0 && (
         <div className='mb-8 flex flex-col gap-4 rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-4 lg:flex-row lg:items-center lg:justify-between'>
           <div className='relative w-full lg:max-w-md'>
-            <Search className='absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400' />
+            <Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400' />
             <Input
               type='search'
               placeholder='Search by name...'
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className='border-[#27156F]/15 bg-white pl-9'
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className='h-9 border-[#27156F]/15 bg-white pl-9 text-base sm:text-sm'
             />
           </div>
-          <div className='flex flex-wrap items-center gap-2'>
+          <div className='flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:flex-1 lg:justify-end'>
             <Select value={yearFilter} onValueChange={handleYearChange}>
               <SelectTrigger className={YEAR_SELECT_TRIGGER}>
                 <SelectValue placeholder='All years' />
@@ -284,7 +287,7 @@ export function GraduatesDashboard() {
                 <SelectItem value='all' className={YEAR_SELECT_ITEM}>
                   All years
                 </SelectItem>
-                {years.map((year) => (
+                {(filters?.years ?? []).map((year) => (
                   <SelectItem
                     key={year}
                     value={String(year)}
@@ -298,30 +301,40 @@ export function GraduatesDashboard() {
             <CohortCourseSelect
               value={cohortFilter}
               onValueChange={handleCohortChange}
-              disabled={cohortOptions.length === 0}
+              disabled={(filters?.cohorts.length ?? 0) === 0}
               placeholder={
                 yearFilter !== "all" ? "Cohorts in year" : "All cohorts"
               }
               allOption={{ value: "all", label: "All cohorts" }}
-              options={cohortOptions.map((cohort) => ({
+              options={(filters?.cohorts ?? []).map((cohort) => ({
                 value: cohort,
                 label: cohort,
               }))}
+              triggerClassName={GRADUATE_FILTER_SELECT_TRIGGER}
             />
             <CohortCourseSelect
               value={courseFilter}
-              onValueChange={setCourseFilter}
-              disabled={cohortFilter === "all" || courseOptions.length === 0}
+              onValueChange={(value) => {
+                setCourseFilter(value);
+                setPage(1);
+              }}
+              disabled={
+                cohortFilter === "all" || (filters?.courses.length ?? 0) === 0
+              }
               placeholder='Select cohort first'
               allOption={{ value: "all", label: "All courses" }}
-              options={courseOptions.map((course) => ({
+              options={(filters?.courses ?? []).map((course) => ({
                 value: course,
                 label: course,
               }))}
+              triggerClassName={GRADUATE_FILTER_SELECT_TRIGGER}
             />
             <CohortCourseSelect
               value={titleFilter}
-              onValueChange={setTitleFilter}
+              onValueChange={(value) => {
+                setTitleFilter(value);
+                setPage(1);
+              }}
               disabled={titleOptions.length === 0}
               placeholder='All honors'
               allOption={{ value: "all", label: "All honors" }}
@@ -329,16 +342,20 @@ export function GraduatesDashboard() {
                 value: title._id,
                 label: title.name,
               }))}
+              triggerClassName={GRADUATE_FILTER_SELECT_TRIGGER}
             />
           </div>
         </div>
       )}
 
-      {!isLoading && graduates.length > 0 && (
+      {totalGraduates > 0 && (
         <p className='-mt-4 mb-6 text-sm text-gray-500'>
-          Showing {filteredGraduates.length} of {graduates.length} graduate
-          {graduates.length === 1 ? "" : "s"}
+          Showing {graduates.length} of {filteredTotal} graduate
+          {filteredTotal === 1 ? "" : "s"}
           {hasFilters && <span className='text-gray-400'> (filtered)</span>}
+          {isFetching && !tableBusy && (
+            <span className='ml-2 text-gray-400'>Updating...</span>
+          )}
         </p>
       )}
 
@@ -348,7 +365,7 @@ export function GraduatesDashboard() {
           message={error.message}
           size='lg'
         />
-      ) : isLoading ? (
+      ) : tableBusy ? (
         <>
           <GraduatesFilterSkeleton />
           <div className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
@@ -357,7 +374,7 @@ export function GraduatesDashboard() {
             ))}
           </div>
         </>
-      ) : graduates.length === 0 ? (
+      ) : totalGraduates === 0 ? (
         <div className='rounded-2xl border border-dashed border-[#27156F]/20 bg-[#DBEAF6]/20 py-16'>
           <EmptyState
             title='No graduates yet'
@@ -366,22 +383,35 @@ export function GraduatesDashboard() {
             className='border-0'
           />
         </div>
-      ) : filteredGraduates.length === 0 ? (
+      ) : filteredTotal === 0 ? (
         <EmptyState
           title='No matching graduates'
           message='Try adjusting your search or filters.'
           size='lg'
         />
       ) : (
-        <div
-          className={cn(
-            "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        <>
+          <div
+            className={cn(
+              "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+              isFetching && !tableBusy && "opacity-60 transition-opacity",
+            )}
+          >
+            {graduates.map((graduate) => (
+              <GraduateCard key={graduate.id} graduate={graduate} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className='mt-8 flex justify-center'>
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+              />
+            </div>
           )}
-        >
-          {filteredGraduates.map((graduate) => (
-            <GraduateCard key={graduate.id} graduate={graduate} />
-          ))}
-        </div>
+        </>
       )}
     </>
   );

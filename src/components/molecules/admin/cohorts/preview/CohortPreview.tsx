@@ -9,7 +9,11 @@ import {
   useParams,
 } from "next/navigation";
 import { useDebounce } from "@/hooks/useDebounce";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import Link from "next/link";
 import {
   CheckCircle2,
@@ -248,17 +252,8 @@ function CohortPreviewHeader({ cohortName }: { cohortName?: string }) {
   );
 }
 
-interface ApiResponse {
+interface ApplicantsResponse {
   success: boolean;
-  cohort: {
-    name: string;
-    slug: string;
-    startDate: string;
-    endDate: string;
-    applicationStartDate?: string;
-    applicationEndDate?: string;
-    active?: boolean;
-  };
   data: EnrollmentsType;
   pagination: {
     page: number;
@@ -309,18 +304,26 @@ export const CohortPreview = () => {
     .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
     .join("&");
 
-  const { data: cohortDetails, isLoading: cohortDetailsLoading } =
-    useQuery<CohortType>({
-      queryKey: ["cohort", slug],
-      queryFn: async () => {
-        const res = await fetch(`/api/cohorts/${slug}`);
-        if (!res.ok) throw new Error("Cohort not found");
-        return res.json();
-      },
-      enabled: !!slug,
-    });
+  const {
+    data: cohortData,
+    isLoading: cohortLoading,
+    isError: cohortError,
+  } = useQuery<CohortType>({
+    queryKey: ["cohort", slug],
+    queryFn: async () => {
+      const res = await fetch(`/api/cohorts/${slug}`);
+      if (!res.ok) throw new Error("Cohort not found");
+      return res.json();
+    },
+    enabled: !!slug,
+    staleTime: Infinity,
+  });
 
-  const { data, isLoading, isFetching } = useQuery<ApiResponse, Error>({
+  const {
+    data: applicantsData,
+    isLoading: applicantsLoading,
+    isFetching: applicantsFetching,
+  } = useQuery<ApplicantsResponse, Error>({
     queryKey: [
       "cohort-applicants",
       slug,
@@ -333,24 +336,26 @@ export const CohortPreview = () => {
     ],
     queryFn: async () => {
       if (!slug) throw new Error("No slug provided");
-      const res = await fetch(`/api/cohorts/${slug}/applicants?${queryString}`);
+      const res = await fetch(`/api/cohorts/${slug}/preview?${queryString}`);
       if (!res.ok) throw new Error("Network response was not ok");
       return res.json();
     },
     enabled: !!slug,
+    placeholderData: keepPreviousData,
   });
 
   const { data: statsData, isLoading: statsLoading } = useQuery<
     { stats: Record<string, number> },
     Error
   >({
-    queryKey: ["cohort-applicants-stats", slug],
+    queryKey: ["cohort-preview-stats", slug],
     queryFn: async () => {
       const res = await fetch(`/api/cohorts/${slug}/applicants/stats`);
       if (!res.ok) throw new Error("Failed to fetch stats");
       return res.json();
     },
     enabled: !!slug,
+    staleTime: 60_000,
   });
 
   useEffect(() => {
@@ -363,7 +368,14 @@ export const CohortPreview = () => {
     if (pageSize !== DEFAULT_PAGE_SIZE) {
       urlParams.set("limit", String(pageSize));
     }
-    router.push(`${pathname}?${urlParams.toString()}`, { scroll: false });
+
+    const nextQuery = urlParams.toString();
+    if (nextQuery === searchParams.toString()) {
+      return;
+    }
+
+    const nextUrl = nextQuery ? `${pathname}?${nextQuery}` : pathname;
+    router.replace(nextUrl, { scroll: false });
   }, [
     debouncedSearchTerm,
     status,
@@ -373,6 +385,7 @@ export const CohortPreview = () => {
     pageSize,
     pathname,
     router,
+    searchParams,
   ]);
 
   const handleSearchTerm = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -380,9 +393,10 @@ export const CohortPreview = () => {
     setPage(1);
   };
 
-  const filteredEnrollments = data?.data || [];
-  const totalPages = data?.pagination?.totalPages || 1;
-  const totalApplicants = data?.pagination?.total ?? filteredEnrollments.length;
+  const filteredEnrollments = applicantsData?.data || [];
+  const totalPages = applicantsData?.pagination?.totalPages || 1;
+  const totalApplicants =
+    applicantsData?.pagination?.total ?? filteredEnrollments.length;
   const globalPosition = navToLastOnLoad
     ? Math.min(page * pageSize, totalApplicants)
     : (page - 1) * pageSize + currentIndex + 1;
@@ -403,9 +417,9 @@ export const CohortPreview = () => {
     if (course !== "all") params.set("course", course);
     params.set("page", String(targetPage));
     params.set("limit", String(pageSize));
-    const res = await fetch(`/api/cohorts/${slug}/applicants?${params}`);
+    const res = await fetch(`/api/cohorts/${slug}/preview?${params}`);
     if (!res.ok) throw new Error("Network response was not ok");
-    return res.json() as Promise<ApiResponse>;
+    return res.json() as Promise<ApplicantsResponse>;
   };
 
   useEffect(() => {
@@ -422,14 +436,19 @@ export const CohortPreview = () => {
 
   useEffect(() => {
     if (!isCrossPageNav && !navToLastOnLoad) return;
-    if (isFetching) return;
+    if (applicantsFetching) return;
 
     if (navToLastOnLoad && filteredEnrollments.length > 0) {
       setCurrentIndex(filteredEnrollments.length - 1);
       setNavToLastOnLoad(false);
     }
     setIsCrossPageNav(false);
-  }, [isCrossPageNav, navToLastOnLoad, isFetching, filteredEnrollments.length]);
+  }, [
+    isCrossPageNav,
+    navToLastOnLoad,
+    applicantsFetching,
+    filteredEnrollments.length,
+  ]);
 
   useEffect(() => {
     setModalOpen(false);
@@ -452,8 +471,8 @@ export const CohortPreview = () => {
           status,
           location,
           course,
-          pageSize,
           targetPage,
+          pageSize,
         ],
         queryFn: () => fetchApplicantsPage(targetPage),
       });
@@ -538,25 +557,31 @@ export const CohortPreview = () => {
     );
   };
 
-  if (!isLoading && !cohortDetailsLoading && (!data || !slug)) {
+  if (!slug) {
     notFound();
   }
 
-  const cohortName = cohortDetails?.name || data?.cohort?.name;
-  const cohortCourses = getCohortCourses(cohortDetails?.courses);
+  if (!cohortLoading && (cohortError || !cohortData)) {
+    notFound();
+  }
+
+  const cohortName = cohortData?.name;
+  const cohortCourses = getCohortCourses(cohortData?.courses);
+  const previewStats = statsData?.stats;
   const hasFilters =
     !!searchTerm || status !== "all" || location !== "all" || course !== "all";
 
-  const showTable = !isLoading && filteredEnrollments.length > 0;
-  const showEmptyState = !isLoading && filteredEnrollments.length === 0;
+  const showTable = !applicantsLoading && filteredEnrollments.length > 0;
+  const showEmptyState = !applicantsLoading && filteredEnrollments.length === 0;
+  const tableBusy = applicantsLoading && !applicantsData;
 
   return (
     <>
       <CohortPreviewHeader cohortName={cohortName} />
 
-      {statsLoading ? (
+      {statsLoading && !previewStats ? (
         <StatsSkeleton />
-      ) : statsData?.stats ? (
+      ) : previewStats ? (
         <div className='mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5'>
           {STAT_ITEMS.map(({ key, label, icon: Icon, color, bg }) => (
             <div
@@ -573,7 +598,7 @@ export const CohortPreview = () => {
               </div>
               <div>
                 <p className={cn("text-2xl font-bold tabular-nums", color)}>
-                  {statsData.stats[key] ?? 0}
+                  {previewStats[key] ?? 0}
                 </p>
                 <p className='text-xs text-gray-500'>{label}</p>
               </div>
@@ -583,43 +608,43 @@ export const CohortPreview = () => {
       ) : null}
 
       <CohortDetailsTable
-        cohort={cohortDetails ?? data?.cohort}
-        isLoading={cohortDetailsLoading && !cohortDetails}
+        cohort={cohortData}
+        isLoading={cohortLoading && !cohortData}
       />
 
       <section className='space-y-4'>
         <div className='flex items-center justify-between gap-4'>
           <h2 className='text-lg font-bold text-[#27156F]'>Applicants</h2>
-          {!isLoading && data?.pagination?.total !== undefined && (
+          {!tableBusy && applicantsData?.pagination?.total !== undefined && (
             <span className='text-sm text-gray-500'>
-              {data.pagination.total} total
+              {applicantsData.pagination.total} total
             </span>
           )}
         </div>
 
         <TableContainer>
-          <div className='flex flex-col gap-4 border-b border-[#27156F]/10 bg-[#DBEAF6]/20 p-4 lg:flex-row lg:items-center lg:justify-between'>
-            <div className='relative w-full lg:max-w-md'>
-              <Search className='absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400' />
+          <div className='flex flex-wrap flex-col gap-3 border-b border-[#27156F]/10 bg-[#DBEAF6]/20 p-3 sm:gap-4 sm:p-4 lg:flex-row lg:items-center lg:justify-between'>
+            <div className='relative flex-1 min-w-[300px] lg:w-full lg:max-w-sm xl:max-w-md'>
+              <Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400' />
               <Input
                 type='search'
                 placeholder='Search by name, email, or phone...'
                 value={searchTerm}
                 onChange={handleSearchTerm}
-                className='border-[#27156F]/15 bg-white pl-9'
-                disabled={isLoading}
+                className='h-9 w-full border-[#27156F]/15 bg-white pl-9 text-base sm:text-sm'
+                disabled={tableBusy}
               />
             </div>
-            <div className='grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:gap-2'>
+            <div className='grid min-w-0 grid-cols-1 gap-2 min-[480px]:grid-cols-2 md:grid-cols-4 lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:justify-end lg:gap-2'>
               <Select
                 value={status}
                 onValueChange={(value) => {
                   setStatus(value);
                   setPage(1);
                 }}
-                disabled={isLoading}
+                disabled={tableBusy}
               >
-                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[130px] sm:w-auto'>
+                <SelectTrigger className='h-9 w-full min-w-0 border-[#27156F]/15 bg-white lg:w-auto lg:min-w-[8.125rem]'>
                   <SelectValue placeholder='All Status' />
                 </SelectTrigger>
                 <SelectContent>
@@ -637,9 +662,9 @@ export const CohortPreview = () => {
                   setLocation(value);
                   setPage(1);
                 }}
-                disabled={isLoading}
+                disabled={tableBusy}
               >
-                <SelectTrigger className='w-full border-[#27156F]/15 bg-white sm:min-w-[140px] sm:w-auto'>
+                <SelectTrigger className='h-9 w-full min-w-0 border-[#27156F]/15 bg-white lg:w-auto lg:min-w-[8.75rem]'>
                   <SelectValue placeholder='All Locations' />
                 </SelectTrigger>
                 <SelectContent>
@@ -651,27 +676,30 @@ export const CohortPreview = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <CohortCourseSelect
-                value={course}
-                onValueChange={(value) => {
-                  setCourse(value);
-                  setPage(1);
-                }}
-                disabled={isLoading || cohortCourses.length === 0}
-                placeholder='All Courses'
-                allOption={{ value: "all", label: "All Courses" }}
-                options={cohortCourses.map((c) => ({
-                  value: String(c._id),
-                  label: c.title,
-                }))}
-              />
+              <div className='min-w-0 min-[480px]:col-span-2 md:col-span-1 lg:col-span-auto'>
+                <CohortCourseSelect
+                  value={course}
+                  onValueChange={(value) => {
+                    setCourse(value);
+                    setPage(1);
+                  }}
+                  disabled={cohortLoading || cohortCourses.length === 0}
+                  placeholder='All Courses'
+                  allOption={{ value: "all", label: "All Courses" }}
+                  options={cohortCourses.map((c) => ({
+                    value: String(c._id),
+                    label: c.title,
+                  }))}
+                  triggerClassName='h-9 w-full min-w-0 lg:w-52'
+                />
+              </div>
               <Button
                 variant='outline'
-                className='w-full gap-2 border-[#27156F]/20 bg-white sm:w-auto'
+                className='h-9 w-full gap-2 border-[#27156F]/20 bg-white min-[480px]:col-span-2 md:col-span-1 lg:w-auto'
                 onClick={handleDownload}
-                disabled={isLoading || filteredEnrollments.length === 0}
+                disabled={tableBusy || filteredEnrollments.length === 0}
               >
-                <Download className='size-4' />
+                <Download className='size-4 shrink-0' />
                 Download
               </Button>
             </div>
@@ -681,7 +709,7 @@ export const CohortPreview = () => {
             <>
               <div className='border-b border-[#27156F]/10 bg-gray-50/80 px-4 py-2.5 text-sm text-gray-600'>
                 Showing {filteredEnrollments.length} of{" "}
-                {data?.pagination?.total ?? 0} applicants
+                {applicantsData?.pagination?.total ?? 0} applicants
                 {hasFilters && (
                   <span className='ml-1 text-gray-500'>(filtered)</span>
                 )}
@@ -717,9 +745,9 @@ export const CohortPreview = () => {
             </>
           )}
 
-          {isLoading && <TableSkeleton totalRows={pageSize} />}
+          {tableBusy && <TableSkeleton totalRows={pageSize} />}
 
-          {(showTable || isLoading) && (
+          {(showTable || tableBusy) && (
             <div className='border-t border-[#27156F]/10 px-4 py-3'>
               <div className='flex flex-col items-center justify-between gap-3 sm:flex-row'>
                 <div className='flex items-center gap-2 text-sm text-gray-600'>
@@ -730,7 +758,7 @@ export const CohortPreview = () => {
                       setPageSize(parsePageSize(value));
                       setPage(1);
                     }}
-                    disabled={isLoading}
+                    disabled={tableBusy}
                   >
                     <SelectTrigger className='h-9 w-[5.5rem] border-[#27156F]/15 bg-white'>
                       <SelectValue />
@@ -745,7 +773,7 @@ export const CohortPreview = () => {
                   </Select>
                   <span className='whitespace-nowrap'>per page</span>
                 </div>
-                {isLoading ? (
+                {tableBusy ? (
                   <PaginationSkeleton />
                 ) : (
                   totalPages > 1 && (

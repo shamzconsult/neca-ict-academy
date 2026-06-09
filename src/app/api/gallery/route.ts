@@ -15,6 +15,9 @@ export const POST = async (req: Request) => {
     const descriptions = formData.getAll("description[]") as string[];
     const dates = formData.getAll("date[]") as string[];
     const files = formData.getAll("images[]") as File[];
+    const useAsHeroBackgrounds = formData.getAll(
+      "useAsHeroBackground[]",
+    ) as string[];
 
     // Validate
     if (!titles.length || !files.length || !dates.length) {
@@ -49,6 +52,7 @@ export const POST = async (req: Request) => {
         description: descriptions[i],
         images: [url],
         date: dates[i],
+        useAsHeroBackground: useAsHeroBackgrounds[i] === "true",
       });
       createdGalleries.push(newGallery);
     }

@@ -38,6 +38,53 @@ function formatDate(dateStr?: string) {
       });
 }
 
+function parseDateOnly(dateStr: string) {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  if (!year || !month || !day) return Number.NaN;
+  return Date.UTC(year, month - 1, day);
+}
+
+function daySpanInclusive(start?: string, end?: string) {
+  if (!start || !end) return null;
+  const startMs = parseDateOnly(start);
+  const endMs = parseDateOnly(end);
+  if (Number.isNaN(startMs) || Number.isNaN(endMs) || endMs < startMs) {
+    return null;
+  }
+  return Math.floor((endMs - startMs) / 86_400_000) + 1;
+}
+
+function formatDurationLabel(days: number) {
+  if (days >= 365) {
+    const count = Math.floor(days / 365);
+    return `${count} ${count === 1 ? "year" : "years"}`;
+  }
+  if (days >= 30) {
+    const count = Math.floor(days / 30);
+    return `${count} ${count === 1 ? "month" : "months"}`;
+  }
+  if (days >= 7) {
+    const count = Math.floor(days / 7);
+    return `${count} ${count === 1 ? "week" : "weeks"}`;
+  }
+  return `${days} ${days === 1 ? "day" : "days"}`;
+}
+
+function formatDateRange(start?: string, end?: string) {
+  const durationDays = daySpanInclusive(start, end);
+  const duration =
+    durationDays != null ? formatDurationLabel(durationDays) : null;
+
+  return (
+    <>
+      {formatDate(start)} — {formatDate(end)}
+      {duration ? (
+        <span className='ml-2 text-gray-500'>({duration})</span>
+      ) : null}
+    </>
+  );
+}
+
 function DetailRow({
   label,
   children,
@@ -55,6 +102,53 @@ function DetailRow({
   );
 }
 
+const SkeletonBar = ({ className = "" }: { className?: string }) => (
+  <div
+    className={`animate-pulse rounded-md bg-gray-200/80 ${className}`.trim()}
+    aria-hidden
+  />
+);
+
+function CohortDetailsSkeleton() {
+  return (
+    <TableContainer className='mb-8'>
+      <div className='flex items-center gap-2 border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3'>
+        <Calendar className='size-4 text-[#27156F]/30' aria-hidden />
+        <SkeletonBar className='h-5 w-32' />
+      </div>
+      <Table className='min-w-0'>
+        <TableBody>
+          <DetailRow label='Cohort Name'>
+            <SkeletonBar className='h-4 w-48 max-w-full' />
+          </DetailRow>
+          <DetailRow label='Status'>
+            <SkeletonBar className='h-6 w-16 rounded-full' />
+          </DetailRow>
+          <DetailRow label='Application Window'>
+            <SkeletonBar className='h-4 w-72 max-w-full' />
+          </DetailRow>
+          <DetailRow label='Cohort Duration'>
+            <SkeletonBar className='h-4 w-72 max-w-full' />
+          </DetailRow>
+          <DetailRow label='Linked Courses'>
+            <ul className='flex flex-col gap-1.5'>
+              {Array.from({ length: 2 }).map((_, i) => (
+                <li key={i} className='flex items-center gap-2'>
+                  <SkeletonBar className='size-3.5 shrink-0 rounded-sm' />
+                  <SkeletonBar className='h-4 w-44 max-w-full' />
+                </li>
+              ))}
+            </ul>
+          </DetailRow>
+          <DetailRow label='Created'>
+            <SkeletonBar className='h-4 w-28' />
+          </DetailRow>
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+}
+
 export function CohortDetailsTable({
   cohort,
   isLoading,
@@ -63,18 +157,7 @@ export function CohortDetailsTable({
   isLoading?: boolean;
 }) {
   if (isLoading) {
-    return (
-      <TableContainer className='mb-8'>
-        <div className='border-b border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3'>
-          <div className='h-5 w-32 animate-pulse rounded bg-gray-200' />
-        </div>
-        <div className='space-y-3 p-4'>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className='h-4 animate-pulse rounded bg-gray-100' />
-          ))}
-        </div>
-      </TableContainer>
-    );
+    return <CohortDetailsSkeleton />;
   }
 
   if (!cohort) return null;
@@ -99,11 +182,13 @@ export function CohortDetailsTable({
             </TableStatusBadge>
           </DetailRow>
           <DetailRow label='Application Window'>
-            {formatDate(cohort.applicationStartDate)} —{" "}
-            {formatDate(cohort.applicationEndDate)}
+            {formatDateRange(
+              cohort.applicationStartDate,
+              cohort.applicationEndDate,
+            )}
           </DetailRow>
           <DetailRow label='Cohort Duration'>
-            {formatDate(cohort.startDate)} — {formatDate(cohort.endDate)}
+            {formatDateRange(cohort.startDate, cohort.endDate)}
           </DetailRow>
           <DetailRow label={`Linked Courses (${courseList.length})`}>
             {courseList.length > 0 ? (

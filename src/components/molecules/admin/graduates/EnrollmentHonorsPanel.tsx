@@ -58,6 +58,7 @@ export function EnrollmentHonorsPanel({
     queryClient.invalidateQueries({ queryKey: ["enrollment-detail"] });
     queryClient.invalidateQueries({ queryKey: ["graduated-applicants"] });
     queryClient.invalidateQueries({ queryKey: ["cohort-applicants"] });
+    queryClient.invalidateQueries({ queryKey: ["cohort-preview-stats"] });
     for (const key of queryKeysToInvalidate) {
       queryClient.invalidateQueries({ queryKey: key });
     }
