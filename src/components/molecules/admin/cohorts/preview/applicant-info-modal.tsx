@@ -14,6 +14,7 @@ import { useParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { parseApiError } from "@/lib/parse-api-error";
+import { invalidateAdminDashboardQueries } from "@/hooks/useAdminCohorts";
 import {
   Select,
   SelectContent,
@@ -319,6 +320,7 @@ function ApplicantInfoModalContent({
         exact: false,
       });
       queryClient.invalidateQueries({ queryKey: ["graduated-applicants"] });
+      invalidateAdminDashboardQueries(queryClient);
       toast.success("Applicant updated successfully");
       setUpdateError("");
     },

@@ -22,6 +22,7 @@ import {
 } from "../ui/select";
 import { DatePicker } from "../ui/date-picker";
 import { parseApiError } from "@/lib/parse-api-error";
+import { invalidateAdminDashboardQueries } from "@/hooks/useAdminCohorts";
 import {
   FieldError,
   FormErrorBanner,
@@ -160,6 +161,7 @@ export const CohortForm = ({
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cohorts"] });
+      invalidateAdminDashboardQueries(queryClient);
       setCohortsData((prev) => [...prev, data.newCohort]);
       toast.success("Cohort created successfully");
       resetForm();
@@ -204,6 +206,7 @@ export const CohortForm = ({
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["cohorts"] });
       queryClient.invalidateQueries({ queryKey: ["cohort-stats"] });
+      invalidateAdminDashboardQueries(queryClient);
 
       setCohortsData((prev) =>
         prev.map((cohort) => {

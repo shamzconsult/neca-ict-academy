@@ -95,7 +95,7 @@ export async function getApplicationStats(cohortId?: string | null) {
     },
   ];
 
-  const [cohorts, [facetResult]] = await Promise.all([
+  const [cohorts, [facetResult], recentActivity] = await Promise.all([
     Cohort.find({}, { name: 1 }).sort({ createdAt: -1 }).lean(),
     Enrollment.aggregate<{
       genderStats: Array<{
@@ -108,6 +108,38 @@ export async function getApplicationStats(cohortId?: string | null) {
       locationByState: LocationGroup[];
       totalApplications: Array<{ total: number }>;
     }>(pipeline),
+    Enrollment.aggregate<{
+      count: number;
+      cohortName: string;
+      cohortSlug: string;
+    }>([
+      {
+        $match: {
+          createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        },
+      },
+      { $group: { _id: "$cohort", count: { $sum: 1 } } },
+      { $match: { count: { $gt: 0 } } },
+      { $sort: { count: -1 } },
+      { $limit: 3 },
+      {
+        $lookup: {
+          from: Cohort.collection.name,
+          localField: "_id",
+          foreignField: "_id",
+          as: "cohort",
+        },
+      },
+      { $unwind: "$cohort" },
+      {
+        $project: {
+          _id: 0,
+          count: 1,
+          cohortName: "$cohort.name",
+          cohortSlug: "$cohort.slug",
+        },
+      },
+    ]),
   ]);
 
   const genderStats = facetResult?.genderStats[0] ?? {
@@ -140,5 +172,6 @@ export async function getApplicationStats(cohortId?: string | null) {
       name: cohort.name,
     })),
     totalApplications: facetResult?.totalApplications[0]?.total ?? 0,
+    recentActivity,
   };
 }

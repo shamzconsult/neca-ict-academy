@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { ApplicationStatsChart } from "./ApplicationStatsChart";
-import { CohortType } from "@/types";
 import { CohortForm } from "@/components/atom/CohortForm";
 import Link from "next/link";
 import EmptyState from "@/components/atom/EmptyState";
@@ -23,6 +22,10 @@ import {
 } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
 import { PageLoader } from "@/components/atom/PageLoader";
+import {
+  useAdminCohorts,
+  useSetAdminCohortsCache,
+} from "@/hooks/useAdminCohorts";
 import { cn } from "@/lib/utils";
 
 type LocationStats = {
@@ -43,6 +46,12 @@ type Cohort = {
   name: string;
 };
 
+type RecentActivity = {
+  count: number;
+  cohortName: string;
+  cohortSlug: string;
+};
+
 interface DashboardStat {
   name: string;
   value: number;
@@ -50,10 +59,6 @@ interface DashboardStat {
   accent: string;
   iconBg: string;
   iconColor: string;
-}
-
-interface AdminDashboardProps {
-  cohortsData: CohortType[];
 }
 
 const STAT_CONFIG = [
@@ -126,6 +131,56 @@ const StatCard = ({ stat }: { stat: DashboardStat }) => {
   );
 };
 
+const formatRecentCount = (count: number) =>
+  count >= 100 ? "100+" : count.toLocaleString();
+
+const RecentActivityBanner = ({ activity }: { activity: RecentActivity[] }) => {
+  const top = activity[0];
+  if (!top) return null;
+
+  const others = activity.slice(1);
+
+  return (
+    <div className='mb-8 flex items-start gap-3 rounded-xl border border-[#27156F]/10 bg-[#DBEAF6]/30 px-4 py-3 sm:items-center'>
+      <span className='relative mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#27156F]/10 sm:mt-0'>
+        <Clock className='size-4 text-[#27156F]' />
+        <span className='absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[#E02B20] animate-pulse' />
+      </span>
+      <div className='min-w-0 text-sm text-[#27156F]'>
+        <p>
+          <span className='font-bold tabular-nums'>
+            {formatRecentCount(top.count)}
+          </span>{" "}
+          applicant{top.count === 1 ? "" : "s"} applied for{" "}
+          <Link
+            href={`/admin/cohorts/${top.cohortSlug}`}
+            className='font-semibold underline decoration-[#27156F]/30 underline-offset-2 hover:text-[#E02B20]'
+          >
+            {top.cohortName}
+          </Link>{" "}
+          in the last 24 hours
+        </p>
+        {others.length > 0 ? (
+          <p className='mt-1 text-xs text-[#27156F]/70'>
+            {others.map((item, index) => (
+              <span key={item.cohortSlug}>
+                {index > 0 ? ", " : ""}
+                {formatRecentCount(item.count)} in{" "}
+                <Link
+                  href={`/admin/cohorts/${item.cohortSlug}`}
+                  className='font-medium underline decoration-[#27156F]/20 underline-offset-2 hover:text-[#E02B20]'
+                >
+                  {item.cohortName}
+                </Link>
+              </span>
+            ))}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
 const DashboardSection = ({
   title,
   action,
@@ -144,16 +199,18 @@ const DashboardSection = ({
   </section>
 );
 
-export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
+export const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
-  const [localCohorts, setLocalCohorts] = useState<CohortType[]>(
-    cohortsData || [],
-  );
   const [selectedCohort, setSelectedCohort] = useState<string>("all");
+  const setCohortsData = useSetAdminCohortsCache();
+  const {
+    data: cohorts = [],
+    isPending: cohortsPending,
+  } = useAdminCohorts();
 
   const {
     data: statsData,
-    isLoading,
+    isPending: statsPending,
     isFetching,
   } = useQuery<{
     success: boolean;
@@ -164,6 +221,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       levelStats: Record<string, number>;
       cohorts: Cohort[];
       totalApplications: number;
+      recentActivity: RecentActivity[];
     };
   }>({
     queryKey: ["applications-stats", selectedCohort],
@@ -175,7 +233,11 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       return res.json();
     },
     staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
+
+  const statsInitialLoad = statsPending && !statsData;
 
   const dashboardStats: DashboardStat[] = statsData?.data
     ? STAT_CONFIG.map((config) => ({
@@ -191,11 +253,11 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       }))
     : [];
 
-  const firstFiveCohorts = localCohorts.slice(0, 5);
+  const firstFiveCohorts = cohorts.slice(0, 5);
 
   const toggleModal = () => setShowModal((prev) => !prev);
 
-  if (!statsData && isLoading) {
+  if (cohortsPending || statsInitialLoad) {
     return <PageLoader className='bg-gray-50' />;
   }
 
@@ -228,11 +290,15 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       />
 
       {statsData ? (
-        <div className='mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
+        <div className='mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5'>
           {dashboardStats.map((stat) => (
             <StatCard key={stat.name} stat={stat} />
           ))}
         </div>
+      ) : null}
+
+      {statsData?.data.recentActivity?.length ? (
+        <RecentActivityBanner activity={statsData.data.recentActivity} />
       ) : null}
 
       <DashboardSection title='Application Statistics'>
@@ -240,7 +306,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
           data={statsData?.data}
           selectedCohort={selectedCohort}
           onCohortChange={setSelectedCohort}
-          isFetching={isLoading || isFetching}
+          isFetching={isFetching}
         />
       </DashboardSection>
 
@@ -256,7 +322,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
           </Link>
         }
       >
-        {localCohorts.length > 0 ? (
+        {cohorts.length > 0 ? (
           <CohortTable
             tableHead={adminCohortTableHead}
             tableData={firstFiveCohorts}
@@ -273,7 +339,7 @@ export const AdminDashboard = ({ cohortsData }: AdminDashboardProps) => {
       {showModal && (
         <CohortForm
           toggleModal={toggleModal}
-          setCohortsData={setLocalCohorts}
+          setCohortsData={setCohortsData}
         />
       )}
     </>

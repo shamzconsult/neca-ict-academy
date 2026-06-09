@@ -3,19 +3,23 @@
 import { CohortForm } from "@/components/atom/CohortForm";
 import CohortTable from "@/components/atom/Table/CohortTable";
 import EmptyState from "@/components/atom/EmptyState";
+import { PageLoader } from "@/components/atom/PageLoader";
 import { cohortTableHead } from "@/const";
-import { CohortsProps, CohortType } from "@/types";
+import { CohortType } from "@/types";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ExternalLink, PlusCircle, SquareLibrary } from "lucide-react";
 import { AdminSectionHeader } from "@/components/atom/AdminSectionHeader";
+import {
+  useAdminCohorts,
+  useSetAdminCohortsCache,
+} from "@/hooks/useAdminCohorts";
 
-export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
+export const Cohorts = () => {
   const [showModal, setShowModal] = useState(false);
-  const [cohortsData, setCohortsData] = useState<CohortType[]>(
-    initialCohorts || [],
-  );
+  const setCohortsData = useSetAdminCohortsCache();
+  const { data: cohortsData = [], isPending } = useAdminCohorts();
   const [cohortToEdit, setCohortToEdit] = useState<CohortType | null>(null);
   const [, setFormData] = useState({
     name: "",
@@ -47,6 +51,11 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
       setShowModal(true);
     }
   };
+
+  if (isPending) {
+    return <PageLoader className='bg-gray-50' />;
+  }
+
   return (
     <>
       <AdminSectionHeader
@@ -75,8 +84,7 @@ export const Cohorts = ({ cohortsData: initialCohorts }: CohortsProps) => {
           </>
         }
       />
-      {/* <hr className='border-gray-200 mb-4' /> */}
-      {cohortsData?.length > 0 ? (
+      {cohortsData.length > 0 ? (
         <CohortTable
           tableHead={cohortTableHead}
           handleEdit={handleEdit}
