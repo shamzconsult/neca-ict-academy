@@ -6,15 +6,22 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Lock,
+  Megaphone,
+  X,
+} from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { VisuallyHidden } from "../visually-hidden";
 import Link from "next/link";
 
 const AD_IMAGES = [
   {
-    // url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1780417489/enrollment/course/xtjtebrod69yvlsbkbut.png",
     url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1781168124/ITF_NECA_flyer_deadline_13_June_2026_no_necaofficial_1_clrfw6.png",
     active: true,
   },
@@ -143,6 +150,21 @@ export const AdvertOverlay: React.FC = () => {
     return activeIndices[nextPos];
   };
 
+  const getPrevIdx = (currentIdx: number) =>
+    (currentIdx - 1 + AD_IMAGES.length) % AD_IMAGES.length;
+
+  const getNextIdx = (currentIdx: number) =>
+    (currentIdx + 1) % AD_IMAGES.length;
+
+  const goToSlide = (idx: number) => {
+    if (idx === activeIdx) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setActiveIdx(idx);
+      setIsTransitioning(false);
+    }, 200);
+  };
+
   useEffect(() => {
     if (!open || activeIndices.length <= 1 || !shouldAutoScroll) return;
 
@@ -151,139 +173,208 @@ export const AdvertOverlay: React.FC = () => {
       setTimeout(() => {
         setActiveIdx((prev) => getNextActiveIdx(prev));
         setIsTransitioning(false);
-      }, 300);
+      }, 200);
     }, SWITCH_INTERVAL);
 
     return () => clearInterval(interval);
   }, [open, shouldAutoScroll, activeIdx, activeIndices.length]);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
-
+  const handleClose = () => setOpen(false);
   const pauseAutoScroll = () => setIsHovered(true);
   const resumeAutoScroll = () => setIsHovered(false);
 
   if (!open) return null;
 
-  const sharedWrapperProps = {
-    className: "relative block w-full max-w-full",
+  const imageWrapperProps = {
+    className: "group/image relative block w-full",
     onMouseEnter: pauseAutoScroll,
     onMouseLeave: resumeAutoScroll,
     onTouchStart: pauseAutoScroll,
     onTouchEnd: resumeAutoScroll,
   };
 
-  const advertImage = (
-    <>
-      <img
-        src={AD_IMAGES[activeIdx].url}
-        alt={`Advert ${activeIdx + 1}`}
-        className={cn(
-          "mx-auto w-full max-w-full rounded-lg object-contain shadow-2xl transition-opacity duration-300",
-          "max-h-[min(62dvh,520px)] sm:max-h-[80vh]",
-          isTransitioning ? "opacity-0" : "opacity-100",
-        )}
-      />
-      {!currentImage?.active && (
-        <div className='absolute left-2 top-2 rounded-full bg-red-600/70 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm sm:left-4 sm:top-4 sm:px-3 sm:py-1.5 sm:text-sm'>
-          Past Event
-        </div>
-      )}
-    </>
-  );
-
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogTitle asChild>
-        <VisuallyHidden>NECA ICT Academy Advert</VisuallyHidden>
+        <VisuallyHidden>NECA ICT Academy Announcements</VisuallyHidden>
       </DialogTitle>
       <DialogContent
         className={cn(
-          "flex max-h-[100dvh] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] flex-col",
-          "overflow-x-hidden overflow-y-auto border-none bg-transparent p-2 shadow-none",
-          "sm:h-auto sm:max-h-[95vh] sm:w-full sm:max-w-[min(100vw,56rem)] sm:p-4",
+          "max-h-[100dvh] w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] gap-0 overflow-hidden",
+          "border-none bg-transparent p-0 shadow-none",
+          "sm:max-h-[95vh] sm:w-full sm:max-w-2xl",
         )}
         hideClose
       >
-        <DialogClose asChild>
-          <button
-            type='button'
-            className='absolute right-2 top-2 z-50 flex size-9 items-center justify-center rounded-full bg-black/30 text-2xl font-bold text-white transition hover:bg-black/40 hover:text-red-300 sm:right-4 sm:top-4 sm:size-11 sm:text-3xl'
-            onClick={handleClose}
-            aria-label='Close advert'
-          >
-            &times;
-          </button>
-        </DialogClose>
+        <div className='overflow-hidden rounded-2xl bg-white shadow-2xl'>
+          {/* Header */}
+          <div className='flex items-center justify-between gap-3 border-b border-[#27156F]/10 bg-gradient-to-r from-[#27156F] to-[#27156F]/90 px-4 py-3 sm:px-5'>
+            <div className='flex min-w-0 items-center gap-2.5 text-white'>
+              <span className='flex size-8 shrink-0 items-center justify-center rounded-lg bg-white/15'>
+                <Megaphone className='size-4' aria-hidden />
+              </span>
+              <div className='min-w-0'>
+                <p className='truncate text-sm font-semibold sm:text-base'>
+                  Announcements
+                </p>
+                <p className='text-[11px] text-white/75 sm:text-xs'>
+                  {activeIdx + 1} of {AD_IMAGES.length}
+                </p>
+              </div>
+            </div>
+            <DialogClose asChild>
+              <button
+                type='button'
+                onClick={handleClose}
+                aria-label='Close announcements'
+                className='flex size-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25'
+              >
+                <X className='size-4' />
+              </button>
+            </DialogClose>
+          </div>
 
-        <div className='flex w-full min-w-0 flex-col items-center justify-center gap-3 py-1 sm:gap-4 sm:py-2'>
-          {currentImage?.active ? (
-            <Link href='/enroll' {...sharedWrapperProps}>
-              {advertImage}
-            </Link>
-          ) : (
-            <div {...sharedWrapperProps}>{advertImage}</div>
-          )}
+          {/* Main slide */}
+          <div className='relative bg-gradient-to-b from-[#DBEAF6]/40 to-white px-3 pb-3 pt-4 sm:px-5 sm:pb-4 sm:pt-5'>
+            <div className='relative'>
+              {currentImage?.active ? (
+                <Link href='/enroll' {...imageWrapperProps}>
+                  <SlideImage
+                    src={AD_IMAGES[activeIdx].url}
+                    index={activeIdx}
+                    isTransitioning={isTransitioning}
+                    isActive={true}
+                  />
+                </Link>
+              ) : (
+                <div {...imageWrapperProps}>
+                  <SlideImage
+                    src={AD_IMAGES[activeIdx].url}
+                    index={activeIdx}
+                    isTransitioning={isTransitioning}
+                    isActive={false}
+                  />
+                </div>
+              )}
 
-          <div className='flex w-full min-w-0 max-w-full items-center gap-1.5 px-0.5 sm:gap-2 sm:px-0 justify-center'>
+              <button
+                type='button'
+                onClick={() => goToSlide(getPrevIdx(activeIdx))}
+                aria-label='Previous announcement'
+                className='absolute left-1 top-1/2 z-20 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white opacity-100 backdrop-blur-sm transition hover:bg-black/55 sm:left-2 sm:opacity-0 sm:group-hover/image:opacity-100'
+              >
+                <ChevronLeft className='size-5' />
+              </button>
+              <button
+                type='button'
+                onClick={() => goToSlide(getNextIdx(activeIdx))}
+                aria-label='Next announcement'
+                className='absolute right-1 top-1/2 z-20 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/40 text-white opacity-100 backdrop-blur-sm transition hover:bg-black/55 sm:right-2 sm:opacity-0 sm:group-hover/image:opacity-100'
+              >
+                <ChevronRight className='size-5' />
+              </button>
+            </div>
+
+            <div className='mt-4 flex justify-center'>
+              {currentImage?.active ? (
+                <Button
+                  asChild
+                  className='h-10 gap-2 rounded-full bg-[#E02B20] px-6 font-semibold text-white shadow-md hover:bg-[#c9251c]'
+                >
+                  <Link href='/enroll'>
+                    Apply Now
+                    <ArrowRight className='size-4' />
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className='h-10 gap-2 rounded-full bg-gray-400 px-6 font-semibold text-white shadow-md disabled:pointer-events-none disabled:opacity-100'
+                >
+                  Event Ended
+                  <Lock className='size-4' />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Dot indicators */}
+          <div className='flex justify-center gap-1.5 border-t border-[#27156F]/5 bg-[#FBFBFB] px-4 py-2.5'>
+            {AD_IMAGES.map((image, idx) => (
+              <button
+                key={`dot-${image.url}-${idx}`}
+                type='button'
+                onClick={() => goToSlide(idx)}
+                aria-label={`Go to announcement ${idx + 1}`}
+                aria-current={idx === activeIdx ? "true" : undefined}
+                className={cn(
+                  "h-1.5 rounded-full transition-all duration-300",
+                  idx === activeIdx
+                    ? "w-6 bg-[#27156F]"
+                    : "w-1.5 bg-[#27156F]/25 hover:bg-[#27156F]/45",
+                )}
+              />
+            ))}
+          </div>
+
+          {/* Thumbnails */}
+          <div className='flex justify-center items-center gap-1.5 border-t border-[#27156F]/10 bg-[#F5F7FA] px-2 py-3 sm:gap-2 sm:px-4'>
             <button
               type='button'
               onClick={() => scrollThumbnails("left")}
               disabled={!canScrollLeft}
               aria-label='Scroll thumbnails left'
               className={cn(
-                "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
+                "flex size-8 shrink-0 items-center justify-center rounded-full border border-[#27156F]/10 bg-white shadow-sm transition",
                 canScrollLeft
-                  ? "cursor-pointer hover:scale-110 hover:bg-white"
+                  ? "text-[#27156F] hover:border-[#27156F]/25 hover:bg-[#DBEAF6]/50"
                   : "cursor-not-allowed opacity-30",
               )}
             >
-              <ChevronLeft className='size-4 text-gray-700 sm:size-5' />
+              <ChevronLeft className='size-4' />
             </button>
 
             <div
               ref={scrollContainerRef}
               onScroll={updateScrollButtons}
               className={cn(
-                "min-w-0 flex-1 overflow-x-auto px-1 py-1 no-scrollbar sm:px-2",
-                "max-w-[calc(3*3rem+2*0.5rem+0.5rem)] sm:max-w-[calc(5*4rem+4*0.75rem+1rem)]",
+                "min-w-0 flex-1 overflow-x-auto no-scrollbar",
+                "max-w-[calc(3*3rem+2*0.5rem)] sm:max-w-[calc(5*4rem+4*0.75rem)]",
               )}
             >
-              <div className='flex w-max gap-2 sm:gap-3'>
+              <div className='flex w-max gap-2'>
                 {AD_IMAGES.map((image, idx) => (
                   <button
                     type='button'
                     data-thumb
                     data-active={idx === activeIdx ? "true" : "false"}
-                    key={`${image.url}-${idx}`}
+                    key={`thumb-${image.url}-${idx}`}
                     onMouseEnter={pauseAutoScroll}
                     onMouseLeave={resumeAutoScroll}
                     onTouchStart={pauseAutoScroll}
-                    onClick={() => setActiveIdx(idx)}
-                    aria-label={`Show advert ${idx + 1}${!image.active ? " (Past Event)" : ""}`}
+                    onClick={() => goToSlide(idx)}
+                    aria-label={`Show announcement ${idx + 1}${!image.active ? " (Past event)" : ""}`}
                     aria-current={idx === activeIdx ? "true" : undefined}
                     className={cn(
-                      "relative size-12 shrink-0 rounded border-2 bg-white p-0.5 shadow-md transition sm:size-16",
+                      "relative size-12 shrink-0 overflow-hidden rounded-lg border-2 bg-white shadow-sm transition sm:size-14",
                       idx === activeIdx
-                        ? "border-[#27156F] ring-2 ring-[#27156F]/30"
-                        : "border-white opacity-80 hover:scale-105",
+                        ? "border-[#27156F] ring-2 ring-[#27156F]/20"
+                        : "border-transparent opacity-70 hover:opacity-100",
+                      !image.active && "opacity-60",
                     )}
                   >
                     <img
                       src={image.url}
-                      alt={`Advert ${idx + 1} thumbnail`}
+                      alt=''
                       className={cn(
-                        "size-full rounded object-cover",
+                        "size-full object-cover",
                         !image.active && "grayscale",
                       )}
                     />
                     {!image.active && (
-                      <div className='absolute inset-0 flex items-center justify-center rounded bg-black/30'>
-                        <span className='text-[7px] font-medium text-white sm:text-[8px]'>
-                          Past
-                        </span>
-                      </div>
+                      <span className='absolute inset-x-0 bottom-0 bg-[#27156F]/80 py-0.5 text-center text-[7px] font-medium text-white sm:text-[8px]'>
+                        Past
+                      </span>
                     )}
                   </button>
                 ))}
@@ -296,13 +387,13 @@ export const AdvertOverlay: React.FC = () => {
               disabled={!canScrollRight}
               aria-label='Scroll thumbnails right'
               className={cn(
-                "flex size-7 shrink-0 items-center justify-center rounded-full bg-white/90 shadow-md transition sm:size-8",
+                "flex size-8 shrink-0 items-center justify-center rounded-full border border-[#27156F]/10 bg-white shadow-sm transition",
                 canScrollRight
-                  ? "cursor-pointer hover:scale-110 hover:bg-white"
+                  ? "text-[#27156F] hover:border-[#27156F]/25 hover:bg-[#DBEAF6]/50"
                   : "cursor-not-allowed opacity-30",
               )}
             >
-              <ChevronRight className='size-4 text-gray-700 sm:size-5' />
+              <ChevronRight className='size-4' />
             </button>
           </div>
         </div>
@@ -310,3 +401,38 @@ export const AdvertOverlay: React.FC = () => {
     </Dialog>
   );
 };
+
+function SlideImage({
+  src,
+  index,
+  isTransitioning,
+  isActive,
+}: {
+  src: string;
+  index: number;
+  isTransitioning: boolean;
+  isActive: boolean;
+}) {
+  return (
+    <div className='relative overflow-hidden rounded-xl border border-[#27156F]/10 bg-white shadow-inner'>
+      <img
+        src={src}
+        alt={`Announcement ${index + 1}`}
+        className={cn(
+          "mx-auto w-full object-contain transition-all duration-300",
+          "max-h-[min(55dvh,480px)] sm:max-h-[min(65vh,520px)]",
+          isTransitioning ? "scale-[0.98] opacity-0" : "scale-100 opacity-100",
+        )}
+      />
+      {isActive ? (
+        <span className='absolute left-3 top-3 rounded-full bg-[#27156F] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white shadow-sm sm:text-xs'>
+          Open
+        </span>
+      ) : (
+        <span className='absolute left-3 top-3 rounded-full bg-gray-800/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur-sm sm:text-xs'>
+          Past event
+        </span>
+      )}
+    </div>
+  );
+}
