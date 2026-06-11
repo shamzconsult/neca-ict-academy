@@ -158,7 +158,7 @@ const RecentActivityBanner = ({ activity }: { activity: RecentActivity[] }) => {
           >
             {top.cohortName}
           </Link>{" "}
-          in the last 24 hours
+          today
         </p>
         {others.length > 0 ? (
           <p className='mt-1 text-xs text-[#27156F]/70'>

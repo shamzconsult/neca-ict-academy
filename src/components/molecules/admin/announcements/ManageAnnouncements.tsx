@@ -256,12 +256,32 @@ export function ManageAnnouncements() {
       </p>
 
       {isLoading ? (
-        <div className='space-y-2'>
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className='overflow-hidden rounded-2xl border border-[#27156F]/10 bg-white'>
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
               key={i}
-              className='h-[72px] animate-pulse rounded-xl bg-gray-100'
-            />
+              className='flex flex-col gap-3 border-b border-[#27156F]/5 p-4 last:border-0 sm:flex-row sm:items-center'
+            >
+              <div className='flex min-w-0 flex-1 items-center gap-3 sm:gap-4'>
+                <div className='size-14 shrink-0 animate-pulse rounded-lg bg-[#DBEAF6]/50 sm:size-16' />
+                <div className='min-w-0 flex-1 space-y-2'>
+                  <div className='h-4 w-48 max-w-full animate-pulse rounded bg-gray-100' />
+                  <div className='h-3 w-36 animate-pulse rounded bg-gray-100' />
+                  <div className='flex gap-1.5'>
+                    <div className='h-5 w-12 animate-pulse rounded-full bg-gray-100' />
+                    <div className='h-5 w-14 animate-pulse rounded-full bg-gray-100' />
+                  </div>
+                </div>
+              </div>
+              <div className='flex shrink-0 flex-wrap items-center gap-1'>
+                <div className='h-8 w-8 animate-pulse rounded-md bg-gray-100' />
+                <div className='h-8 w-8 animate-pulse rounded-md bg-gray-100' />
+                <div className='h-8 w-20 animate-pulse rounded-md bg-gray-100' />
+                <div className='h-8 w-16 animate-pulse rounded-md bg-gray-100' />
+                <div className='h-8 w-8 animate-pulse rounded-md bg-gray-100' />
+                <div className='h-8 w-8 animate-pulse rounded-md bg-gray-100' />
+              </div>
+            </div>
           ))}
         </div>
       ) : error ? (

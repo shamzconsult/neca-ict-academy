@@ -19,6 +19,14 @@ function toCountMap(groups: CountGroup[]) {
   }, {});
 }
 
+/** Start of today at UTC midnight (matches cohort date handling). */
+function getStartOfTodayUtc() {
+  const now = new Date();
+  return new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+  );
+}
+
 export async function getApplicationStats(cohortId?: string | null) {
   const matchStage: Record<string, unknown> = {};
   if (cohortId && cohortId !== "all" && Types.ObjectId.isValid(cohortId)) {
@@ -115,7 +123,7 @@ export async function getApplicationStats(cohortId?: string | null) {
     }>([
       {
         $match: {
-          createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+          createdAt: { $gte: getStartOfTodayUtc() },
         },
       },
       { $group: { _id: "$cohort", count: { $sum: 1 } } },
