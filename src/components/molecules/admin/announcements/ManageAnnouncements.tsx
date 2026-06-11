@@ -43,7 +43,7 @@ const EMPTY_FORM = {
   title: "",
   active: true,
   hidden: false,
-  sortOrder: "0",
+  sortOrder: "1",
   image: null as File | null,
 };
 
@@ -101,12 +101,17 @@ export function ManageAnnouncements() {
     setPreviewUrl(null);
   };
 
+  const getNextSortOrder = () => {
+    if (announcements.length === 0) return 1;
+    return Math.max(...announcements.map((item) => item.sortOrder)) + 1;
+  };
+
   const openCreate = () => {
     setEditing(null);
     resetForm();
     setForm({
       ...EMPTY_FORM,
-      sortOrder: String(announcements.length),
+      sortOrder: String(getNextSortOrder()),
     });
     setDialogOpen(true);
   };
@@ -218,6 +223,40 @@ export function ManageAnnouncements() {
       if (!res.ok) {
         throw new Error(
           await parseApiError(res, "Failed to update announcement"),
+        );
+      }
+    },
+    onSuccess: () => invalidate(),
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: async ({
+      index,
+      direction,
+    }: {
+      index: number;
+      direction: "up" | "down";
+    }) => {
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      const item = announcements[index];
+      const other = announcements[swapIndex];
+      if (!item || !other) return;
+
+      const [firstRes, secondRes] = await Promise.all([
+        fetch(`/api/announcements/${item._id}`, {
+          method: "PUT",
+          body: buildUpdateFormData(item, { sortOrder: other.sortOrder }),
+        }),
+        fetch(`/api/announcements/${other._id}`, {
+          method: "PUT",
+          body: buildUpdateFormData(other, { sortOrder: item.sortOrder }),
+        }),
+      ]);
+
+      if (!firstRes.ok || !secondRes.ok) {
+        throw new Error(
+          await parseApiError(firstRes, "Failed to reorder announcements"),
         );
       }
     },
@@ -346,7 +385,7 @@ export function ManageAnnouncements() {
                     </p>
                   </div>
                   <p className='mt-0.5 text-xs text-gray-500'>
-                    Order {item.sortOrder + 1} · Position {index + 1} of{" "}
+                    Order {item.sortOrder} · Position {index + 1} of{" "}
                     {announcements.length}
                   </p>
                   <div className='flex items-center gap-1 mt-1'>
@@ -378,12 +417,9 @@ export function ManageAnnouncements() {
                   variant='ghost'
                   size='icon'
                   className='size-8'
-                  disabled={index === 0 || patchMutation.isPending}
+                  disabled={index === 0 || reorderMutation.isPending}
                   onClick={() =>
-                    patchMutation.mutate({
-                      item,
-                      patch: { sortOrder: item.sortOrder - 1 },
-                    })
+                    reorderMutation.mutate({ index, direction: "up" })
                   }
                   aria-label='Move up'
                 >
@@ -396,13 +432,10 @@ export function ManageAnnouncements() {
                   className='size-8'
                   disabled={
                     index === announcements.length - 1 ||
-                    patchMutation.isPending
+                    reorderMutation.isPending
                   }
                   onClick={() =>
-                    patchMutation.mutate({
-                      item,
-                      patch: { sortOrder: item.sortOrder + 1 },
-                    })
+                    reorderMutation.mutate({ index, direction: "down" })
                   }
                   aria-label='Move down'
                 >
@@ -513,6 +546,11 @@ export function ManageAnnouncements() {
             onSubmit={(e) => {
               e.preventDefault();
               setFormError("");
+              const order = Number(form.sortOrder);
+              if (!Number.isFinite(order) || order < 1) {
+                setFormError("Display order must be at least 1.");
+                return;
+              }
               saveMutation.mutate();
             }}
           >
@@ -535,7 +573,7 @@ export function ManageAnnouncements() {
               <Input
                 id='announcement-sort'
                 type='number'
-                min={0}
+                min={1}
                 value={form.sortOrder}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, sortOrder: e.target.value }))

@@ -32,7 +32,7 @@ export async function PUT(request: Request, context: RouteContext) {
     if (hidden !== null) updatedFields.hidden = hidden === "true";
     if (sortOrder !== null) {
       const order = Number(sortOrder);
-      if (Number.isFinite(order)) updatedFields.sortOrder = order;
+      if (Number.isFinite(order) && order >= 1) updatedFields.sortOrder = order;
     }
 
     if (file && file.size > 0 && file.name !== "undefined") {

@@ -1,4 +1,7 @@
-import { getAnnouncements } from "@/lib/announcements.server";
+import {
+  getAnnouncements,
+  getNextAnnouncementSortOrder,
+} from "@/lib/announcements.server";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import connectViaMongoose from "@/lib/db";
 import Announcement from "@/models/announcement";
@@ -28,7 +31,7 @@ export async function POST(request: Request) {
     const title = (formData.get("title") as string) ?? "";
     const active = formData.get("active") === "true";
     const hidden = formData.get("hidden") === "true";
-    const sortOrder = Number(formData.get("sortOrder") ?? 0);
+    const sortOrderParam = Number(formData.get("sortOrder"));
     const file = formData.get("image") as File | null;
 
     if (!file || file.size === 0) {
@@ -42,12 +45,16 @@ export async function POST(request: Request) {
     const base64 = `data:${file.type};base64,${buffer.toString("base64")}`;
     const { url } = await uploadToCloudinary(base64, "announcements");
 
+    const sortOrder = Number.isFinite(sortOrderParam) && sortOrderParam >= 1
+      ? sortOrderParam
+      : await getNextAnnouncementSortOrder();
+
     const announcement = await Announcement.create({
       title: title.trim(),
       url,
       active,
       hidden,
-      sortOrder: Number.isFinite(sortOrder) ? sortOrder : 0,
+      sortOrder,
     });
 
     revalidatePath("/");
