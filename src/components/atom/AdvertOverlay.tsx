@@ -14,7 +14,8 @@ import Link from "next/link";
 
 const AD_IMAGES = [
   {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1780417489/enrollment/course/xtjtebrod69yvlsbkbut.png",
+    // url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1780417489/enrollment/course/xtjtebrod69yvlsbkbut.png",
+    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1781168124/ITF_NECA_flyer_deadline_13_June_2026_no_necaofficial_1_clrfw6.png",
     active: true,
   },
   {
