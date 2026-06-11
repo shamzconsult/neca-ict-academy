@@ -35,6 +35,17 @@ export type GraduationTitleType = {
   sortOrder: number;
 };
 
+export type AnnouncementType = {
+  _id: string;
+  title: string;
+  url: string;
+  active: boolean;
+  hidden: boolean;
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type EnrollmentType = {
   _id: string;
   enrollmentId?: string;

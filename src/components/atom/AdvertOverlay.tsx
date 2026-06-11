@@ -17,39 +17,10 @@ import {
   X,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { VisuallyHidden } from "../visually-hidden";
 import Link from "next/link";
-
-const AD_IMAGES = [
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1781168124/ITF_NECA_flyer_deadline_13_June_2026_no_necaofficial_1_clrfw6.png",
-    active: true,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1769585637/NECA_Academy_-_Free_AI_course_f1jo57.jpg",
-    active: false,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747153124/ICT_ACADEMY_FLIER_2_1_2_1_yswykd.jpg",
-    active: false,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747147393/enrollment/course/mxgu4h5xa295wk4igdr4.webp",
-    active: false,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1748613785/neca_flier_2_2_pgmlai.webp",
-    active: false,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1747134855/enrollment/course/nod3uf4l2bhrr4fzp9wc.webp",
-    active: false,
-  },
-  {
-    url: "https://res.cloudinary.com/dtryuudiy/image/upload/v1749112300/NECA_ICT_ACADEMY_8_Weeks_AI_Course_FLIER_mqyk7n.jpg",
-    active: false,
-  },
-];
+import type { AnnouncementType } from "@/types";
 
 const SWITCH_INTERVAL = 5000;
 const SHOW_DELAY_MS = 2000;
@@ -63,10 +34,26 @@ export const AdvertOverlay: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const { data, isLoading } = useQuery<{
+    success: boolean;
+    data: AnnouncementType[];
+  }>({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const res = await fetch("/api/announcements");
+      if (!res.ok) throw new Error("Failed to fetch announcements");
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const announcements = data?.data ?? [];
+
   useEffect(() => {
+    if (isLoading || announcements.length === 0) return;
     const timer = setTimeout(() => setOpen(true), SHOW_DELAY_MS);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading, announcements.length]);
 
   const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -136,10 +123,10 @@ export const AdvertOverlay: React.FC = () => {
     return () => clearTimeout(timer);
   }, [open, activeIdx, scrollActiveThumbIntoView]);
 
-  const currentImage = AD_IMAGES[activeIdx];
+  const currentImage = announcements[activeIdx];
   const shouldAutoScroll = currentImage?.active && !isHovered;
 
-  const activeIndices = AD_IMAGES.map((img, idx) =>
+  const activeIndices = announcements.map((img, idx) =>
     img.active ? idx : -1,
   ).filter((idx) => idx !== -1);
 
@@ -151,10 +138,10 @@ export const AdvertOverlay: React.FC = () => {
   };
 
   const getPrevIdx = (currentIdx: number) =>
-    (currentIdx - 1 + AD_IMAGES.length) % AD_IMAGES.length;
+    (currentIdx - 1 + announcements.length) % announcements.length;
 
   const getNextIdx = (currentIdx: number) =>
-    (currentIdx + 1) % AD_IMAGES.length;
+    (currentIdx + 1) % announcements.length;
 
   const goToSlide = (idx: number) => {
     if (idx === activeIdx) return;
@@ -183,7 +170,7 @@ export const AdvertOverlay: React.FC = () => {
   const pauseAutoScroll = () => setIsHovered(true);
   const resumeAutoScroll = () => setIsHovered(false);
 
-  if (!open) return null;
+  if (isLoading || announcements.length === 0 || !open) return null;
 
   const imageWrapperProps = {
     className: "group/image relative block w-full",
@@ -218,7 +205,7 @@ export const AdvertOverlay: React.FC = () => {
                   Announcements
                 </p>
                 <p className='text-[11px] text-white/75 sm:text-xs'>
-                  {activeIdx + 1} of {AD_IMAGES.length}
+                  {activeIdx + 1} of {announcements.length}
                 </p>
               </div>
             </div>
@@ -240,7 +227,7 @@ export const AdvertOverlay: React.FC = () => {
               {currentImage?.active ? (
                 <Link href='/enroll' {...imageWrapperProps}>
                   <SlideImage
-                    src={AD_IMAGES[activeIdx].url}
+                    src={announcements[activeIdx].url}
                     index={activeIdx}
                     isTransitioning={isTransitioning}
                     isActive={true}
@@ -249,7 +236,7 @@ export const AdvertOverlay: React.FC = () => {
               ) : (
                 <div {...imageWrapperProps}>
                   <SlideImage
-                    src={AD_IMAGES[activeIdx].url}
+                    src={announcements[activeIdx].url}
                     index={activeIdx}
                     isTransitioning={isTransitioning}
                     isActive={false}
@@ -300,9 +287,9 @@ export const AdvertOverlay: React.FC = () => {
 
           {/* Dot indicators */}
           <div className='flex justify-center gap-1.5 border-t border-[#27156F]/5 bg-[#FBFBFB] px-4 py-2.5'>
-            {AD_IMAGES.map((image, idx) => (
+            {announcements.map((image, idx) => (
               <button
-                key={`dot-${image.url}-${idx}`}
+                key={`dot-${image._id}`}
                 type='button'
                 onClick={() => goToSlide(idx)}
                 aria-label={`Go to announcement ${idx + 1}`}
@@ -343,12 +330,12 @@ export const AdvertOverlay: React.FC = () => {
               )}
             >
               <div className='flex w-max gap-2'>
-                {AD_IMAGES.map((image, idx) => (
+                {announcements.map((image, idx) => (
                   <button
                     type='button'
                     data-thumb
                     data-active={idx === activeIdx ? "true" : "false"}
-                    key={`thumb-${image.url}-${idx}`}
+                    key={`thumb-${image._id}`}
                     onMouseEnter={pauseAutoScroll}
                     onMouseLeave={resumeAutoScroll}
                     onTouchStart={pauseAutoScroll}

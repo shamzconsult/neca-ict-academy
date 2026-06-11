@@ -9,6 +9,7 @@ import {
   ImageIcon,
   LayoutDashboard,
   LogOut,
+  Megaphone,
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
@@ -68,6 +69,12 @@ const NAV_ITEMS: NavItem[] = [
     label: "Graduation Titles",
     icon: Award,
     match: (pathname) => pathname.startsWith("/admin/graduation-titles"),
+  },
+  {
+    href: "/admin/announcements",
+    label: "Announcements",
+    icon: Megaphone,
+    match: (pathname) => pathname.startsWith("/admin/announcements"),
   },
   {
     href: "/gallery",
