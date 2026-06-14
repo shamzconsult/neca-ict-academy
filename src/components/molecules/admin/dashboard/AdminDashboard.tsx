@@ -125,7 +125,9 @@ const StatCard = ({ stat }: { stat: DashboardStat }) => {
         <p className='text-2xl font-bold tabular-nums text-[#27156F] sm:text-3xl'>
           {stat.value.toLocaleString()}
         </p>
-        <p className='mt-0.5 text-sm text-gray-500'>{stat.name}</p>
+        <p className='mt-0.5 text-sm text-gray-500 whitespace-nowrap'>
+          {stat.name}
+        </p>
       </div>
     </div>
   );
@@ -203,10 +205,7 @@ export const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCohort, setSelectedCohort] = useState<string>("all");
   const setCohortsData = useSetAdminCohortsCache();
-  const {
-    data: cohorts = [],
-    isPending: cohortsPending,
-  } = useAdminCohorts();
+  const { data: cohorts = [], isPending: cohortsPending } = useAdminCohorts();
 
   const {
     data: statsData,
@@ -337,10 +336,7 @@ export const AdminDashboard = () => {
       </DashboardSection>
 
       {showModal && (
-        <CohortForm
-          toggleModal={toggleModal}
-          setCohortsData={setCohortsData}
-        />
+        <CohortForm toggleModal={toggleModal} setCohortsData={setCohortsData} />
       )}
     </>
   );
