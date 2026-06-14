@@ -22,12 +22,17 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import {
+  ArrowRight,
+  BookOpen,
+  CalendarClock,
+  Check,
   FileText,
   ImageIcon,
   Loader2,
   Mail,
   MailSearch,
   Phone,
+  Sparkles,
 } from "lucide-react";
 import { CohortGallery } from "./CohortGallery";
 import {
@@ -322,15 +327,145 @@ function EnquiryContact() {
   );
 }
 
-function PortalInfoColumn({ variant }: { variant: "sidebar" | "mobile" }) {
+function PortalInfoColumn({
+  variant,
+  hideTimeline = false,
+}: {
+  variant: "sidebar" | "mobile";
+  hideTimeline?: boolean;
+}) {
   return (
     <div className='min-w-0 space-y-6'>
       <CohortGallery variant={variant === "sidebar" ? "sidebar" : "compact"} />
-      <ApplicationTimeline
-        variant={variant === "sidebar" ? "vertical" : "horizontal"}
-      />
+      {!hideTimeline && (
+        <ApplicationTimeline
+          variant={variant === "sidebar" ? "vertical" : "horizontal"}
+        />
+      )}
       <EnquiryContact />
     </div>
+  );
+}
+
+const PROGRAM_HIGHLIGHTS = [
+  "Hands-on training with industry experts",
+  "Real-world project experience",
+  "Career support and mentorship",
+  "Government-backed certification on completion",
+] as const;
+
+function NoActiveCohortsScreen({
+  onCheckStatus,
+}: {
+  onCheckStatus: () => void;
+}) {
+  return (
+    <main className='relative z-10 grid min-w-0 gap-10 px-5 pt-24 lg:grid-cols-2 lg:items-start lg:gap-7 lg:pl-[8.5%] lg:pr-[8%]'>
+      <aside className='hidden min-w-0 lg:block lg:py-8'>
+        <PortalInfoColumn variant='sidebar' hideTimeline />
+      </aside>
+
+      <section className='min-w-0 py-6 pb-8 pt-20 sm:py-8 sm:pb-10'>
+        <div className='relative overflow-hidden rounded-2xl border-2 border-[#27156F]/25 bg-gradient-to-br from-[#27156F] via-[#2f1a85] to-[#1e1048] p-6 shadow-xl shadow-[#27156F]/25 sm:p-8'>
+          <div
+            className='pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-white/[0.07]'
+            aria-hidden
+          />
+          <div
+            className='pointer-events-none absolute -bottom-10 -left-10 size-40 rounded-full bg-[#DBEAF6]/10'
+            aria-hidden
+          />
+          <div
+            className='pointer-events-none absolute right-8 top-8 size-24 rounded-full bg-[#E02B20]/15 blur-2xl'
+            aria-hidden
+          />
+
+          <div className='relative'>
+            <span className='inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-sm'>
+              <CalendarClock className='size-3.5' strokeWidth={2} />
+              Enrollment closed
+            </span>
+
+            <h1 className='mt-5 text-2xl font-bold leading-tight text-white sm:text-4xl'>
+              Applications are currently closed
+            </h1>
+            <p className='mt-3 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg'>
+              The application window for this intake has ended. We&apos;re
+              preparing the next cohort, check back soon for new learning
+              opportunities.
+            </p>
+
+            <div className='mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap'>
+              <Button
+                type='button'
+                className='h-11 gap-2 bg-white text-[#27156F] shadow-md hover:bg-white/90'
+                onClick={onCheckStatus}
+              >
+                <MailSearch className='size-4' />
+                Check application status
+              </Button>
+              <Button
+                type='button'
+                variant='outline'
+                className='h-11 gap-2 border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white'
+                asChild
+              >
+                <Link href='/courses'>
+                  <BookOpen className='size-4' />
+                  Browse our courses
+                </Link>
+              </Button>
+              <Button
+                type='button'
+                variant='ghost'
+                className='h-11 gap-2 text-white/90 hover:bg-white/10 hover:text-white'
+                asChild
+              >
+                <Link href='/'>
+                  Return to homepage
+                  <ArrowRight className='size-4' />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className='mt-6'>
+          <div className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 sm:p-6'>
+            <div className='flex items-center gap-2 text-[#27156F]'>
+              <Sparkles className='size-5' />
+              <h2 className='font-semibold'>What to expect</h2>
+            </div>
+            <p className='mt-1 text-sm text-gray-600'>
+              When the next intake opens, here&apos;s what applicants can look
+              forward to.
+            </p>
+            <ul className='mt-4 space-y-3'>
+              {PROGRAM_HIGHLIGHTS.map((item) => (
+                <li
+                  key={item}
+                  className='flex items-start gap-2.5 text-sm text-gray-700'
+                >
+                  <span className='mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#27156F]/10'>
+                    <Check
+                      className='size-3 text-[#27156F]'
+                      strokeWidth={2.5}
+                    />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <aside className='min-w-0 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
+        <div className='mx-auto min-w-0 max-w-2xl'>
+          <PortalInfoColumn variant='mobile' hideTimeline />
+        </div>
+      </aside>
+    </main>
   );
 }
 
@@ -540,7 +675,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
 
       {/* Main Content */}
       {cohorts?.length > 0 ? (
-        <main className='px-5 lg:pl-[8.5%] lg:pr-[8%] relative z-10 grid min-w-0 pt-24 lg:grid-cols-2 lg:items-start gap-10 xl:gap-20'>
+        <main className='px-5 lg:pl-[8.5%] lg:pr-[8%] relative z-10 grid min-w-0 pt-24 lg:grid-cols-2 lg:items-start gap-10'>
           {/* Left column — desktop only */}
           <aside className='hidden min-w-0 lg:block lg:py-8'>
             <PortalInfoColumn variant='sidebar' />
@@ -877,86 +1012,7 @@ const ApplicationPortal = ({ cohorts }: { cohorts: ApplicationFormProps }) => {
           </aside>
         </main>
       ) : (
-        <div className='flex min-h-[70vh] flex-col items-center justify-center px-4 pt-44 text-center sm:pt-20'>
-          <div className='mb-6 flex size-20 items-center justify-center rounded-full bg-[#DBEAF6]/50 text-[#27156F]/40'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              strokeWidth={1.5}
-              stroke='currentColor'
-              className='size-10'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                d='M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25'
-              />
-            </svg>
-          </div>
-          <h1 className='mb-3 text-2xl font-bold text-[#27156F]'>
-            No active cohorts right now
-          </h1>
-          <p className='mb-6 max-w-md text-gray-600'>
-            We&apos;re preparing for the next intake. Check back soon for new
-            learning opportunities.
-          </p>
-          <div className='max-w-md rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 text-left'>
-            <h2 className='mb-3 font-semibold text-[#27156F]'>
-              What to expect
-            </h2>
-            <ul className='space-y-2.5 text-sm text-gray-700'>
-              <li className='flex items-center gap-2'>
-                <svg
-                  className='size-4 shrink-0 text-[#27156F]'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M5 13l4 4L19 7'
-                  />
-                </svg>
-                Hands-on training with industry experts
-              </li>
-              <li className='flex items-center gap-2'>
-                <svg
-                  className='size-4 shrink-0 text-[#27156F]'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M5 13l4 4L19 7'
-                  />
-                </svg>
-                Real-world project experience
-              </li>
-              <li className='flex items-center gap-2'>
-                <svg
-                  className='size-4 shrink-0 text-[#27156F]'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M5 13l4 4L19 7'
-                  />
-                </svg>
-                Career support and mentorship
-              </li>
-            </ul>
-          </div>
-        </div>
+        <NoActiveCohortsScreen onCheckStatus={toggleModal} />
       )}
       {showModal &&
         (!showReview ? (
