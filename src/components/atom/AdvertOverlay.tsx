@@ -48,12 +48,23 @@ export const AdvertOverlay: React.FC = () => {
   });
 
   const announcements = data?.data ?? [];
+  const hasOpenEvent = announcements.some((announcement) => announcement.active);
 
   useEffect(() => {
-    if (isLoading || announcements.length === 0) return;
+    if (isLoading || !hasOpenEvent) return;
     const timer = setTimeout(() => setOpen(true), SHOW_DELAY_MS);
     return () => clearTimeout(timer);
-  }, [isLoading, announcements.length]);
+  }, [isLoading, hasOpenEvent]);
+
+  useEffect(() => {
+    if (!hasOpenEvent) return;
+    const firstActiveIdx = announcements.findIndex(
+      (announcement) => announcement.active,
+    );
+    if (firstActiveIdx >= 0) {
+      setActiveIdx(firstActiveIdx);
+    }
+  }, [hasOpenEvent, data]);
 
   const updateScrollButtons = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -170,7 +181,7 @@ export const AdvertOverlay: React.FC = () => {
   const pauseAutoScroll = () => setIsHovered(true);
   const resumeAutoScroll = () => setIsHovered(false);
 
-  if (isLoading || announcements.length === 0 || !open) return null;
+  if (isLoading || !hasOpenEvent || !open) return null;
 
   const imageWrapperProps = {
     className: "group/image relative block w-full",
