@@ -342,7 +342,7 @@ function PortalInfoColumn({
           variant={variant === "sidebar" ? "vertical" : "horizontal"}
         />
       )}
-      <EnquiryContact />
+      {/* <EnquiryContact /> */}
     </div>
   );
 }
@@ -360,12 +360,12 @@ function NoActiveCohortsScreen({
   onCheckStatus: () => void;
 }) {
   return (
-    <main className='relative z-10 grid min-w-0 gap-10 px-5 pt-24 lg:grid-cols-2 lg:items-start lg:gap-7 lg:pl-[8.5%] lg:pr-[8%]'>
+    <main className='relative z-10 grid min-w-0 gap-10 px-5 pt-36 sm:pt-24 lg:grid-cols-2 lg:items-start lg:gap-7 lg:pl-[8.5%] lg:pr-[8%]'>
       <aside className='hidden min-w-0 lg:block lg:py-8'>
         <PortalInfoColumn variant='sidebar' hideTimeline />
       </aside>
 
-      <section className='min-w-0 py-6 pb-8 pt-20 sm:py-8 sm:pb-10'>
+      <section className='min-w-0 py-8 pb-0'>
         <div className='relative overflow-hidden rounded-2xl border-2 border-[#27156F]/25 bg-gradient-to-br from-[#27156F] via-[#2f1a85] to-[#1e1048] p-6 shadow-xl shadow-[#27156F]/25 sm:p-8'>
           <div
             className='pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-white/[0.07]'
@@ -430,7 +430,7 @@ function NoActiveCohortsScreen({
           </div>
         </div>
 
-        <div className='mt-6'>
+        {/* <div className='mt-6'>
           <div className='rounded-2xl border border-[#27156F]/10 bg-[#DBEAF6]/20 p-5 sm:p-6'>
             <div className='flex items-center gap-2 text-[#27156F]'>
               <Sparkles className='size-5' />
@@ -457,14 +457,21 @@ function NoActiveCohortsScreen({
               ))}
             </ul>
           </div>
+        </div> */}
+        <div className='mt-4'>
+          <EnquiryContact />
         </div>
       </section>
 
-      <aside className='min-w-0 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
+      <aside className='min-w-0 pb-16 lg:hidden'>
+        <PortalInfoColumn variant='sidebar' hideTimeline />
+      </aside>
+
+      {/* <aside className='min-w-0 pb-12 sm:px-8 sm:pb-16 lg:hidden'>
         <div className='mx-auto min-w-0 max-w-2xl'>
           <PortalInfoColumn variant='mobile' hideTimeline />
         </div>
-      </aside>
+      </aside> */}
     </main>
   );
 }
